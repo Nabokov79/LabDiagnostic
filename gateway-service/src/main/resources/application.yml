@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+      - id: company-service
+        uri: lb://company-service
+        predicates:
+          - Path=/WorkVisionWeb/company/**
+      - id: laboratory-qc-service
+        uri: lb://laboratory-qc-service
+        predicates:
+          - Path=/WorkVisionWeb/laboratory/**
+      - id: equipment-service
+        uri: lb://equipment-service
+        predicates:
+          - Path=/WorkVisionWeb/equipment/**
+      - id: measurement-service
+        uri: lb://measurement-service
+        predicates:
+          - Path=/WorkVisionWeb/measurement/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka
+    register-with-eureka: false
