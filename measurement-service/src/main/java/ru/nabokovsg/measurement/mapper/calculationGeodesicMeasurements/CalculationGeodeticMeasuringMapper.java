@@ -1,0 +1,22 @@
+package ru.nabokovsg.measurement.mapper.calculationGeodesicMeasurements;
+
+import org.mapstruct.Mapper;
+import ru.nabokovsg.measurement.dto.calculationGeodesicMeasurements.ResponseCalculatingOppositePointDto;
+import ru.nabokovsg.measurement.dto.calculationGeodesicMeasurements.ResponseCalculationControlPointDto;
+import ru.nabokovsg.measurement.dto.calculationGeodesicMeasurements.ResponseCalculationNeighboringPointDto;
+import ru.nabokovsg.measurement.dto.calculationGeodesicMeasurements.ResponseCalculationReferencePointDto;
+import ru.nabokovsg.measurement.model.calculationGeodesicMeasurements.*;
+
+@Mapper(componentModel = "spring")
+public interface CalculationGeodeticMeasuringMapper {
+
+    CalculationGeodeticMeasuring mapToCalculationGeodeticMeasuringPoints(Long equipmentId);
+
+    ResponseCalculationReferencePointDto mapToResponseCalculationReferencePointDto(ReferencePoint referencePoint);
+
+    ResponseCalculationControlPointDto mapToResponseCalculationControlPointDto(ControlPoint controlPoint);
+
+    ResponseCalculatingOppositePointDto mapToResponseCalculatingOppositePointDto(CalculatingOppositePoint oppositePoint);
+
+    ResponseCalculationNeighboringPointDto mapToResponseCalculationNeighboringPointDto(CalculationNeighboringPoint neighboringPoint);
+}
