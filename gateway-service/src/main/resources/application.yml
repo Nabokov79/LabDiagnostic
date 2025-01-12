@@ -23,6 +23,10 @@ spring:
         uri: lb://measurement-service
         predicates:
           - Path=/WorkVisionWeb/measurement/**
+      - id: document-service
+        uri: lb://document-service
+        predicates:
+          - Path=/WorkVisionWeb/document/**
 
 eureka:
   client:

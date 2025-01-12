@@ -31,3 +31,6 @@ eureka:
       enabled: true
   instance:
     preferIpAddress: true
+
+services:
+  equipment: http://localhost:8083
