@@ -28,11 +28,4 @@ public interface CalculationMeasuredParameterMapper {
     void mapToUpdateMinValue(@MappingTarget CalculationMeasuredParameter parameter, Double minValue);
 
     void mapToUpdateMaxValue(@MappingTarget CalculationMeasuredParameter calculationParameter, Double maxValue);
-
-    @Mapping(source = "parameter.parameterName", target = "parameterName")
-    @Mapping(source = "parameter.unitMeasurement", target = "unitMeasurement")
-    @Mapping(source = "parameter.value", target = "minValue")
-    @Mapping(target = "maxValue", ignore = true)
-    void mapToQuantityParameter(@MappingTarget CalculationMeasuredParameter calculationParameter
-                                             , MeasuredParameter parameter);
 }

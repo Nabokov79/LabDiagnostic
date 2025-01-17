@@ -22,9 +22,9 @@ public class QCLDocumentTypeServiceImpl implements QCLDocumentTypeService {
 
     @Override
     public ResponseQCLDocumentTypeDto save(NewQCLDocumentTypeDto documentTypeDto) {
-        if (repository.existsByDiagnosisTypeAndTypeDocumentAndDocumentTitle(documentTypeDto.getDiagnosisType()
-                                                                          , documentTypeDto.getTypeDocument()
-                                                                          , documentTypeDto.getDocumentTitle())) {
+        if (repository.existsByDiagnosisTypeAndTypeAndDocumentTitle(documentTypeDto.getDiagnosisType()
+                                                                  , documentTypeDto.getType()
+                                                                  , documentTypeDto.getDocumentTitle())) {
             throw new BadRequestException(
                     String.format("Diagnostic document type found : %s", documentTypeDto));
         }

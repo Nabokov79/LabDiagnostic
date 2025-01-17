@@ -27,39 +27,47 @@ public class SynchronizingServiceImpl implements SynchronizingService {
 
     @Override
     public void updateDefectName(DefectLibrary defectLibrary) {
-        Set<MeasuredParameter> parameters = new HashSet<>();
         Set<DefectMeasurement> defects = defectRepository.findAllByDefectLibraryId(defectLibrary.getId());
+        Map<Long, String> parametersName = defectLibrary.getMeasuredParameters()
+                .stream()
+                .collect(Collectors.toMap(MeasurementParameterLibrary::getId
+                        , MeasurementParameterLibrary::getParameterName));
         defects.forEach(defect -> {
-                    parameters.addAll(defect.getMeasuredParameters());
-                    mapper.updateDefectName(defect, defectLibrary.getDefectName());
-                });
+            mapper.updateDefectName(defect, defectLibrary.getDefectName());
+            updateDefectMeasuredParameterName(defect.getMeasuredParameters(), parametersName, defect);
+        });
         defectRepository.saveAll(defects);
-        updateMeasuredParameterName(parameters
-                                 , defectLibrary.getMeasuredParameters()
-                                                .stream()
-                                                .collect(Collectors.toMap(MeasurementParameterLibrary::getId
-                                                                     , MeasurementParameterLibrary::getParameterName)));
     }
 
     @Override
     public void updateRepairName(RepairLibrary repairLibrary) {
-        Set<MeasuredParameter> parameters = new HashSet<>();
         Set<RepairMeasurement> repairs = repairRepository.findAllByRepairLibraryId(repairLibrary.getId());
+        Map<Long, String> parametersName = repairLibrary.getMeasuredParameters()
+                .stream()
+                .collect(Collectors.toMap(MeasurementParameterLibrary::getId
+                        , MeasurementParameterLibrary::getParameterName));
         repairs.forEach(repair -> {
-                    parameters.addAll(repair.getMeasuredParameters());
-                    mapper. updateRepairName(repair, repairLibrary.getRepairName());
-                });
+            mapper.updateRepairName(repair, repairLibrary.getRepairName());
+            updateRepairMeasuredParameterName(repair.getMeasuredParameters(), parametersName, repair);
+        });
         repairRepository.saveAll(repairs);
-        updateMeasuredParameterName(parameters
-                                  , repairLibrary.getMeasuredParameters()
-                                                 .stream()
-                                                 .collect(Collectors.toMap(MeasurementParameterLibrary::getId
-                                                                     , MeasurementParameterLibrary::getParameterName)));
     }
 
-    private void updateMeasuredParameterName(Set<MeasuredParameter> parameters, Map<Long, String> parametersLibrary) {
-        parameters.forEach(parameter -> mapper.updateMeasuredParameterName(parameter
-                                                                  , parametersLibrary.get(parameter.getParameterId())));
-        parameterRepository.saveAll(parameters);
+    private void updateDefectMeasuredParameterName(Set<MeasuredParameter> measuredParameters
+                                                 , Map<Long, String> parametersName
+                                                 , DefectMeasurement defect) {
+        measuredParameters.forEach(parameter -> mapper.updateDefectMeasuredParameterName(parameter
+                                                                        , parametersName.get(parameter.getParameterId())
+                                                                        , defect));
+        parameterRepository.saveAll(measuredParameters);
+    }
+
+    private void updateRepairMeasuredParameterName(Set<MeasuredParameter> measuredParameters
+                                                , Map<Long, String> parametersName
+                                                , RepairMeasurement repair) {
+        measuredParameters.forEach(parameter -> mapper.updateRepairMeasuredParameterName(parameter
+                                                                        , parametersName.get(parameter.getParameterId())
+                                                                        , repair));
+        parameterRepository.saveAll(measuredParameters);
     }
 }

@@ -26,22 +26,22 @@ import java.util.List;
         produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
-@Tag(name="Результаты расчета геодезической съемки(нивелировании) оборудования",
-        description="API для работы с данными результатов расчета геодезической съемки(нивелировании) оборудования")
+@Tag(name="Рассчитанные результаты измерения дефектов и мест ремонта элементов оборудования",
+        description="API для работы с рассчитанные результатами измерения дефектов и мест ремонта элементов оборудования")
 public class CalculationMeasurementController {
 
     private final CalculationMeasurementService service;
 
-    @Operation(summary = "Получить результаты расчета измерений по реперам")
-    @GetMapping("/{id}")
+    @Operation(summary = "Получить рассчитанные результаты измерений по дефектов")
+    @GetMapping("/defect/{id}")
     public ResponseEntity<List<ResponseCalculationDefectMeasurementDto>> getAllDefect(
             @PathVariable(name = "id") @NotNull @Positive
             @Parameter(name = "Идентификатор оборудования") Long equipmentId) {
         return ResponseEntity.ok().body(service.getAllDefect(equipmentId));
     }
 
-    @Operation(summary = "Получить результаты расчета измерений по контрольным точкам")
-    @GetMapping("/{id}")
+    @Operation(summary = "Получить рассчитанные результаты измерений мест ремонтов")
+    @GetMapping("/repair/{id}")
     public ResponseEntity<List<ResponseCalculationRepairMeasurementDto>> getAllRepair(
             @PathVariable(name = "id") @NotNull @Positive
             @Parameter(name = "Идентификатор оборудования") Long equipmentId) {

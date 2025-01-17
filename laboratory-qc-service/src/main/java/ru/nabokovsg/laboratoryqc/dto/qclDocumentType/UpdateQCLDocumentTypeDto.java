@@ -23,7 +23,7 @@ public class UpdateQCLDocumentTypeDto {
     private String diagnosisType;
     @Schema(description = "Вид документа")
     @NotBlank(message = "Type document should not be blank")
-    private String typeDocument;
+    private String type;
     @Schema(description = "Заголовок документа")
     @NotBlank(message = "Document title should not be blank")
     private String documentTitle;

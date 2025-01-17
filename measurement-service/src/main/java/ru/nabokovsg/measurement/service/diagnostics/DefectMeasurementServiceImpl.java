@@ -1,7 +1,10 @@
 package ru.nabokovsg.measurement.service.diagnostics;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.nabokovsg.measurement.client.MeasurementClient;
+import ru.nabokovsg.measurement.dto.client.EquipmentDto;
 import ru.nabokovsg.measurement.dto.defect.NewDefectMeasurementDto;
 import ru.nabokovsg.measurement.dto.defect.ResponseDefectMeasurementDto;
 import ru.nabokovsg.measurement.dto.defect.UpdateDefectMeasurementDto;
@@ -23,6 +26,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefectMeasurementServiceImpl implements DefectMeasurementService {
 
     private final DefectMeasurementRepository repository;
@@ -31,42 +35,46 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
     private final DuplicateSearchService duplicateSearchService;
     private final DefectLibraryService libraryService;
     private final CalculationDefectMeasurementService calculationDefectMeasurementService;
+    private final MeasurementClient client;
 
     @Override
     public ResponseDefectMeasurementDto save(NewDefectMeasurementDto defectDto) {
         DefectMeasurement defect = mapper.mapToDefectMeasurement(defectDto);
         Set<DefectMeasurement> defectMeasurements = getAllByPredicate(defect);
-        defect = duplicateSearchService.searchDefectDuplicate(defect, defectMeasurements);
+        defect = getDuplicate(defect, defectMeasurements);
         DefectLibrary defectLibrary = libraryService.getById(defectDto.getDefectLibraryId());
         if (defect.getId() == null) {
-            mapper.mapWitDefectLibrary(defect, defectLibrary);
+            EquipmentDto equipment = client.getEquipment(defectDto.getElementId(), defectDto.getPartElementId());
+            mapper.mapWitDefectLibrary(defect, defectLibrary, equipment.getElementName(), equipment.getPartElementName());
+            setMeasuredParameters(defect, defectLibrary, defectDto.getMeasuredParameters());
             defect = repository.save(defect);
         }
-        setMeasuredParameters(defect, defectLibrary, defectDto.getMeasuredParameters());
+        log.info("Save DefectMeasurement:");
+        if (defectMeasurements.isEmpty()) {
+            defectMeasurements.add(defect);
+        }
         calculationDefectMeasurementService.factory(defect, defectMeasurements, defectLibrary.getCalculation());
         return mapper.mapToResponseDefectMeasurementDto(defect);
+    }
+
+    private DefectMeasurement getDuplicate(DefectMeasurement defect, Set<DefectMeasurement> defectMeasurements) {
+        return Objects.requireNonNullElse(duplicateSearchService.searchDefectDuplicate(defect, defectMeasurements), defect);
     }
 
     @Override
     public ResponseDefectMeasurementDto update(UpdateDefectMeasurementDto defectDto) {
         DefectMeasurement defect = getById(defectDto.getId());
         Set<DefectMeasurement> defectMeasurements = getAllByPredicate(defect);
-        DefectMeasurement duplicate = duplicateSearchService.searchDefectDuplicate(
-                                                      mapper.mapToUpdateDefectMeasurement(defectDto)
-                                                    , defectMeasurements);
+        defect = getDuplicate(defect, defectMeasurements);
         DefectLibrary defectLibrary = libraryService.getById(defect.getDefectLibraryId());
-        if (!Objects.equals(defect.getId(), duplicate.getId())) {
-            duplicate.setMeasuredParameters(
-                    measuredParameterService.update(defect.getMeasuredParameters(), defectDto.getMeasuredParameters()));
+        if (!Objects.equals(defectDto.getId(), defect.getId())) {
             delete(defectDto.getId());
             defectMeasurements.remove(defect);
-        } else {
-            defect.setMeasuredParameters(
-                    measuredParameterService.update(defect.getMeasuredParameters(), defectDto.getMeasuredParameters()));
-            duplicate = defect;
         }
+        defect.setMeasuredParameters(
+                measuredParameterService.update(defect.getMeasuredParameters(), defectDto.getMeasuredParameters()));
         calculationDefectMeasurementService.factory(defect, defectMeasurements, defectLibrary.getCalculation());
-        return mapper.mapToResponseDefectMeasurementDto(repository.save(duplicate));
+        return mapper.mapToResponseDefectMeasurementDto(defect);
     }
 
     @Override

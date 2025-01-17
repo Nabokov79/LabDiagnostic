@@ -33,4 +33,19 @@ public class CalculationDefectMeasurement {
     private Boolean unacceptable;
     @Column(name = "parameters_string")
     private String parametersString;
+
+    @Override
+    public String toString() {
+        return "CalculationDefectMeasurement{" +
+                "id=" + id +
+                ", equipmentId=" + equipmentId +
+                ", elementId=" + elementId +
+                ", partElementId=" + partElementId +
+                ", defectName='" + defectName + '\'' +
+                ", elementName='" + elementName + '\'' +
+                ", partElementName='" + partElementName + '\'' +
+                ", unacceptable=" + unacceptable +
+                ", parametersString='" + parametersString + '\'' +
+                '}';
+    }
 }

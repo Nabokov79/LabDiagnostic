@@ -13,10 +13,14 @@ public class EquipmentDto {
 
     @Schema(description = "Идентификатор типа оборудования")
     private Long equipmentLibraryId;
+    @Schema(description = "Наименование элемента единицы оборудования")
+    private String elementName;
     @Schema(description = "Идентификатор типа элемента")
     private Long elementLibraryId;
     @Schema(description = "Идентификатор типа подэлемента")
     private Long partElementLibraryId;
+    @Schema(description = "Наименование подэлемента единицы оборудования")
+    private String partElementName;
     @Schema(description = "Типоразмер элемента, подэлемента единицы оборудования")
     private String standardSize;
     @Schema(description = "Толщина стенки")

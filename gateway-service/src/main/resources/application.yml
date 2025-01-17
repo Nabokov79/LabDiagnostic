@@ -28,8 +28,14 @@ spring:
         predicates:
           - Path=/WorkVisionWeb/document/**
 
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://eureka-service:8761/eureka
+#    register-with-eureka: false
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka-service:8761/eureka
+      defaultZone: http://localhost:8761/eureka
     register-with-eureka: false

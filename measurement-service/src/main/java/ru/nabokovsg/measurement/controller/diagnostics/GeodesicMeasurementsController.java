@@ -40,7 +40,7 @@ public class GeodesicMeasurementsController {
     }
 
     @Operation(summary = "Добавить данные геодезический съемки оборудования")
-    @PostMapping
+    @PatchMapping
     public ResponseEntity<List<ResponseGeodesicMeasurementDto>> update(
             @RequestBody @Valid
             @Parameter(name = "Данные измерений геодезической съемки") UpdateGeodesicMeasurementDto measurementDto) {

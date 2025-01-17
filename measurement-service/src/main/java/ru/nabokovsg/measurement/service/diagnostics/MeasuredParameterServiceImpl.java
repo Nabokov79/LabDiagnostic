@@ -1,6 +1,7 @@
 package ru.nabokovsg.measurement.service.diagnostics;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.dto.measuredParameter.UpdateMeasuredParameterDto;
 import ru.nabokovsg.measurement.exceptions.BadRequestException;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MeasuredParameterServiceImpl implements MeasuredParameterService {
 
     private final MeasuredParameterRepository repository;
@@ -22,7 +24,7 @@ public class MeasuredParameterServiceImpl implements MeasuredParameterService {
 
     @Override
     public Set<MeasuredParameter> save(ParameterMeasurementBuilder builder) {
-        return new HashSet<>(repository.saveAll(build(builder)));
+        return new HashSet<>(build(builder));
     }
 
     @Override

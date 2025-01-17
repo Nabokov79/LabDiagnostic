@@ -42,9 +42,25 @@ public class DefectMeasurement {
     private String partElementName;
     @OneToMany(mappedBy = "defect",
                orphanRemoval = true,
-               cascade = CascadeType.REMOVE,
-               fetch = FetchType.EAGER)
+               cascade = CascadeType.ALL)
     private Set<MeasuredParameter> measuredParameters;
+
+    @Override
+    public String toString() {
+        return "DefectMeasurement{" +
+                "id=" + id +
+                ", equipmentId=" + equipmentId +
+                ", defectLibraryId=" + defectLibraryId +
+                ", defectName='" + defectName + '\'' +
+                ", unacceptable=" + unacceptable +
+                ", useCalculateThickness=" + useCalculateThickness +
+                ", qualityAssessment='" + qualityAssessment + '\'' +
+                ", elementId=" + elementId +
+                ", elementName='" + elementName + '\'' +
+                ", partElementId=" + partElementId +
+                ", partElementName='" + partElementName + '\'' +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {

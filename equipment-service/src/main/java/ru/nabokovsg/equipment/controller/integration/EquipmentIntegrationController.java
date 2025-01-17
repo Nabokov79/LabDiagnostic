@@ -26,7 +26,7 @@ public class EquipmentIntegrationController {
 
     private final EquipmentIntegrationService service;
 
-    @Operation(summary = "Получить сведения об оборудовании из библиотеки оборудования или оборудование котельной, ЦТП")
+    @Operation(summary = "Получить сведения об единице оборудования по идентификаторам элемента, подэлемента")
     @GetMapping
     public ResponseEntity<EquipmentDto> getIds(@RequestParam(name = "elementId") @NotNull @Positive
                                             @Parameter(description = "Идентификатор элемента") Long elementId
@@ -35,7 +35,7 @@ public class EquipmentIntegrationController {
         return ResponseEntity.ok().body(service.getIds(elementId, partElementId));
     }
 
-    @Operation(summary = "Получить сведения об оборудовании из библиотеки оборудования или оборудование котельной, ЦТП")
+    @Operation(summary = "Получить сведения об единице оборудования по идентификатору")
     @GetMapping("/{id}")
     public ResponseEntity<EquipmentDto> getByEquipmentId(@PathVariable(name = "id") @NotNull @Positive
                                                       @Parameter(description = "Идентификатор оборудования") Long id) {

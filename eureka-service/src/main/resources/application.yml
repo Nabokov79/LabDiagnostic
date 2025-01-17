@@ -9,7 +9,5 @@ eureka:
   client:
     fetch-registry: false
     register-with-eureka: false
-  server:
-    renewal-percent-threshold: 0.49
   instance:
     hostname: eureka-service

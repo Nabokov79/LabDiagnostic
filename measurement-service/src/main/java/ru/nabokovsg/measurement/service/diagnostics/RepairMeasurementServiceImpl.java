@@ -2,6 +2,8 @@ package ru.nabokovsg.measurement.service.diagnostics;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.nabokovsg.measurement.client.MeasurementClient;
+import ru.nabokovsg.measurement.dto.client.EquipmentDto;
 import ru.nabokovsg.measurement.dto.measuredParameter.NewMeasuredParameterDto;
 import ru.nabokovsg.measurement.dto.repair.NewRepairMeasurementDto;
 import ru.nabokovsg.measurement.dto.repair.ResponseRepairMeasurementDto;
@@ -31,6 +33,7 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
     private final MeasuredParameterService measuredParameterService;
     private final DuplicateSearchService duplicateSearchService;
     private final CalculationRepairMeasurementService calculationRepairMeasurementService;
+    private final MeasurementClient client;
 
     @Override
     public ResponseRepairMeasurementDto save(NewRepairMeasurementDto repairDto) {
@@ -39,7 +42,8 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
         repair = duplicateSearchService.searchRepairDuplicate(repair, repairMeasurements);
         RepairLibrary repairLibrary = libraryService.getById(repair.getRepairLibraryId());
         if (repair.getId() == null) {
-            mapper.mapWithRepairLibrary(repair, repairLibrary);
+            EquipmentDto equipment = client.getEquipment(repairDto.getElementId(), repairDto.getPartElementId());
+            mapper.mapWithRepairLibrary(repair, repairLibrary, equipment.getElementName(), equipment.getPartElementName());
             repair = repository.save(repair);
         }
         setMeasuredParameters(repair, repairLibrary, repairDto.getMeasuredParameters());

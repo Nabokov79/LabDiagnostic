@@ -35,7 +35,7 @@ public class CalculationGeodeticMeasuringController {
     private final CalculationGeodeticMeasuringService service;
 
     @Operation(summary = "Получить результаты расчета измерений по реперам")
-    @GetMapping("/{id}")
+    @GetMapping("/reference/{id}")
     public ResponseEntity<List<ResponseCalculationReferencePointDto>> getAllReferencePoint(
                                                     @PathVariable(name = "id") @NotNull @Positive
                                                     @Parameter(name = "Идентификатор оборудования") Long equipmentId) {
@@ -43,7 +43,7 @@ public class CalculationGeodeticMeasuringController {
     }
 
     @Operation(summary = "Получить результаты расчета измерений по контрольным точкам")
-    @GetMapping("/{id}")
+    @GetMapping("/control/{id}")
     public ResponseEntity<List<ResponseCalculationControlPointDto>> getAllControlPoint(
                                                     @PathVariable(name = "id") @NotNull @Positive
                                                     @Parameter(name = "Идентификатор оборудования") Long equipmentId) {
@@ -51,7 +51,7 @@ public class CalculationGeodeticMeasuringController {
     }
 
     @Operation(summary = "Получить результаты расчета измерений диаметральных точек")
-    @GetMapping("/{id}")
+    @GetMapping("/opposite/{id}")
     public ResponseEntity<List<ResponseCalculatingOppositePointDto>> getAllOppositePoint(
                                                     @PathVariable(name = "id") @NotNull @Positive
                                                     @Parameter(name = "Идентификатор оборудования") Long equipmentId) {
@@ -59,7 +59,7 @@ public class CalculationGeodeticMeasuringController {
     }
 
     @Operation(summary = "Получить результаты расчета измерений соседних точек")
-    @GetMapping("/{id}")
+    @GetMapping("/neighboring/{id}")
     public ResponseEntity<List<ResponseCalculationNeighboringPointDto>> getAllNeighboringPoint(
                                                 @PathVariable(name = "id") @NotNull @Positive
                                                 @Parameter(name = "Идентификатор оборудования") Long equipmentId) {

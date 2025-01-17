@@ -13,75 +13,75 @@ services:
       retries: 5
       timeout: 10s
 
-  company-service:
-    build: company-service
-    container_name: company-service
-    ports:
-      - "8081:8081"
-    networks:
-      - backend
-    depends_on:
-      eureka-service:
-        condition: service_healthy
-      company-db:
-        condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://company-db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=mywords
-
-  company-db:
-    image: postgres:14-alpine
-    container_name: company-db
-    ports:
-      - "6542:5432"
-    networks:
-      - backend
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mywords
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-  laboratory-qc-service:
-    build: laboratory-qc-service
-    container_name: laboratory-qc-service
-    ports:
-      - "8082:8082"
-    networks:
-      - backend
-    depends_on:
-      eureka-service:
-        condition: service_healthy
-      laboratory-qc-db:
-        condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://laboratory-qc-db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=mywords
-
-  laboratory-qc-db:
-    image: postgres:14-alpine
-    container_name: laboratory-qc-db
-    ports:
-      - "6543:5432"
-    networks:
-      - backend
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mywords
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+#  company-service:
+#    build: company-service
+#    container_name: company-service
+#    ports:
+#      - "8081:8081"
+#    networks:
+#      - backend
+#    depends_on:
+#      eureka-service:
+#        condition: service_healthy
+#      company-db:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://company-db:5432/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=mywords
+#
+#  company-db:
+#    image: postgres:14-alpine
+#    container_name: company-db
+#    ports:
+#      - "6542:5432"
+#    networks:
+#      - backend
+#    environment:
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=mywords
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 10s
+#
+#  laboratory-qc-service:
+#    build: laboratory-qc-service
+#    container_name: laboratory-qc-service
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - backend
+#    depends_on:
+#      eureka-service:
+#        condition: service_healthy
+#      laboratory-qc-db:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://laboratory-qc-db:5432/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=mywords
+#
+#  laboratory-qc-db:
+#    image: postgres:14-alpine
+#    container_name: laboratory-qc-db
+#    ports:
+#      - "6543:5432"
+#    networks:
+#      - backend
+#    environment:
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=mywords
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 10s
 
   equipment-service:
     build: equipment-service
@@ -153,40 +153,40 @@ services:
       retries: 5
       start_period: 10s
 
-  document-service:
-    build: document-service
-    container_name: document-service
-    ports:
-      - "8085:8085"
-    networks:
-      - backend
-    depends_on:
-      document-db:
-        condition: service_healthy
-      eureka-service:
-        condition: service_healthy
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://document-db:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=mywords
-
-  document-db:
-    image: postgres:14-alpine
-    container_name: document-db
-    ports:
-      - "6546:5432"
-    networks:
-      - backend
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mywords
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+#  document-service:
+#    build: document-service
+#    container_name: document-service
+#    ports:
+#      - "8085:8085"
+#    networks:
+#      - backend
+#    depends_on:
+#      document-db:
+#        condition: service_healthy
+#      eureka-service:
+#        condition: service_healthy
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://document-db:5432/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=mywords
+#
+#  document-db:
+#    image: postgres:14-alpine
+#    container_name: document-db
+#    ports:
+#      - "6546:5432"
+#    networks:
+#      - backend
+#    environment:
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=mywords
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready -U habrpguser -d habrdb" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#      start_period: 10s
 
   gateway-service:
     build: gateway-service

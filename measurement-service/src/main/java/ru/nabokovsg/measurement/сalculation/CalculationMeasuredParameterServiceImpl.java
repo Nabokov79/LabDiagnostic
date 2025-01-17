@@ -1,6 +1,7 @@
 package ru.nabokovsg.measurement.сalculation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.exceptions.BadRequestException;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationMeasuredParameterMapper;
@@ -15,11 +16,12 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CalculationMeasuredParameterServiceImpl implements CalculationMeasuredParameterService {
 
     private final CalculationMeasuredParameterMapper mapper;
     private final static String BLANK = " ";
-    private final static String SEMICOLON = ";";
+    private final static String SEMICOLON = "; ";
 
     @Override
     public String getMeasuredParameters(Set<MeasuredParameter> measuredParameters
@@ -49,6 +51,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
                 setQuantityParameter(calculationParameter, parameter);
+                parameters.put(parameter.getParameterName(), calculationParameter);
             } else {
                 if (calculationParameter == null) {
                     parameters.put(parameter.getParameterName(), mapper.mapToMinValue(parameter));
@@ -63,11 +66,18 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
     }
 
     private String countMax(Set<MeasuredParameter> measuredParameters) {
+        log.info("Count max:");
         Map<String, CalculationMeasuredParameter> parameters = new HashMap<>();
+        log.info("MeasuredParameter : {}", measuredParameters);
         measuredParameters.forEach(parameter -> {
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                setQuantityParameter(calculationParameter, parameter);
+                if (calculationParameter == null) {
+                    calculationParameter = mapper.mapToMinValue(parameter);
+                } else {
+                    setQuantityParameter(calculationParameter, parameter);
+                }
+                parameters.put(parameter.getParameterName(), calculationParameter);
             } else {
                 if (calculationParameter == null) {
                     parameters.put(parameter.getParameterName(), mapper.mapToMaxValue(parameter));
@@ -131,11 +141,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
     }
 
     private void setQuantityParameter(CalculationMeasuredParameter calculationParameter, MeasuredParameter parameter) {
-        if (calculationParameter == null) {
-            mapper.mapToQuantityParameter(calculationParameter, parameter);
-        } else {
-            mapper.mapToUpdateMinValue(calculationParameter, calculationParameter.getMaxValue() + parameter.getValue());
-        }
+        mapper.mapToUpdateMinValue(calculationParameter, calculationParameter.getMinValue() + parameter.getValue());
     }
 
     private String buildParameters(Map<String, CalculationMeasuredParameter> calculateParameters) {
@@ -157,18 +163,18 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
     }
 
     private String buildParameter(CalculationMeasuredParameter parameter) {
-        String measuredParameter = BLANK;
-        if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-            return String.join(BLANK, parameter.getParameterName(), String.valueOf(parameter.getMinValue()));
+        String measuredParameter = parameter.getParameterName();
+        log.info("measuredParameter Name : {}", measuredParameter);
+        if (measuredParameter.equals(MeasurementParameterType.QUANTITY.label)) {
+            measuredParameter = String.valueOf(parameter.getMinValue());
+        } else {
+            if (parameter.getMinValue() != null) {
+                measuredParameter = String.join(BLANK,  "от", String.valueOf(parameter.getMinValue()));
+            }
+            if (parameter.getMaxValue() != null) {
+                measuredParameter = String.join(BLANK,  "до", String.valueOf(parameter.getMaxValue()));
+            }
         }
-        if (parameter.getMinValue() != null) {
-            measuredParameter = String.join(BLANK, parameter.getParameterName()
-                                                            , "от"
-                                                            , String.valueOf(parameter.getMinValue()));
-        }
-        if (parameter.getMaxValue() != null) {
-            measuredParameter = String.join(BLANK, "до", String.valueOf(parameter.getMaxValue()));
-        }
-        return String.join(BLANK, measuredParameter, parameter.getUnitMeasurement());
+        return String.join(BLANK,  parameter.getParameterName(), measuredParameter, parameter.getUnitMeasurement());
     }
 }

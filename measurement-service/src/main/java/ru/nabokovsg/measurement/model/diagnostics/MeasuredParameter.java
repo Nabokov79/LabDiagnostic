@@ -1,5 +1,6 @@
 package ru.nabokovsg.measurement.model.diagnostics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,11 +29,25 @@ public class MeasuredParameter {
     private String unitMeasurement;
     @ManyToOne
     @JoinColumn(name = "defect_id")
+    @JsonIgnore
     private DefectMeasurement defect;
     @ManyToOne
     @JoinColumn(name = "repair_id")
+    @JsonIgnore
     private RepairMeasurement repair;
     @ManyToOne
     @JoinColumn(name = "weld_defect_id")
+    @JsonIgnore
     private WeldDefectControl weldDefect;
+
+    @Override
+    public String toString() {
+        return "MeasuredParameter{" +
+                "id=" + id +
+                ", parameterId=" + parameterId +
+                ", parameterName='" + parameterName + '\'' +
+                ", value=" + value +
+                ", unitMeasurement='" + unitMeasurement + '\'' +
+                '}';
+    }
 }

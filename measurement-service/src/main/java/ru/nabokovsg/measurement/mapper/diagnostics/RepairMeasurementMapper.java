@@ -17,7 +17,10 @@ public interface RepairMeasurementMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "measuredParameters", ignore = true)
-    void mapWithRepairLibrary(@MappingTarget RepairMeasurement repair, RepairLibrary repairLibrary);
+    void mapWithRepairLibrary(@MappingTarget RepairMeasurement repair
+                                           , RepairLibrary repairLibrary
+                                           , String elementName
+                                           , String partElementName);
 
     RepairMeasurement mapToUpdateRepairMeasurement(UpdateRepairMeasurementDto repairDto);
 

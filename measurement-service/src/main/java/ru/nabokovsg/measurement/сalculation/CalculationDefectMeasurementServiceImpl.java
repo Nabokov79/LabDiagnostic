@@ -1,6 +1,7 @@
 package ru.nabokovsg.measurement.сalculation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationDefectMeasurementMapper;
 import ru.nabokovsg.measurement.model.diagnostics.CalculationDefectMeasurement;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CalculationDefectMeasurementServiceImpl implements CalculationDefectMeasurementService {
 
     private final CalculationDefectMeasurementRepository repository;
@@ -24,12 +26,17 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     public void factory(DefectMeasurement defect
                       , Set<DefectMeasurement> defectMeasurements
                       , ParameterCalculationType calculation) {
+        log.info("Factory:");
+        log.info(String.format("DefectMeasurement: %s", defect));
+        log.info(String.format("DefectMeasurements: %s", defectMeasurements));
+        log.info(String.format("ParameterCalculationType: %s", calculation));
         switch (calculation) {
             case MIN, MAX, MAX_MIN -> {
                 Set<MeasuredParameter> measuredParameters = defectMeasurements.stream()
                                                                         .map(DefectMeasurement::getMeasuredParameters)
                                                                         .flatMap(Collection::stream)
                                                                         .collect(Collectors.toSet());
+                log.info(String.format("MeasuredParameter: %s", measuredParameters));
                 saveOne(defect, measuredParameters, calculation);
             }
             case NO_ACTION -> saveAll(defect, defectMeasurements, calculation);
@@ -39,13 +46,21 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     private void saveOne(DefectMeasurement defect
                        , Set<MeasuredParameter> measuredParameters
                        , ParameterCalculationType calculation) {
+        log.info("Save one defect:");
+        log.info(String.format("DefectMeasurement: %s", defect));
+        log.info(String.format("MeasuredParameter: %s", measuredParameters));
+        log.info(String.format("ParameterCalculationType: %s", calculation));
         CalculationDefectMeasurement calculationDefect = get(defect);
+        log.info(String.format("Before CalculationDefectMeasurement: %s", calculationDefect));
         String parameters = calculationParameterService.getMeasuredParameters(measuredParameters, calculation);
         if (calculationDefect == null) {
-            repository.save(mapper.mapToCalculationDefectMeasurement(defect, parameters));
-            return;
+            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, parameters);
+        } else {
+            mapper.mapToUpdateMeasuredParameters(calculationDefect, parameters);
         }
-        repository.save(mapper.mapToUpdateMeasuredParameters(calculationDefect, parameters));
+        log.info(String.format("After CalculationDefectMeasurement: %s", calculationDefect));
+        log.info(String.format("parameters: %s", parameters));
+        repository.save(calculationDefect);
     }
 
     private void saveAll(DefectMeasurement defect

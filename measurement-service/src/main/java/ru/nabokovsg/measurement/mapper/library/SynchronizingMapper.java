@@ -13,5 +13,11 @@ public interface SynchronizingMapper {
 
     void updateRepairName(@MappingTarget RepairMeasurement repair, String repairName);
 
-    void updateMeasuredParameterName(@MappingTarget MeasuredParameter parameter, String parameterName);
+    void updateDefectMeasuredParameterName(@MappingTarget MeasuredParameter parameter
+                                                        , String parameterName
+                                                        , DefectMeasurement defect);
+
+    void updateRepairMeasuredParameterName(@MappingTarget MeasuredParameter parameter
+                                                        , String parameterName
+                                                        , RepairMeasurement repair);
 }

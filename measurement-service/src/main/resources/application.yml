@@ -23,14 +23,28 @@ spring:
     init:
       mode: always
 
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://eureka-service:8761/eureka
+#    healthcheck:
+#      enabled: true
+#  instance:
+#    preferIpAddress: true
+#
+#services:
+#  equipment:
+#    url: http://equipment-service:8083
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka-service:8761/eureka
+      defaultZone: http://localhost:8761/eureka
     healthcheck:
       enabled: true
   instance:
     preferIpAddress: true
 
 services:
-  equipment: http://localhost:8083
+  equipment:
+    url: http://localhost:8083

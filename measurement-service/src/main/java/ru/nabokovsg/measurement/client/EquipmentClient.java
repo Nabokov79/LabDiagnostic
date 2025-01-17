@@ -17,7 +17,7 @@ public class EquipmentClient {
         this.client = client;
     }
 
-    public EquipmentDto getEquipmentData(String path, MultiValueMap<String, String> params) {
+    public EquipmentDto getEquipment(String path, MultiValueMap<String, String> params) {
         return client.get()
                 .uri(uriBuilder -> uriBuilder.path(path)
                         .queryParams(params)
@@ -27,7 +27,7 @@ public class EquipmentClient {
                 .block();
     }
 
-    public EquipmentDto getEquipmentData(String path) {
+    public EquipmentDto getEquipment(String path) {
         return client.get()
                 .uri(path)
                 .retrieve()

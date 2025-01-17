@@ -2,6 +2,8 @@ package ru.nabokovsg.document.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.nabokovsg.document.mapper.HeaderTemplateMapper;
+import ru.nabokovsg.document.repository.HeaderTemplateRepository;
 
 @Service
 @RequiredArgsConstructor

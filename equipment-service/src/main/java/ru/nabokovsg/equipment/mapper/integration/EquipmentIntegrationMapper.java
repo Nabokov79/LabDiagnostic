@@ -12,6 +12,7 @@ public interface EquipmentIntegrationMapper {
 
     @Mapping(source = "element.equipment.equipmentLibraryId", target = "equipmentLibraryId")
     @Mapping(source = "elementLibraryId", target = "elementLibraryId")
+    @Mapping(source = "elementName", target = "elementName")
     @Mapping(source = "standardSize", target = "standardSize")
     @Mapping(source = "thickness", target = "thickness")
     @Mapping(source = "minDiameter", target = "minDiameter")
@@ -23,6 +24,9 @@ public interface EquipmentIntegrationMapper {
 
     @Mapping(source = "partElement.element.equipment.equipmentLibraryId", target = "equipmentLibraryId")
     @Mapping(source = "partElement.element.elementLibraryId", target = "elementLibraryId")
+    @Mapping(source = "partElement.element.elementName", target = "elementName")
+    @Mapping(source = "partElementLibraryId", target = "partElementLibraryId")
+    @Mapping(source = "partElementName", target = "partElementName")
     @Mapping(source = "standardSize", target = "standardSize")
     @Mapping(source = "thickness", target = "thickness")
     @Mapping(source = "minDiameter", target = "minDiameter")

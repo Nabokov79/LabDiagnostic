@@ -23,4 +23,12 @@ public class NewMeasuredParameterDto {
     @NotNull(message = "value should not be null")
     @Positive(message = "value can only be positive")
     private Double value;
+
+    @Override
+    public String toString() {
+        return "NewMeasuredParameterDto{" +
+                "parameterLibraryId=" + parameterLibraryId +
+                ", value=" + value +
+                '}';
+    }
 }
