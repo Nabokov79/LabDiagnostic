@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.nabokovsg.laboratoryqc.dto.companyStructureService.CompanyStructureDto;
+import ru.nabokovsg.laboratoryqc.dto.companyStructureService.DepartmentStructureDto;
 
 @Component
 public class CompanyStructureClient {
@@ -17,13 +18,21 @@ public class CompanyStructureClient {
         this.client = client;
     }
 
-    public CompanyStructureDto get(MultiValueMap<String, String> params) {
+    public CompanyStructureDto get(String patch, MultiValueMap<String, String> params) {
         return client.get()
-                     .uri(uriBuilder -> uriBuilder.path("/company/journal")
+                     .uri(uriBuilder -> uriBuilder.path(patch)
                                                   .queryParams(params)
                                                   .build())
                     .retrieve()
                     .bodyToMono(CompanyStructureDto.class)
                     .block();
+    }
+
+    public DepartmentStructureDto get(String patch) {
+        return client.get()
+                .uri(patch)
+                .retrieve()
+                .bodyToMono(DepartmentStructureDto.class)
+                .block();
     }
 }

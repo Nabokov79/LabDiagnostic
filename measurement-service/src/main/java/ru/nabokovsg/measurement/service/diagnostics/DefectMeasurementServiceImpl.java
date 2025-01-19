@@ -26,7 +26,6 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class DefectMeasurementServiceImpl implements DefectMeasurementService {
 
     private final DefectMeasurementRepository repository;
@@ -49,7 +48,6 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
             setMeasuredParameters(defect, defectLibrary, defectDto.getMeasuredParameters());
             defect = repository.save(defect);
         }
-        log.info("Save DefectMeasurement:");
         if (defectMeasurements.isEmpty()) {
             defectMeasurements.add(defect);
         }
@@ -103,11 +101,11 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
 
     @Override
     public void delete(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return;
-        }
-       throw new NotFoundException(String.format("Defect measurement with id=%s not found for delete", id));
+        DefectMeasurement defect = getById(id);
+        measuredParameterService.deleteAll(defect.getMeasuredParameters());
+        repository.deleteById(id);
+        DefectLibrary defectLibrary = libraryService.getById(defect.getDefectLibraryId());
+        calculationDefectMeasurementService.factory(defect, getAllByPredicate(defect), defectLibrary.getCalculation());
     }
 
     private DefectMeasurement getById(Long id) {

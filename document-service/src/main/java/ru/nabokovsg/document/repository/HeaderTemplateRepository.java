@@ -1,7 +1,7 @@
 package ru.nabokovsg.document.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.nabokovsg.document.model.HeaderTemplate;
+import ru.nabokovsg.document.model.PageTitleTemplate;
 
-public interface HeaderTemplateRepository extends JpaRepository<HeaderTemplate, Long> {
+public interface HeaderTemplateRepository extends JpaRepository<PageTitleTemplate, Long> {
 }

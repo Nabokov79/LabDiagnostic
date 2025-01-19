@@ -56,6 +56,8 @@ public class UpdateQualityControlJournalDto {
     @Schema(description = "Нормативный документ")
     @NotBlank(message = "regulatoryDocument should not be blank")
     private String regulatoryDocument;
+    @Schema(description = "Наименование сварочного формуляра")
+    private String appendices;
 
     @Override
     public String toString() {
@@ -72,6 +74,7 @@ public class UpdateQualityControlJournalDto {
                 ", documentTypeId=" + documentTypeId +
                 ", methodologicalDocument=" + methodologicalDocument +
                 ", regulatoryDocument=" + regulatoryDocument +
+                ", appendices=" + appendices +
                 '}';
     }
 }

@@ -111,11 +111,9 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
 
     @Override
     public void delete(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return;
-        }
-        throw new NotFoundException(String.format("Repair with id=%s not found for delete", id));
+        RepairMeasurement repair = getById(id);
+        repository.deleteById(id);
+        measuredParameterService.deleteAll(repair.getMeasuredParameters());
     }
 
     private RepairMeasurement getById(Long id) {

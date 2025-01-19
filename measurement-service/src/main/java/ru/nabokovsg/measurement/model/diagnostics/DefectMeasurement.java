@@ -40,9 +40,7 @@ public class DefectMeasurement {
     private Long partElementId;
     @Column(name = "part_element_name")
     private String partElementName;
-    @OneToMany(mappedBy = "defect",
-               orphanRemoval = true,
-               cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "defect")
     private Set<MeasuredParameter> measuredParameters;
 
     @Override

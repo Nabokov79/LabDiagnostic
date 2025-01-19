@@ -14,13 +14,13 @@ import lombok.Setter;
 @Schema(description = "Данные нового вида отчетного документа")
 public class NewQCLDocumentTypeDto {
 
-    @Schema(description = "Вид диагностики/контроля")
-    @NotBlank(message = "Diagnosis type source should not be blank")
-    private String diagnosisType;
+    @Schema(description = "Вид работы")
+    @NotBlank(message = "Work type source should not be blank")
+    private String workType;
     @Schema(description = "Вид документа")
     @NotBlank(message = "Type document should not be blank")
     private String type;
     @Schema(description = "Заголовок документа")
     @NotBlank(message = "Document title should not be blank")
-    private String documentTitle;
+    private String title;
 }

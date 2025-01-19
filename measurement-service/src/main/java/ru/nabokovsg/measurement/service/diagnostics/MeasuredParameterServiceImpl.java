@@ -24,7 +24,7 @@ public class MeasuredParameterServiceImpl implements MeasuredParameterService {
 
     @Override
     public Set<MeasuredParameter> save(ParameterMeasurementBuilder builder) {
-        return new HashSet<>(build(builder));
+        return new HashSet<>(repository.saveAll(build(builder)));
     }
 
     @Override

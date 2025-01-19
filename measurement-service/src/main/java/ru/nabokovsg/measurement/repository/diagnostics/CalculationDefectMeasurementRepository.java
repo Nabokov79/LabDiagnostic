@@ -1,6 +1,8 @@
 package ru.nabokovsg.measurement.repository.diagnostics;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import ru.nabokovsg.measurement.model.diagnostics.CalculationDefectMeasurement;
 
 import java.util.Set;

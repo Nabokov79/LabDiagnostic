@@ -8,6 +8,7 @@ import ru.nabokovsg.laboratoryqc.dto.qclDocumentType.UpdateQCLDocumentTypeDto;
 import ru.nabokovsg.laboratoryqc.exceptions.BadRequestException;
 import ru.nabokovsg.laboratoryqc.exceptions.NotFoundException;
 import ru.nabokovsg.laboratoryqc.mapper.QCLDocumentTypeMapper;
+import ru.nabokovsg.laboratoryqc.model.WorkType;
 import ru.nabokovsg.laboratoryqc.repository.QCLDocumentTypeRepository;
 import ru.nabokovsg.laboratoryqc.model.QCLDocumentType;
 
@@ -22,9 +23,10 @@ public class QCLDocumentTypeServiceImpl implements QCLDocumentTypeService {
 
     @Override
     public ResponseQCLDocumentTypeDto save(NewQCLDocumentTypeDto documentTypeDto) {
-        if (repository.existsByDiagnosisTypeAndTypeAndDocumentTitle(documentTypeDto.getDiagnosisType()
-                                                                  , documentTypeDto.getType()
-                                                                  , documentTypeDto.getDocumentTitle())) {
+        validWorkType(documentTypeDto.getWorkType());
+        if (repository.existsByWorkTypeAndTypeAndTitle(documentTypeDto.getWorkType()
+                                                          , documentTypeDto.getType()
+                                                          , documentTypeDto.getTitle())) {
             throw new BadRequestException(
                     String.format("Diagnostic document type found : %s", documentTypeDto));
         }
@@ -33,6 +35,7 @@ public class QCLDocumentTypeServiceImpl implements QCLDocumentTypeService {
 
     @Override
     public ResponseQCLDocumentTypeDto update(UpdateQCLDocumentTypeDto documentTypeDto) {
+        validWorkType(documentTypeDto.getWorkType());
         if (repository.existsById(documentTypeDto.getId())) {
             return mapper.mapToResponseQLCDocumentTypeDto(
                     repository.save(mapper.mapToUpdateQLCDocumentType(documentTypeDto)));
@@ -68,5 +71,11 @@ public class QCLDocumentTypeServiceImpl implements QCLDocumentTypeService {
             return;
         }
         throw new NotFoundException(String.format("Diagnostic document type with id = %s not found for delete", id));
+    }
+
+    private void validWorkType(String workType) {
+       WorkType.from(workType)
+               .orElseThrow(() -> new BadRequestException(
+                       String.format("Type of work is not supported, workType=%s", workType)));
     }
 }

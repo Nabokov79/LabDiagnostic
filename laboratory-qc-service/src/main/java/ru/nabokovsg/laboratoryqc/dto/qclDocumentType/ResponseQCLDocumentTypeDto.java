@@ -16,7 +16,7 @@ public class ResponseQCLDocumentTypeDto {
     @Schema(description = "Вид диагностики/контроля")
     private String diagnosisType;
     @Schema(description = "Вид документа")
-    private String typeDocument;
+    private String type;
     @Schema(description = "Заголовок документа")
-    private String documentTitle;
+    private String title;
 }

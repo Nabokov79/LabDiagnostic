@@ -68,6 +68,8 @@ public class JournalCompletedWork {
     private LocalDate nextDate;
     @Column(name = "status")
     private String status;
+    @Column(name = "appendices")
+    private String appendices;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "chief_id",  nullable = false)
     private QCLEmployee headWorkPerformer;

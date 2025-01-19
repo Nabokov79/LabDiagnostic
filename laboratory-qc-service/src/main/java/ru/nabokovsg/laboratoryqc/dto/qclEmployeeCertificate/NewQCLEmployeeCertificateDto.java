@@ -24,7 +24,7 @@ public class NewQCLEmployeeCertificateDto {
     @Schema(description = "Номер сертификата")
     @NotBlank(message = "Document number should not be blank")
     private String documentNumber;
-    @Schema(description = "Вид контроля соглано документа")
+    @Schema(description = "Вид контроля соглаcно документа")
     @NotBlank(message = "control type should not be blank")
     private String controlName;
     @Schema(description = "Квалификационный уровень сотрудника по данным документа")
@@ -33,7 +33,7 @@ public class NewQCLEmployeeCertificateDto {
     @Schema(description = "Дата выдачи документа")
     @NotNull(message = "start date should not be null")
     private LocalDate dateIssue;
-    @Schema(description = "Дата окончания действиядокумента")
+    @Schema(description = "Дата окончания действия документа")
     @NotNull(message = "start date should not be null")
     private LocalDate validityPeriod;
     @Schema(description = "Шифр объектов, для контроля которых допущен сотрудник согласно данным сертификата")
@@ -42,7 +42,7 @@ public class NewQCLEmployeeCertificateDto {
     @Schema(description = "Организация, выдавшая сертификат")
     @NotBlank(message = "organization should not be blank")
     private String organization;
-    @Schema(description = "Индентификатор сотрудника, которому принадлежит сертификат")
+    @Schema(description = "Идентификатор сотрудника, которому принадлежит сертификат")
     @NotNull(message = "employee id should not be null")
     @Positive(message = "employee id can only be positive")
     private Long employeeId;

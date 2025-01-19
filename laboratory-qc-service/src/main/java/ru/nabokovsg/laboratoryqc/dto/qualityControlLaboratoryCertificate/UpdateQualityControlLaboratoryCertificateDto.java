@@ -34,4 +34,16 @@ public class UpdateQualityControlLaboratoryCertificateDto {
     @Schema(description = "Организация, выдавшая документ")
     @NotBlank(message = "organization should not be blank")
     private String organization;
+
+    @Override
+    public String toString() {
+        return "UpdateQualityControlLaboratoryCertificateDto{" +
+                "id=" + id +
+                ", documentName='" + documentName + '\'' +
+                ", documentNumber='" + documentNumber + '\'' +
+                ", dateIssue=" + dateIssue +
+                ", validityPeriod=" + validityPeriod +
+                ", organization='" + organization + '\'' +
+                '}';
+    }
 }

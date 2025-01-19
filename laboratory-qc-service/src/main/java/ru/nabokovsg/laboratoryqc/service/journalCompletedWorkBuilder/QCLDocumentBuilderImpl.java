@@ -26,7 +26,7 @@ public class QCLDocumentBuilderImpl implements QCLDocumentBuilder {
     @Override
     public void build(JournalCompletedWork journal, Long documentTypeId) {
         QCLDocumentType documentType = documentTypeService.getById(documentTypeId);
-        String document = String.join(" ", documentType.getType(), documentType.getDocumentTitle());
+        String document = String.join(" ", documentType.getType(), documentType.getTitle());
         mapper.mapToDocument(journal, documentType, document, getDocumentNumber(journal));
     }
 

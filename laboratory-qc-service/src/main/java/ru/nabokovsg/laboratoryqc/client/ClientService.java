@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import ru.nabokovsg.laboratoryqc.dto.companyStructureService.CompanyStructureDto;
+import ru.nabokovsg.laboratoryqc.dto.companyStructureService.DepartmentStructureDto;
 import ru.nabokovsg.laboratoryqc.dto.equipmentDiagnosedQCLService.EquipmentDto;
 import ru.nabokovsg.laboratoryqc.exceptions.BadRequestException;
 import ru.nabokovsg.laboratoryqc.model.JournalType;
@@ -17,6 +18,7 @@ public class ClientService {
 
     private final CompanyStructureClient companyStructureClient;
     private final EquipmentClient equipmentClient;
+    private final static String API_PREFIX = "/company";
 
     public CompanyStructureDto getStructuralDivision(Long heatSupplyAreaId, Long exploitationRegionId, Long addressId, JournalType journalType) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -32,7 +34,13 @@ public class ClientService {
             default -> throw new BadRequestException(String.format("Journal type=%s is not supported", journalType));
         }
         params.put("addressId", List.of(String.valueOf(addressId)));
-        return companyStructureClient.get(params);
+        String patch = String.join("/", API_PREFIX, "journal");
+        return companyStructureClient.get(patch, params);
+    }
+
+    public DepartmentStructureDto getDepartmentStructure(Long departmentId) {
+        String patch = String.join("/", API_PREFIX, "department", String.valueOf(departmentId));
+        return companyStructureClient.get(patch);
     }
 
     public EquipmentDto getEquipment(Long equipmentId, Long elementId, JournalType journalType) {

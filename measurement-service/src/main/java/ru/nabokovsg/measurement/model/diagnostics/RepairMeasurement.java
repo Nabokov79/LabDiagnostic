@@ -30,10 +30,7 @@ public class RepairMeasurement {
     private Long partElementId;
     @Column(name = "repair_name")
     private String repairName;
-    @OneToMany(mappedBy = "repair",
-               orphanRemoval = true,
-               cascade = CascadeType.REMOVE,
-               fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "repair")
     private Set<MeasuredParameter> measuredParameters;
 
     @Override

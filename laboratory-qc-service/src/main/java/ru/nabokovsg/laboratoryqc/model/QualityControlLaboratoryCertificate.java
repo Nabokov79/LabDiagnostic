@@ -19,6 +19,12 @@ public class QualityControlLaboratoryCertificate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "organization_name")
+    private String organizationFullName;
+    @Column(name = "branch_name")
+    private String branchFullName;
+    @Column(name = "department_name")
+    private String departmentFullName;
     @Column(name = "document_name")
     private String documentName;
     @Column(name = "document_number")
