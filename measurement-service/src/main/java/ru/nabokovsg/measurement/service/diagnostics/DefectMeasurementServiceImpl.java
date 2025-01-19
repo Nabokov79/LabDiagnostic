@@ -1,7 +1,6 @@
 package ru.nabokovsg.measurement.service.diagnostics;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.client.MeasurementClient;
 import ru.nabokovsg.measurement.dto.client.EquipmentDto;
