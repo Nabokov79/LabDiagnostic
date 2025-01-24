@@ -13,4 +13,14 @@ public class CalculationMeasuredParameter {
     private Double minValue;
     private Double maxValue;
     private String unitMeasurement;
+
+    @Override
+    public String toString() {
+        return "CalculationMeasuredParameter{" +
+                "parameterName='" + parameterName + '\'' +
+                ", minValue=" + minValue +
+                ", maxValue=" + maxValue +
+                ", unitMeasurement='" + unitMeasurement + '\'' +
+                '}';
+    }
 }

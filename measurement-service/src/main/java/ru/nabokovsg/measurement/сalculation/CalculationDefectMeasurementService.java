@@ -7,7 +7,6 @@ import java.util.Set;
 
 public interface CalculationDefectMeasurementService {
 
-    void factory(DefectMeasurement defect
-               , Set<DefectMeasurement> defectMeasurements
-               , ParameterCalculationType calculation);
+    void save(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type);
+    void delete(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type);
 }

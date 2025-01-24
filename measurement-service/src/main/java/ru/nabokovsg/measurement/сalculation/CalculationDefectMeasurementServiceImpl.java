@@ -5,13 +5,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.nabokovsg.measurement.exceptions.BadRequestException;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationDefectMeasurementMapper;
-import ru.nabokovsg.measurement.model.diagnostics.CalculationDefectMeasurement;
-import ru.nabokovsg.measurement.model.diagnostics.DefectMeasurement;
-import ru.nabokovsg.measurement.model.diagnostics.MeasuredParameter;
-import ru.nabokovsg.measurement.model.diagnostics.QCalculationDefectMeasurement;
+import ru.nabokovsg.measurement.model.diagnostics.*;
 import ru.nabokovsg.measurement.model.library.ParameterCalculationType;
 import ru.nabokovsg.measurement.repository.diagnostics.CalculationDefectMeasurementRepository;
+import ru.nabokovsg.measurement.service.common.ConvertingMeasuredParameterToStringService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,56 +23,71 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     private final CalculationDefectMeasurementMapper mapper;
     private final CalculationMeasuredParameterService calculationParameterService;
     private final EntityManager em;
+    private final ConvertingMeasuredParameterToStringService stringBuilder;
 
     @Override
-    public void factory(DefectMeasurement defect
-                      , Set<DefectMeasurement> defectMeasurements
-                      , ParameterCalculationType calculation) {
-        if (defectMeasurements.isEmpty()) {
+    public void save(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type) {
+        defects.add(defect);
+        calculation(defect, defects, type);
+    }
+
+    @Override
+    public void delete(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type) {
+        if (defects.isEmpty()) {
             deleteAll(defect);
-            return;
-        }
-        switch (calculation) {
-            case MIN, MAX, MAX_MIN -> {
-                Set<MeasuredParameter> measuredParameters = defectMeasurements.stream()
-                                                                        .map(DefectMeasurement::getMeasuredParameters)
-                                                                        .flatMap(Collection::stream)
-                                                                        .collect(Collectors.toSet());
-                saveOne(defect, measuredParameters, calculation);
-            }
-            case NO_ACTION -> saveAll(defect, defectMeasurements, calculation);
+        } else {
+            calculation(defect, defects, type);
         }
     }
 
-    private void saveOne(DefectMeasurement defect
-                       , Set<MeasuredParameter> measuredParameters
-                       , ParameterCalculationType calculation) {
+    private void calculation(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type) {
+        switch (type) {
+            case MIN, MAX, MAX_MIN -> saveOne(defect, defects, type);
+            case NO_ACTION -> saveAll(defect, defects);
+        }
+    }
+
+    private void saveOne(DefectMeasurement defect, Set<DefectMeasurement> defects, ParameterCalculationType type) {
+        Set<MeasuredParameter> parameters = defects.stream()
+                .map(DefectMeasurement::getMeasuredParameters)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
         CalculationDefectMeasurement calculationDefect = get(defect);
-        String parameters = calculationParameterService.getMeasuredParameters(measuredParameters, calculation);
+        String parametersString = calculateDefectParameters(parameters, type);
         if (calculationDefect == null) {
-            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, parameters);
+            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, parametersString);
         } else {
-            mapper.mapToUpdateMeasuredParameters(calculationDefect, defect.getUnacceptable(), parameters);
+            mapper.mapToUpdateMeasuredParameters(calculationDefect, defect.getUnacceptable(), parametersString);
         }
         repository.save(calculationDefect);
     }
 
-    private void saveAll(DefectMeasurement defect
-                       , Set<DefectMeasurement> defectMeasurements
-                       , ParameterCalculationType calculation) {
-        Set<CalculationDefectMeasurement> defectsDb = getAll(defect);
-        List<CalculationDefectMeasurement> defects = defectMeasurements
+    private void saveAll(DefectMeasurement defectMeasurement, Set<DefectMeasurement> defects) {
+        Set<CalculationDefectMeasurement> calculationDefectsDb = getAll(defectMeasurement);
+        List<CalculationDefectMeasurement> calculationDefects = defects
                 .stream()
-                .map(defectMeasurement ->  mapper.mapToCalculationDefectMeasurement(defect
-                                                       , calculationParameterService.getMeasuredParameters(
-                                                               defectMeasurement.getMeasuredParameters(), calculation)))
+                .map(defect -> mapper.mapToCalculationDefectMeasurement(defect,
+                        stringBuilder.convertMeasuredParameter(defect.getMeasuredParameters())))
                 .toList();
-        if (!defectsDb.isEmpty()) {
-            updateAll(defectsDb, defects);
-            repository.saveAll(defectsDb);
+        if (!calculationDefectsDb.isEmpty()) {
+            updateAll(calculationDefectsDb, calculationDefects);
+            repository.saveAll(calculationDefectsDb);
             return;
         }
-        repository.saveAll(defects);
+        repository.saveAll(calculationDefects);
+    }
+
+    private String calculateDefectParameters(Set<MeasuredParameter> parameters
+                                                                              , ParameterCalculationType type) {
+        Map<String, CalculationMeasuredParameter> calculationParameters = new HashMap<>();
+        switch (type) {
+            case MIN -> calculationParameterService.countMin(parameters, calculationParameters);
+            case MAX -> calculationParameterService.countMax(parameters, calculationParameters);
+            case MAX_MIN -> calculationParameterService.countMinMax(parameters, calculationParameters);
+            default -> throw new BadRequestException(
+                    String.format("The type of defect calculation is not supported: %s", type));
+        }
+        return stringBuilder.convertCalculationParameters(calculationParameters);
     }
 
     private void updateAll(Set<CalculationDefectMeasurement> defectsDb, List<CalculationDefectMeasurement> defects) {
@@ -82,19 +96,18 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
             mapper.mapToUpdateCalculationDefectMeasurement(defects.get(index), defect);
             index++;
         }
-        repository.saveAll(defectsDb);
     }
 
     private Set<CalculationDefectMeasurement> getAll(DefectMeasurement defect) {
         if (defect.getPartElementId() != null) {
             return repository.findAllByEquipmentIdAndElementIdAndPartElementIdAndDefectName(defect.getEquipmentId()
-                    , defect.getElementId()
-                    , defect.getPartElementId()
-                    , defect.getDefectName());
+                                                                                          , defect.getElementId()
+                                                                                          , defect.getPartElementId()
+                                                                                          , defect.getDefectName());
         }
         return repository.findAllByEquipmentIdAndElementIdAndDefectName(defect.getEquipmentId()
-                , defect.getElementId()
-                , defect.getDefectName());
+                                                                      , defect.getElementId()
+                                                                      , defect.getDefectName());
     }
 
     private CalculationDefectMeasurement get(DefectMeasurement defect) {
@@ -116,7 +129,7 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
         builder.and(defectMeasurement.elementId.eq(defect.getElementId()));
         builder.and(defectMeasurement.defectName.eq(defect.getDefectName()));
         if (defect.getPartElementId() != null) {
-          builder.and(defectMeasurement.partElementId.eq(defect.getPartElementId()));
+            builder.and(defectMeasurement.partElementId.eq(defect.getPartElementId()));
         }
         new JPAQueryFactory(em)
                 .delete(defectMeasurement)

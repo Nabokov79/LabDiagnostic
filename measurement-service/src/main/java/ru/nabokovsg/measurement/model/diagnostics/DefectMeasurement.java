@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.nabokovsg.measurement.model.library.ParameterCalculationType;
 
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +21,9 @@ public class DefectMeasurement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "calculation")
+    @Enumerated(EnumType.STRING)
+    private ParameterCalculationType calculation;
     @Column(name = "equipment_id")
     private Long equipmentId;
     @Column(name = "defect_library_id")
@@ -40,8 +44,10 @@ public class DefectMeasurement {
     private Long partElementId;
     @Column(name = "part_element_name")
     private String partElementName;
-    @OneToMany(mappedBy = "defect")
+    @OneToMany(mappedBy = "defect", cascade = CascadeType.ALL)
     private Set<MeasuredParameter> measuredParameters;
+    @Column(name = "parameters_string")
+    private String parametersString;
 
     @Override
     public String toString() {
@@ -57,6 +63,7 @@ public class DefectMeasurement {
                 ", elementName='" + elementName + '\'' +
                 ", partElementId=" + partElementId +
                 ", partElementName='" + partElementName + '\'' +
+                ", measuredParameters='" + measuredParameters + '\'' +
                 '}';
     }
 

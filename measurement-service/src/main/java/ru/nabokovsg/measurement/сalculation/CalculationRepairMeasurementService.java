@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface CalculationRepairMeasurementService {
 
-    void factory(RepairMeasurement repair
-               , Set<RepairMeasurement> repairMeasurements
-               , ParameterCalculationType calculation);
+    void save(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type);
+
+    void delete(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type);
 }

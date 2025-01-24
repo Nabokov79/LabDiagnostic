@@ -132,6 +132,8 @@ CREATE TABLE IF NOT EXISTS DEFECT_MEASUREMENTS
     use_calculate_thickness BOOLEAN                                 NOT NULL,
     element_id              BIGINT                                  NOT NULL,
     part_element_id         BIGINT,
+    parameters_string       VARCHAR                                 NOT NULL,
+    calculation             VARCHAR                                 NOT NULL,
     CONSTRAINT pk_defectMeasurement PRIMARY KEY (id)
 );
 

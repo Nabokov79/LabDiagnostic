@@ -12,9 +12,9 @@ public interface CalculationRepairMeasurementMapper {
     @Mapping(target = "id", ignore = true)
     CalculationRepairMeasurement mapToCalculationRepairMeasurement(RepairMeasurement repair, String parametersString);
 
-    CalculationRepairMeasurement mapToUpdateMeasuredParameters(@MappingTarget CalculationRepairMeasurement repair
+    void mapToUpdateMeasuredParameters(@MappingTarget CalculationRepairMeasurement repair
             , String parametersString);
 
     void mapToUpdateCalculationRepairMeasurement(@MappingTarget CalculationRepairMeasurement repairDb
-                                                              , CalculationRepairMeasurement defect);
+                                                              , CalculationRepairMeasurement repair);
 }

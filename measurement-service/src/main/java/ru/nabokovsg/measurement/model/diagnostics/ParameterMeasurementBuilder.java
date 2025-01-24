@@ -1,11 +1,9 @@
 package ru.nabokovsg.measurement.model.diagnostics;
 
-import ru.nabokovsg.measurement.dto.measuredParameter.NewMeasuredParameterDto;
 import ru.nabokovsg.measurement.model.common.MeasurementType;
 import ru.nabokovsg.measurement.model.library.MeasurementParameterLibrary;
 import ru.nabokovsg.measurement.model.qualityControl.WeldDefectControl;
 
-import java.util.List;
 import java.util.Set;
 
 public class ParameterMeasurementBuilder {
@@ -14,7 +12,6 @@ public class ParameterMeasurementBuilder {
     private final DefectMeasurement defect;
     private final WeldDefectControl weldDefect;
     private final RepairMeasurement repair;
-    private final List<NewMeasuredParameterDto> newMeasuredParameters;
     private final Set<MeasuredParameter> measuredParameters;
     private final Set<MeasurementParameterLibrary> measurementParameterLibraries;
 
@@ -24,7 +21,6 @@ public class ParameterMeasurementBuilder {
         this.weldDefect = builder.weldDefect;
         this.repair = builder.repair;
         this.measuredParameters = builder.measuredParameters;
-        this.newMeasuredParameters = builder.newMeasuredParameters;
         this.measurementParameterLibraries = builder.measurementParameterLibraries;
     }
 
@@ -44,10 +40,6 @@ public class ParameterMeasurementBuilder {
         return repair;
     }
 
-    public List<NewMeasuredParameterDto> getNewMeasuredParameters() {
-        return newMeasuredParameters;
-    }
-
     public Set<MeasuredParameter> getMeasuredParameters() {
         return measuredParameters;
     }
@@ -62,7 +54,6 @@ public class ParameterMeasurementBuilder {
         private DefectMeasurement defect;
         private WeldDefectControl weldDefect;
         private RepairMeasurement repair;
-        private List<NewMeasuredParameterDto> newMeasuredParameters;
         private Set<MeasuredParameter> measuredParameters;
         private Set<MeasurementParameterLibrary> measurementParameterLibraries;
 
@@ -83,11 +74,6 @@ public class ParameterMeasurementBuilder {
 
         public Builder repair(RepairMeasurement repair) {
             this.repair = repair;
-            return this;
-        }
-
-        public Builder newMeasuredParameters(List<NewMeasuredParameterDto> newMeasuredParameters) {
-            this.newMeasuredParameters = newMeasuredParameters;
             return this;
         }
 

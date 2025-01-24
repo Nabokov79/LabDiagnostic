@@ -21,49 +21,57 @@ public class CalculationRepairMeasurementServiceImpl implements CalculationRepai
     private final CalculationMeasuredParameterService calculationParameterService;
 
     @Override
-    public void factory(RepairMeasurement repair
-                      , Set<RepairMeasurement> repairMeasurements
-                      , ParameterCalculationType calculation) {
-        switch (calculation) {
-            case MIN, MAX, MAX_MIN -> {
-                Set<MeasuredParameter> measuredParameters = repairMeasurements.stream()
-                        .map(RepairMeasurement::getMeasuredParameters)
-                        .flatMap(Collection::stream)
-                        .collect(Collectors.toSet());
-                saveOne(repair, measuredParameters, calculation);
-            }
-            case NO_ACTION -> saveAll(repair, repairMeasurements, calculation);
+    public void save(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
+        repairs.add(repair);
+        calculation(repair, repairs, type);
+
+    }
+
+    @Override
+    public void delete(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
+
+    }
+
+    private void calculation(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
+        switch (type) {
+            case MIN, MAX, MAX_MIN ->  saveOne(repair, repairs, type);
+            case NO_ACTION -> saveAll(repair, repairs, type);
         }
     }
 
     private void saveOne(RepairMeasurement repair
-                       , Set<MeasuredParameter> measuredParameters
-                       , ParameterCalculationType calculation) {
-        CalculationRepairMeasurement calculationRepair = get(repair);
-        String parameters = calculationParameterService.getMeasuredParameters(measuredParameters, calculation);
-        if (calculationRepair == null) {
-            repository.save(mapper.mapToCalculationRepairMeasurement(repair, parameters));
-            return;
+                       , Set<RepairMeasurement> repairs
+                       , ParameterCalculationType type) {
+        Set<MeasuredParameter> measuredParameters = repairs.stream()
+                .map(RepairMeasurement::getMeasuredParameters)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        CalculationRepairMeasurement calculationDefect = get(repair);
+        String parameters = calculationParameterService.getMeasuredParameters(measuredParameters, type);
+        if (calculationDefect == null) {
+            calculationDefect = mapper.mapToCalculationRepairMeasurement(repair, parameters);
+        } else {
+            mapper.mapToUpdateMeasuredParameters(calculationDefect, parameters);
         }
-        repository.save(mapper.mapToUpdateMeasuredParameters(calculationRepair, parameters));
+        repository.save(calculationDefect);
     }
 
     private void saveAll(RepairMeasurement repair
-                       , Set<RepairMeasurement> repairMeasurements
-                       , ParameterCalculationType calculation) {
+                       , Set<RepairMeasurement> repairs
+                       , ParameterCalculationType type) {
         Set<CalculationRepairMeasurement> repairsDb = getAll(repair);
-        List<CalculationRepairMeasurement> repairs = repairMeasurements
+        List<CalculationRepairMeasurement> calculationRepair = repairs
                 .stream()
                 .map(defectMeasurement ->  mapper.mapToCalculationRepairMeasurement(repair
                         , calculationParameterService.getMeasuredParameters(
-                                defectMeasurement.getMeasuredParameters(), calculation)))
+                                defectMeasurement.getMeasuredParameters(), type)))
                 .toList();
         if (!repairsDb.isEmpty()) {
-            updateAll(repairsDb, repairs);
+            updateAll(repairsDb, calculationRepair);
             repository.saveAll(repairsDb);
             return;
         }
-        repository.saveAll(repairs);
+        repository.saveAll(calculationRepair);
     }
 
     private void updateAll(Set<CalculationRepairMeasurement> repairsDb, List<CalculationRepairMeasurement> repairs) {
