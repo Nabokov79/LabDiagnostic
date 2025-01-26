@@ -24,8 +24,7 @@ public class MeasuredParameterServiceImpl implements MeasuredParameterService {
 
     @Override
     public Set<MeasuredParameter> save(ParameterMeasurementBuilder builder) {
-        build(builder);
-        return new HashSet<>(repository.saveAll(builder.getMeasuredParameters()));
+        return new HashSet<>(repository.saveAll(build(builder)));
     }
 
     @Override
@@ -60,7 +59,19 @@ public class MeasuredParameterServiceImpl implements MeasuredParameterService {
                 coincidences++;
             }
         }
+        if (coincidences == parameters.size()) {
+            sumQuantityParameter(measuredParameters, parameters);
+        }
         return coincidences == parameters.size();
+    }
+
+    private void sumQuantityParameter(Set<MeasuredParameter> measuredParameters, Map<Long, Double> parameters) {
+        measuredParameters
+                .forEach(parameter -> {
+                    if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
+                        parameter.setValue(parameter.getValue() + parameters.get(parameter.getParameterId()));
+                    }
+                });
     }
 
     @Override
@@ -73,17 +84,23 @@ public class MeasuredParameterServiceImpl implements MeasuredParameterService {
                 .collect(Collectors.toSet());
     }
 
-    private void build(ParameterMeasurementBuilder builder) {
+    private Set<MeasuredParameter> build(ParameterMeasurementBuilder builder) {
         switch (builder.getLibraryDataType()) {
-            case REPAIR ->
-                 builder.getMeasuredParameters()
-                         .forEach(parameter -> mapper.mapWithRepair(parameter, builder.getRepair()));
-            case DEFECT ->
-                 builder.getMeasuredParameters()
-                              .forEach(parameter -> mapper.mapWithDefect(parameter, builder.getDefect()));
-            case WELD_DEFECT ->
-                builder.getMeasuredParameters()
+            case REPAIR -> {
+                builder.getRepair().getMeasuredParameters()
+                        .forEach(parameter -> mapper.mapWithRepair(parameter, builder.getRepair()));
+                return builder.getRepair().getMeasuredParameters();
+            }
+            case DEFECT -> {
+                builder.getDefect().getMeasuredParameters()
+                        .forEach(parameter -> mapper.mapWithDefect(parameter, builder.getDefect()));
+                return builder.getDefect().getMeasuredParameters();
+            }
+            case WELD_DEFECT -> {
+                builder.getWeldDefect().getMeasuredParameters()
                         .forEach(parameter -> mapper.mapWithWeldDefect(parameter, builder.getWeldDefect()));
+                return builder.getWeldDefect().getMeasuredParameters();
+            }
             default -> throw new BadRequestException(
                     String.format("Parameter mapping is not supported, type=%s", builder.getLibraryDataType()));
         }

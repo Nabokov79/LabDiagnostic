@@ -1,4 +1,4 @@
-package ru.nabokovsg.measurement.service.diagnostics;
+package ru.nabokovsg.measurement.сalculation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

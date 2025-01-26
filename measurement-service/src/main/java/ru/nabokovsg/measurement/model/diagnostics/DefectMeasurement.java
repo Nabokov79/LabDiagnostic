@@ -44,7 +44,7 @@ public class DefectMeasurement {
     private Long partElementId;
     @Column(name = "part_element_name")
     private String partElementName;
-    @OneToMany(mappedBy = "defect", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "defect")
     private Set<MeasuredParameter> measuredParameters;
     @Column(name = "parameters_string")
     private String parametersString;
@@ -53,6 +53,7 @@ public class DefectMeasurement {
     public String toString() {
         return "DefectMeasurement{" +
                 "id=" + id +
+                ", calculation=" + calculation +
                 ", equipmentId=" + equipmentId +
                 ", defectLibraryId=" + defectLibraryId +
                 ", defectName='" + defectName + '\'' +

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.nabokovsg.measurement.dto.calculationMeasurement.ResponseCalculationDefectMeasurementDto;
 import ru.nabokovsg.measurement.dto.calculationMeasurement.ResponseCalculationRepairMeasurementDto;
-import ru.nabokovsg.measurement.service.diagnostics.CalculationMeasurementService;
+import ru.nabokovsg.measurement.сalculation.CalculationMeasurementService;
 
 import java.util.List;
 

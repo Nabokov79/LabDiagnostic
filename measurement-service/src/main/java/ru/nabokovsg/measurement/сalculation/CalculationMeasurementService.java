@@ -1,4 +1,4 @@
-package ru.nabokovsg.measurement.service.diagnostics;
+package ru.nabokovsg.measurement.сalculation;
 
 import ru.nabokovsg.measurement.dto.calculationMeasurement.ResponseCalculationDefectMeasurementDto;
 import ru.nabokovsg.measurement.dto.calculationMeasurement.ResponseCalculationRepairMeasurementDto;
