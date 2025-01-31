@@ -24,8 +24,6 @@ public class ResponseDefectMeasurementDto {
     private String defectName;
     @Schema(description = "Статус допустимости значений измерения дефекта")
     private String measurementStatus;
-    @Schema(description = "Строка рассчитанных параметров дефекта")
-    private String parametersString;
     @Schema(description = "Рассчитанные параметры дефекта")
-    private Set<ResponseMeasuredParameterDto> measuredParameters;
+    private String parametersString;
 }

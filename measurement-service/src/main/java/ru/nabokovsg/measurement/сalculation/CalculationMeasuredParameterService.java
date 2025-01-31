@@ -9,6 +9,7 @@ import java.util.Set;
 
 public interface CalculationMeasuredParameterService {
 
+    String calculateMeasuredParameters(Set<MeasuredParameter> parameters, ParameterCalculationType type);
     String getMeasuredParameters(Set<MeasuredParameter> parameters, ParameterCalculationType type);
 
     void countMin(Set<MeasuredParameter> measuredParameters, Map<String, CalculationMeasuredParameter> parameters);

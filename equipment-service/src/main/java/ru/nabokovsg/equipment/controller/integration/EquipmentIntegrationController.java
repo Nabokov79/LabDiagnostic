@@ -30,7 +30,7 @@ public class EquipmentIntegrationController {
     @GetMapping
     public ResponseEntity<EquipmentDto> getIds(@RequestParam(name = "elementId") @NotNull @Positive
                                             @Parameter(description = "Идентификатор элемента") Long elementId
-                                          , @RequestParam(name = "partElementId")
+                                          , @RequestParam(name = "partElementId", required = false)
                                             @Parameter(description = "Идентификатор подэлемента") Long partElementId) {
         return ResponseEntity.ok().body(service.getIds(elementId, partElementId));
     }

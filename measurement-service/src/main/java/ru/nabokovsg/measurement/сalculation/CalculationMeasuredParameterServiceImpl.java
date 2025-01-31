@@ -8,7 +8,9 @@ import ru.nabokovsg.measurement.model.common.MeasurementParameterType;
 import ru.nabokovsg.measurement.model.diagnostics.CalculationMeasuredParameter;
 import ru.nabokovsg.measurement.model.diagnostics.MeasuredParameter;
 import ru.nabokovsg.measurement.model.library.ParameterCalculationType;
+import ru.nabokovsg.measurement.service.common.ConvertingMeasuredParameterToStringService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +19,20 @@ import java.util.Set;
 public class CalculationMeasuredParameterServiceImpl implements CalculationMeasuredParameterService {
 
     private final CalculationMeasuredParameterMapper mapper;
+    private final ConvertingMeasuredParameterToStringService stringBuilder;
+
+    @Override
+    public String calculateMeasuredParameters(Set<MeasuredParameter> parameters, ParameterCalculationType type) {
+        Map<String, CalculationMeasuredParameter> calculationParameters = new HashMap<>();
+        switch (type) {
+            case MIN -> countMin(parameters, calculationParameters);
+            case MAX -> countMax(parameters, calculationParameters);
+            case MAX_MIN -> countMinMax(parameters, calculationParameters);
+            default -> throw new BadRequestException(
+                    String.format("The type of defect calculation is not supported: %s", type));
+        }
+        return stringBuilder.convertCalculationParameters(calculationParameters);
+    }
 
     @Override
     public String getMeasuredParameters(Set<MeasuredParameter> parameters, ParameterCalculationType type) {
@@ -38,7 +54,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
                 if (calculationParameter == null) {
                     calculationParameter = mapper.mapToMinValue(parameter);
                 } else {
-                    setQuantityParameter(calculationParameter, parameter);
+                    calculateQuantity(calculationParameter, parameter);
                 }
                 parameters.put(parameter.getParameterName(), calculationParameter);
             } else {
@@ -61,7 +77,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
                 if (calculationParameter == null) {
                     calculationParameter = mapper.mapToMinValue(parameter);
                 } else {
-                    setQuantityParameter(calculationParameter, parameter);
+                    calculateQuantity(calculationParameter, parameter);
                 }
                 parameters.put(parameter.getParameterName(), calculationParameter);
             } else {
@@ -81,7 +97,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
         measuredParameters.forEach(parameter -> {
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                setQuantityParameter(calculationParameter, parameter);
+                calculateQuantity(calculationParameter, parameter);
             } else {
                 if (calculationParameter == null) {
                     calculationParameter = mapper.mapToMinValue(parameter);
@@ -101,7 +117,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
         });
     }
 
-    private void setQuantityParameter(CalculationMeasuredParameter calculationParameter, MeasuredParameter parameter) {
+    private void calculateQuantity(CalculationMeasuredParameter calculationParameter, MeasuredParameter parameter) {
         mapper.mapToUpdateMinValue(calculationParameter, calculationParameter.getMinValue() + parameter.getValue());
     }
 }

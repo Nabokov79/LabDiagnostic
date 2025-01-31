@@ -17,6 +17,8 @@ public class CalculationDefectMeasurement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "defect_id")
+    private Long defectId;
     @Column(name = "equipment_id")
     private Long equipmentId;
     @Column(name = "element_id")

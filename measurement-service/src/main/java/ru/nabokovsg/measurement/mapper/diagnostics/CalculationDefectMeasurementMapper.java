@@ -11,12 +11,16 @@ public interface CalculationDefectMeasurementMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "parametersString", target = "parametersString")
-    CalculationDefectMeasurement mapToCalculationDefectMeasurement(DefectMeasurement defect, String parametersString);
+    CalculationDefectMeasurement mapToCalculationDefectMeasurement(DefectMeasurement defect
+                                                                 , Long defectId
+                                                                 , String parametersString);
 
     void mapToUpdateMeasuredParameters(@MappingTarget CalculationDefectMeasurement defect
                                                     , Boolean unacceptable
                                                     , String parametersString);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "defect.id", target = "defectId")
     void mapToUpdateCalculationDefectMeasurement(@MappingTarget CalculationDefectMeasurement defectDb
-                                                              , CalculationDefectMeasurement defect);
+                                                              , DefectMeasurement defect);
 }

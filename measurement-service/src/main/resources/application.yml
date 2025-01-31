@@ -5,6 +5,10 @@ springdoc:
 server:
   port: 8084
 
+logging:
+  level:
+    sql: debug
+
 spring:
   application:
     name: measurement-service
