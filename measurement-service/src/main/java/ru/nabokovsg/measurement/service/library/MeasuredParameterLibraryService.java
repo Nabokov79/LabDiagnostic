@@ -11,8 +11,8 @@ import java.util.Set;
 public interface MeasuredParameterLibraryService {
 
     Set<MeasurementParameterLibrary> save(TypeMeasuredParameterBuilder builder
-                                            , List<NewMeasurementParameterLibraryDto> measuredParameters);
+                                        , List<NewMeasurementParameterLibraryDto> measuredParameters);
 
-    Set<MeasurementParameterLibrary> update(Set<MeasurementParameterLibrary> measuredParametersDb
-                                              , List<UpdateMeasurementParameterLibraryDto> measuredParameters);
+    Set<MeasurementParameterLibrary> update(TypeMeasuredParameterBuilder builder
+                                          , List<UpdateMeasurementParameterLibraryDto> measuredParameters);
 }

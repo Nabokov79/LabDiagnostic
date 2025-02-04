@@ -1,4 +1,4 @@
-package ru.nabokovsg.measurement.dto.defect;
+package ru.nabokovsg.measurement.dto.repairMeasurement;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -16,8 +16,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Результаты измерения дефекта элемента, подэлемента оборудования")
-public class NewDefectMeasurementDto {
+@Schema(description = "Данные для добавления результатов измерения мест ремонта элемента, подэлемента оборудования")
+public class NewRepairMeasurementDto {
 
     @Schema(description = "Идентификатор диагностируемого оборудования")
     @NotNull(message = "equipmentId should not be null")
@@ -29,10 +29,10 @@ public class NewDefectMeasurementDto {
     private Long elementId;
     @Schema(description = "Идентификатор подэлемента")
     private Long partElementId;
-    @Schema(description = "Идентификатор дефекта")
-    @NotNull(message = "defectId should not be null")
-    @Positive(message = "defectId can only be positive")
-    private Long defectLibraryId;
-    @Schema(description = "Параметры дефекта элемента")
+    @Schema(description = "Идентификатор ремонта")
+    @NotNull(message = "repairId should not be null")
+    @Positive(message = "repairId can only be positive")
+    private Long repairLibraryId;
+    @Schema(description = "Измеренные параметры выполненного ремонта элемента")
     private List<@Valid NewMeasuredParameterDto> measuredParameters;
 }

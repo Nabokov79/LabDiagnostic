@@ -1,7 +1,6 @@
 package ru.nabokovsg.measurement.сalculation;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationDefectMeasurementMapper;
 import ru.nabokovsg.measurement.model.diagnostics.*;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CalculationDefectMeasurementServiceImpl implements CalculationDefectMeasurementService {
 
     private final CalculationDefectMeasurementRepository repository;
@@ -20,7 +18,7 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     private final CalculationMeasuredParameterService calculationParameterService;
 
     @Override
-    public void calculationManager(DefectMeasurement defect, Set<DefectMeasurement> defects) {
+    public void calculationCalculationDefectManager(DefectMeasurement defect, Set<DefectMeasurement> defects) {
         switch (defect.getCalculation()) {
             case MIN, MAX, MAX_MIN -> saveCalculationMinMax(defect, defects);
             case NO_ACTION -> saveWithoutCalculation(defect);
@@ -28,16 +26,13 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     }
 
     @Override
-    public void deleteManager(DefectMeasurement defect, Set<DefectMeasurement> defects) {
-        log.info("DELETE Manager:");
-        log.info("defects ={}", defects);
-        log.info("calculation ={}", defect.getCalculation());
+    public void deleteCalculationDefectManager(DefectMeasurement defect, Set<DefectMeasurement> defects) {
         switch (defect.getCalculation()) {
             case MIN, MAX, MAX_MIN -> {
                 if (defects.isEmpty()) {
-                    deleteAll(defect);
+                    delete(defect);
                 } else {
-                    saveCalculationMinMax(defect, defects);
+                    calculationCalculationDefectManager(defect, defects);
                 }
             }
             case NO_ACTION -> deleteByDefectId(defect);
@@ -50,9 +45,10 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
         CalculationDefectMeasurement calculationDefect = get(defect);
-        String parametersString = calculationParameterService.calculateMeasuredParameters(parameters, defect.getCalculation());
+        String parametersString = calculationParameterService.calculateMeasuredParameters(parameters
+                                                                                        , defect.getCalculation());
         if (calculationDefect == null) {
-            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, defect.getId(), parametersString);
+            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, parametersString);
         } else {
             mapper.mapToUpdateMeasuredParameters(calculationDefect, defect.getUnacceptable(), parametersString);
         }
@@ -62,7 +58,7 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     private void saveWithoutCalculation(DefectMeasurement defect) {
         CalculationDefectMeasurement calculationDefect = repository.findByDefectId(defect.getId());
         if (calculationDefect == null) {
-            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, defect.getId(), defect.getParametersString());
+            calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, defect.getParametersString());
         } else {
             mapper.mapToUpdateCalculationDefectMeasurement(calculationDefect, defect);
         }
@@ -81,7 +77,8 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
                 , defect.getDefectName());
     }
 
-    private void deleteAll(DefectMeasurement defect) {
+    @Override
+    public void delete(DefectMeasurement defect) {
         if (defect.getPartElementId() != null) {
             repository.deleteByEquipmentIdAndElementIdAndPartElementIdAndDefectName(defect.getEquipmentId()
                                                                                   , defect.getElementId()
@@ -94,8 +91,8 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
         }
     }
 
-    private void deleteByDefectId(DefectMeasurement defect) {
-        log.info("delete defect={}", defect);
+    @Override
+    public void deleteByDefectId(DefectMeasurement defect) {
         repository.deleteByDefectId(defect.getId());
     }
 }

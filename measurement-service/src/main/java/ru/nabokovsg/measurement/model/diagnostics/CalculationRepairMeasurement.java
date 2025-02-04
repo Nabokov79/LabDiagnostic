@@ -19,6 +19,8 @@ public class CalculationRepairMeasurement {
     private Long id;
     @Column(name = "equipment_id")
     private Long equipmentId;
+    @Column(name = "repair_id")
+    private Long repairId;
     @Column(name = "element_id")
     private Long elementId;
     @Column(name = "part_element_id")

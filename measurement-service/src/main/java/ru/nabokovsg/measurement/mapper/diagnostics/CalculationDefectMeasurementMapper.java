@@ -10,10 +10,9 @@ import ru.nabokovsg.measurement.model.diagnostics.DefectMeasurement;
 public interface CalculationDefectMeasurementMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(source = "defect.id", target = "defectId")
     @Mapping(source = "parametersString", target = "parametersString")
-    CalculationDefectMeasurement mapToCalculationDefectMeasurement(DefectMeasurement defect
-                                                                 , Long defectId
-                                                                 , String parametersString);
+    CalculationDefectMeasurement mapToCalculationDefectMeasurement(DefectMeasurement defect, String parametersString);
 
     void mapToUpdateMeasuredParameters(@MappingTarget CalculationDefectMeasurement defect
                                                     , Boolean unacceptable

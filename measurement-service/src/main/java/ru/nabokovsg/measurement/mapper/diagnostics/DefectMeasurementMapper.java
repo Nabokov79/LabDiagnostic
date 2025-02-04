@@ -4,8 +4,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.nabokovsg.measurement.dto.client.EquipmentDto;
-import ru.nabokovsg.measurement.dto.defect.NewDefectMeasurementDto;
-import ru.nabokovsg.measurement.dto.defect.ResponseDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.NewDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.ResponseDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.ResponseShortDefectMeasurementDto;
 import ru.nabokovsg.measurement.model.diagnostics.DefectMeasurement;
 import ru.nabokovsg.measurement.model.diagnostics.MeasuredParameter;
 import ru.nabokovsg.measurement.model.library.DefectLibrary;
@@ -23,11 +24,7 @@ public interface DefectMeasurementMapper {
                                            , EquipmentDto equipment
                                            , String parametersString);
 
-    @Mapping(target = "measuredParameters", ignore = true)
-    @Mapping(target = "id", ignore = true)
-    void mapToUpdateDefectMeasurement(@MappingTarget DefectMeasurement defect
-                                                                , String elementName
-                                                                , String partElementName);
+    ResponseShortDefectMeasurementDto mapToResponseShortDefectMeasurementDto(DefectMeasurement defect);
 
     ResponseDefectMeasurementDto mapToResponseDefectMeasurementDto(DefectMeasurement defect);
 

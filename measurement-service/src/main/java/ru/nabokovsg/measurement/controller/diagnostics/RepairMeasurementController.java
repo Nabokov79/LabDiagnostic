@@ -11,9 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.nabokovsg.measurement.dto.repair.NewRepairMeasurementDto;
-import ru.nabokovsg.measurement.dto.repair.ResponseRepairMeasurementDto;
-import ru.nabokovsg.measurement.dto.repair.UpdateRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.NewRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.ResponseRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.ResponseShortRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.UpdateRepairMeasurementDto;
 import ru.nabokovsg.measurement.service.diagnostics.RepairMeasurementService;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class RepairMeasurementController {
 
     @Operation(summary = "Добавить выполненный ремонт элемента")
     @PostMapping
-    public ResponseEntity<ResponseRepairMeasurementDto> save(
+    public ResponseEntity<ResponseShortRepairMeasurementDto> save(
                             @RequestBody @Valid
                             @Parameter(description = "Выполненный ремонт") NewRepairMeasurementDto repairDto) {
         return ResponseEntity.ok().body(service.save(repairDto));
@@ -41,7 +42,7 @@ public class RepairMeasurementController {
 
     @Operation(summary = "Изменить выполненный ремонт элемента")
     @PatchMapping
-    public ResponseEntity<ResponseRepairMeasurementDto> update(
+    public ResponseEntity<ResponseShortRepairMeasurementDto> update(
             @RequestBody @Valid
             @Parameter(description = "Выполненный ремонт") UpdateRepairMeasurementDto repairDto) {
         return ResponseEntity.ok().body(service.update(repairDto));
@@ -56,7 +57,7 @@ public class RepairMeasurementController {
 
     @Operation(summary = "Получить выполненные ремонты элементов оборудования по идентификатору оборудования")
     @GetMapping
-    public ResponseEntity<List<ResponseRepairMeasurementDto>> getAll(
+    public ResponseEntity<List<ResponseShortRepairMeasurementDto>> getAll(
                                             @RequestParam(name = "equipmentId") @NotNull @Positive
                                             @Parameter(description = "Идентификатор оборудования") Long equipmentId,
                                             @RequestParam(name = "elementId", required = false)

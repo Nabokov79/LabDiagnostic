@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationRepairMeasurementMapper;
 import ru.nabokovsg.measurement.model.diagnostics.*;
-import ru.nabokovsg.measurement.model.library.ParameterCalculationType;
 import ru.nabokovsg.measurement.repository.diagnostics.CalculationRepairMeasurementRepository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,78 +19,31 @@ public class CalculationRepairMeasurementServiceImpl implements CalculationRepai
     private final CalculationMeasuredParameterService calculationParameterService;
 
     @Override
-    public void save(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
-        repairs.add(repair);
-        calculation(repair, repairs, type);
-
-    }
-
-    @Override
-    public void delete(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
-
-    }
-
-    private void calculation(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type) {
-        switch (type) {
-            case MIN, MAX, MAX_MIN ->  saveOne(repair, repairs, type);
-            case NO_ACTION -> saveAll(repair, repairs, type);
-        }
-    }
-
-    private void saveOne(RepairMeasurement repair
-                       , Set<RepairMeasurement> repairs
-                       , ParameterCalculationType type) {
-        Set<MeasuredParameter> measuredParameters = repairs.stream()
+    public void saveCalculationMinMax(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
+        Set<MeasuredParameter> parameters = repairs.stream()
                 .map(RepairMeasurement::getMeasuredParameters)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
-        CalculationRepairMeasurement calculationDefect = get(repair);
-        String parameters = calculationParameterService.getMeasuredParameters(measuredParameters, type);
-        if (calculationDefect == null) {
-            calculationDefect = mapper.mapToCalculationRepairMeasurement(repair, parameters);
+        CalculationRepairMeasurement calculationRepair = get(repair);
+        String parametersString = calculationParameterService.calculateMeasuredParameters(parameters
+                , repair.getCalculation());
+        if (calculationRepair == null) {
+            calculationRepair = mapper.mapToCalculationRepairMeasurement(repair, parametersString);
         } else {
-            mapper.mapToUpdateMeasuredParameters(calculationDefect, parameters);
+            mapper.mapToUpdateMeasuredParameters(calculationRepair, parametersString);
         }
-        repository.save(calculationDefect);
+        repository.save(calculationRepair);
     }
 
-    private void saveAll(RepairMeasurement repair
-                       , Set<RepairMeasurement> repairs
-                       , ParameterCalculationType type) {
-        Set<CalculationRepairMeasurement> repairsDb = getAll(repair);
-        List<CalculationRepairMeasurement> calculationRepair = repairs
-                .stream()
-                .map(defectMeasurement ->  mapper.mapToCalculationRepairMeasurement(repair
-                        , calculationParameterService.getMeasuredParameters(
-                                defectMeasurement.getMeasuredParameters(), type)))
-                .toList();
-        if (!repairsDb.isEmpty()) {
-            updateAll(repairsDb, calculationRepair);
-            repository.saveAll(repairsDb);
-            return;
+    @Override
+    public void saveWithoutCalculation(RepairMeasurement repair) {
+        CalculationRepairMeasurement calculationRepair = repository.findByRepairId(repair.getId());
+        if (calculationRepair == null) {
+            calculationRepair = mapper.mapToCalculationRepairMeasurement(repair, repair.getParametersString());
+        } else {
+            mapper.mapToUpdateCalculationRepairMeasurement(calculationRepair, repair);
         }
-        repository.saveAll(calculationRepair);
-    }
-
-    private void updateAll(Set<CalculationRepairMeasurement> repairsDb, List<CalculationRepairMeasurement> repairs) {
-        int index = 0;
-        for (CalculationRepairMeasurement repair : repairsDb) {
-            mapper.mapToUpdateCalculationRepairMeasurement(repairs.get(index), repair);
-            index++;
-        }
-        repository.saveAll(repairsDb);
-    }
-
-    private Set<CalculationRepairMeasurement> getAll(RepairMeasurement repair) {
-        if (repair.getPartElementId() != null) {
-            return repository.findAllByEquipmentIdAndElementIdAndPartElementIdAndRepairName(repair.getEquipmentId()
-                    , repair.getElementId()
-                    , repair.getPartElementId()
-                    , repair.getRepairName());
-        }
-        return repository.findAllByEquipmentIdAndElementIdAndRepairName(repair.getEquipmentId()
-                , repair.getElementId()
-                , repair.getRepairName());
+        repository.save(calculationRepair);
     }
 
     private CalculationRepairMeasurement get(RepairMeasurement repair) {
@@ -105,5 +56,24 @@ public class CalculationRepairMeasurementServiceImpl implements CalculationRepai
         return repository.findByEquipmentIdAndElementIdAndRepairName(repair.getEquipmentId()
                 , repair.getElementId()
                 , repair.getRepairName());
+    }
+
+    @Override
+    public void delete(RepairMeasurement repair) {
+        if (repair.getPartElementId() != null) {
+            repository.deleteByEquipmentIdAndElementIdAndPartElementIdAndRepairName(repair.getEquipmentId()
+                    , repair.getElementId()
+                    , repair.getPartElementId()
+                    , repair.getRepairName());
+        } else {
+            repository.deleteByEquipmentIdAndElementIdAndRepairName(repair.getEquipmentId()
+                    , repair.getElementId()
+                    , repair.getRepairName());
+        }
+    }
+
+    @Override
+    public void deleteByDefectId(RepairMeasurement repair) {
+        repository.deleteByRepairId(repair.getId());
     }
 }

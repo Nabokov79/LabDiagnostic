@@ -51,7 +51,12 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
         mapper.mapToUpdateTypeRepairLibrary(repair, repairDto);
         addTypeCalculation(repair, repairDto.getCalculation());
         repair = repository.save(repair);
-        repair.setMeasuredParameters(parameterService.update(repair.getMeasuredParameters()
+        repair.setMeasuredParameters(parameterService.update(new TypeMeasuredParameterBuilder.Builder()
+                        .libraryDataType(MeasurementType.REPAIR)
+                        .calculation(repair.getCalculation())
+                        .repair(repair)
+                        . measuredParameters(repair.getMeasuredParameters())
+                        .build()
                 , repairDto.getMeasuredParameters()));
         synchronizingService.updateRepairName(repair);
         return mapper.mapToResponseTypeRepairLibraryDto(repair);

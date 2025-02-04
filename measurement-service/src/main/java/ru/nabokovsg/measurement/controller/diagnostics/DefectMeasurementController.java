@@ -11,9 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.nabokovsg.measurement.dto.defect.NewDefectMeasurementDto;
-import ru.nabokovsg.measurement.dto.defect.ResponseDefectMeasurementDto;
-import ru.nabokovsg.measurement.dto.defect.UpdateDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.NewDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.ResponseDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.ResponseShortDefectMeasurementDto;
+import ru.nabokovsg.measurement.dto.defectMeasurement.UpdateDefectMeasurementDto;
 import ru.nabokovsg.measurement.service.diagnostics.DefectMeasurementService;
 
 import java.util.List;
@@ -33,14 +34,14 @@ public class DefectMeasurementController {
 
     @Operation(summary = "Добавить дефект")
     @PostMapping
-    public ResponseEntity<ResponseDefectMeasurementDto> save(
+    public ResponseEntity<ResponseShortDefectMeasurementDto> save(
             @RequestBody @Valid @Parameter(name = "Дефект") NewDefectMeasurementDto defectDto) {
         return ResponseEntity.ok().body(service.save(defectDto));
     }
 
     @Operation(summary = "Изменить дефект")
     @PatchMapping
-    public ResponseEntity<ResponseDefectMeasurementDto> update(
+    public ResponseEntity<ResponseShortDefectMeasurementDto> update(
             @RequestBody @Valid @Parameter(name = "Дефект") UpdateDefectMeasurementDto defectDto) {
         return ResponseEntity.ok().body(service.update(defectDto));
     }
@@ -54,7 +55,7 @@ public class DefectMeasurementController {
 
     @Operation(summary = "Получить дефекты элементов(подэлементов) по идентификатору оборудования")
     @GetMapping
-    public ResponseEntity<List<ResponseDefectMeasurementDto>> getAll(
+    public ResponseEntity<List<ResponseShortDefectMeasurementDto>> getAll(
                                             @RequestParam(name = "equipmentId") @NotNull @Positive
                                             @Parameter(description = "Идентификатор оборудования") Long equipmentId,
                                             @RequestParam(name = "elementId", required = false)

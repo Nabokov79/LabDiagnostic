@@ -51,12 +51,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
         measuredParameters.forEach(parameter -> {
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                if (calculationParameter == null) {
-                    calculationParameter = mapper.mapToMinValue(parameter);
-                } else {
-                    calculateQuantity(calculationParameter, parameter);
-                }
-                parameters.put(parameter.getParameterName(), calculationParameter);
+                parameters.put(parameter.getParameterName(), calculateQuantity(calculationParameter, parameter));
             } else {
                 if (calculationParameter == null) {
                     parameters.put(parameter.getParameterName(), mapper.mapToMinValue(parameter));
@@ -74,12 +69,7 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
         measuredParameters.forEach(parameter -> {
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                if (calculationParameter == null) {
-                    calculationParameter = mapper.mapToMinValue(parameter);
-                } else {
-                    calculateQuantity(calculationParameter, parameter);
-                }
-                parameters.put(parameter.getParameterName(), calculationParameter);
+                parameters.put(parameter.getParameterName(), calculateQuantity(calculationParameter, parameter));
             } else {
                 if (calculationParameter == null) {
                     parameters.put(parameter.getParameterName(), mapper.mapToMaxValue(parameter));
@@ -97,27 +87,32 @@ public class CalculationMeasuredParameterServiceImpl implements CalculationMeasu
         measuredParameters.forEach(parameter -> {
             CalculationMeasuredParameter calculationParameter = parameters.get(parameter.getParameterName());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                calculateQuantity(calculationParameter, parameter);
+                parameters.put(parameter.getParameterName(), calculateQuantity(calculationParameter, parameter));
             } else {
                 if (calculationParameter == null) {
-                    calculationParameter = mapper.mapToMinValue(parameter);
-                    mapper.mapToUpdateMaxValue(calculationParameter, parameter.getValue());
-                    parameters.put(parameter.getParameterName(), calculationParameter);
+                    parameters.put(parameter.getParameterName(), mapper.mapToMinValue(parameter));
                 } else {
                     double minValue = Math.min(calculationParameter.getMinValue(), parameter.getValue());
-                    double maxValue = Math.max(calculationParameter.getMaxValue(), parameter.getValue());
-                    if (minValue == maxValue) {
-                        mapper.mapToUpdateMinValue(calculationParameter, minValue);
+                    double maxValue;
+                    if (calculationParameter.getMaxValue() != null) {
+                        maxValue = Math.max(calculationParameter.getMaxValue(), parameter.getValue());
                     } else {
-                        mapper.mapToUpdateMinMaxValue(calculationParameter, minValue , maxValue);
+                        maxValue = Math.max(calculationParameter.getMinValue(), parameter.getValue());
                     }
+                    mapper.mapToUpdateMinMaxValue(calculationParameter, minValue, maxValue);
                     parameters.put(parameter.getParameterName(), calculationParameter);
                 }
             }
         });
     }
 
-    private void calculateQuantity(CalculationMeasuredParameter calculationParameter, MeasuredParameter parameter) {
-        mapper.mapToUpdateMinValue(calculationParameter, calculationParameter.getMinValue() + parameter.getValue());
+    private CalculationMeasuredParameter calculateQuantity(CalculationMeasuredParameter calculationParameter
+                                                         , MeasuredParameter parameter) {
+        if (calculationParameter == null) {
+            return mapper.mapToMinValue(parameter);
+        } else {
+            mapper.mapToUpdateMinValue(calculationParameter, calculationParameter.getMinValue() + parameter.getValue());
+            return calculationParameter;
+        }
     }
 }

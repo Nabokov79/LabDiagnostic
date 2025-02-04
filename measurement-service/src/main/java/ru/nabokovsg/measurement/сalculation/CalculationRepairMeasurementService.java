@@ -1,13 +1,16 @@
 package ru.nabokovsg.measurement.сalculation;
 
 import ru.nabokovsg.measurement.model.diagnostics.RepairMeasurement;
-import ru.nabokovsg.measurement.model.library.ParameterCalculationType;
 
 import java.util.Set;
 
 public interface CalculationRepairMeasurementService {
 
-    void save(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type);
+    void saveCalculationMinMax(RepairMeasurement repair, Set<RepairMeasurement> repairs);
 
-    void delete(RepairMeasurement repair, Set<RepairMeasurement> repairs, ParameterCalculationType type);
+    void saveWithoutCalculation(RepairMeasurement repair);
+
+    void delete(RepairMeasurement repair);
+
+    void deleteByDefectId(RepairMeasurement repair);
 }

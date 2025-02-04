@@ -12,29 +12,33 @@ import java.util.Set;
 public class ConvertingMeasuredParameterToStringServiceImpl implements ConvertingMeasuredParameterToStringService {
 
     private final static String BLANK = " ";
-    private final static String SEMICOLON = "; ";
+    private final static String SEMICOLON = ";";
 
     @Override
     public String convertMeasuredParameter(Set<MeasuredParameter> measuredParameters) {
         String measuredParameter = BLANK;
         String quantity = BLANK;
         for (MeasuredParameter parameter : measuredParameters) {
-            String parameterString = String.join(BLANK, parameter.getParameterName()
-                                                      , String.valueOf(parameter.getValue())
-                                                      , parameter.getUnitMeasurement());
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
                 quantity = convertQuantityParameter(parameter.getParameterName()
                                                   , parameter.getValue()
                                                   , parameter.getUnitMeasurement());
             } else {
+                String parameterString = convertParameter(parameter.getParameterName()
+                                                        , parameter.getValue()
+                                                        , parameter.getUnitMeasurement());
                 if (measuredParameter.isBlank()) {
-                    measuredParameter = parameterString;
+                    measuredParameter = String.join("", parameterString, SEMICOLON);
                 } else {
-                    measuredParameter = String.join(SEMICOLON, measuredParameter, parameterString);
+                    measuredParameter = String.join("", String.join(BLANK, measuredParameter, parameterString)
+                                                              , SEMICOLON);
                 }
             }
         }
-        return String.join(SEMICOLON, measuredParameter, quantity);
+        if (quantity.isBlank()) {
+            return measuredParameter;
+        }
+        return String.join(BLANK, measuredParameter, quantity);
     }
 
     @Override
@@ -43,34 +47,50 @@ public class ConvertingMeasuredParameterToStringServiceImpl implements Convertin
         String quantity = BLANK;
         for (CalculationMeasuredParameter parameter : parameters.values()) {
             if (parameter.getParameterName().equals(MeasurementParameterType.QUANTITY.label)) {
-                 quantity = convertQuantityParameter(parameter.getParameterName(), parameter.getMinValue(), parameter.getUnitMeasurement());
+                 quantity = convertQuantityParameter(parameter.getParameterName()
+                                                   , parameter.getMinValue()
+                                                   , parameter.getUnitMeasurement());
             } else {
-                measuredParameters = buildMeasuredParameters(measuredParameters, parameter);
+                if (measuredParameters.isBlank()) {
+                    measuredParameters = convertCalculationParameter(parameter);
+                } else {
+                    measuredParameters = String.join(BLANK, measuredParameters, convertCalculationParameter(parameter));
+                }
             }
         }
-        return String.join(SEMICOLON, measuredParameters, quantity);
-    }
-
-    public String buildMeasuredParameters(String measuredParameters, CalculationMeasuredParameter parameter) {
-        if (measuredParameters.isBlank()) {
-            return convertCalculationParameter(parameter);
-        } else {
-            return String.join(SEMICOLON, measuredParameters, convertCalculationParameter(parameter));
+        if (!quantity.isBlank()) {
+            measuredParameters = String.join(BLANK, measuredParameters, quantity);
         }
+        return measuredParameters;
     }
 
-    public String convertQuantityParameter(String parameterName, Double value, String unitMeasurement) {
-        return String.join(BLANK, parameterName, String.valueOf(value.intValue()) , unitMeasurement);
+    private String convertQuantityParameter(String parameterName, Double value, String unitMeasurement) {
+        String quantity =  String.join("", String.join(BLANK, parameterName
+                                                                    , String.valueOf(value.intValue())
+                                                                    , unitMeasurement));
+        return String.join("", quantity, SEMICOLON);
+    }
+
+    private String convertParameter(String parameterName, Double value, String unitMeasurement) {
+        String parameterString =  String.join("", String.join(BLANK, parameterName
+                                                        , String.valueOf(value)
+                                                        , unitMeasurement));
+        return String.join("", parameterString, SEMICOLON);
     }
 
     private String convertCalculationParameter(CalculationMeasuredParameter parameter) {
         String value = BLANK;
+        String unitMeasurement = String.join("", parameter.getUnitMeasurement(), SEMICOLON);
         if (parameter.getMinValue() != null) {
             value = String.join(BLANK,  "от", String.valueOf(parameter.getMinValue()));
         }
         if (parameter.getMaxValue() != null) {
-            value = String.join(BLANK, "до", String.valueOf(parameter.getMaxValue()));
+            if(value.isBlank()) {
+                value = String.join(BLANK, "до", String.valueOf(parameter.getMaxValue()));
+            } else {
+                value = String.join(BLANK, value, "до", String.valueOf(parameter.getMaxValue()));
+            }
         }
-        return String.join(BLANK, parameter.getParameterName(), value, parameter.getUnitMeasurement());
+        return String.join(BLANK, parameter.getParameterName(), value, unitMeasurement);
     }
 }

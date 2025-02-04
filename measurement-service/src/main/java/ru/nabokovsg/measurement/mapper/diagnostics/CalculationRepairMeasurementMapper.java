@@ -10,11 +10,16 @@ import ru.nabokovsg.measurement.model.diagnostics.RepairMeasurement;
 public interface CalculationRepairMeasurementMapper {
 
     @Mapping(target = "id", ignore = true)
-    CalculationRepairMeasurement mapToCalculationRepairMeasurement(RepairMeasurement repair, String parametersString);
+    @Mapping(source = "repair.id", target = "repairId")
+    @Mapping(source = "parametersString", target = "parametersString")
+    CalculationRepairMeasurement mapToCalculationRepairMeasurement(RepairMeasurement repair
+                                                                 , String parametersString);
 
     void mapToUpdateMeasuredParameters(@MappingTarget CalculationRepairMeasurement repair
-            , String parametersString);
+                                                    , String parametersString);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(source = "repair.id", target = "repairId")
     void mapToUpdateCalculationRepairMeasurement(@MappingTarget CalculationRepairMeasurement repairDb
-                                                              , CalculationRepairMeasurement repair);
+                                                              , RepairMeasurement repair);
 }

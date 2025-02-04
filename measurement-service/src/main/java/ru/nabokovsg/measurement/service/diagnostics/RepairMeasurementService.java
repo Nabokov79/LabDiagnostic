@@ -1,20 +1,21 @@
 package ru.nabokovsg.measurement.service.diagnostics;
 
-import ru.nabokovsg.measurement.dto.repair.NewRepairMeasurementDto;
-import ru.nabokovsg.measurement.dto.repair.ResponseRepairMeasurementDto;
-import ru.nabokovsg.measurement.dto.repair.UpdateRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.NewRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.ResponseRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.ResponseShortRepairMeasurementDto;
+import ru.nabokovsg.measurement.dto.repairMeasurement.UpdateRepairMeasurementDto;
 
 import java.util.List;
 
 public interface RepairMeasurementService {
 
-    ResponseRepairMeasurementDto save(NewRepairMeasurementDto repairDto);
+    ResponseShortRepairMeasurementDto save(NewRepairMeasurementDto repairDto);
 
-    ResponseRepairMeasurementDto update(UpdateRepairMeasurementDto repairDto);
+    ResponseShortRepairMeasurementDto update(UpdateRepairMeasurementDto repairDto);
 
     ResponseRepairMeasurementDto get(Long id);
 
-    List<ResponseRepairMeasurementDto> getAll(Long equipmentId, Long elementId, Long partElementId);
+    List<ResponseShortRepairMeasurementDto> getAll(Long equipmentId, Long elementId, Long partElementId);
 
     void delete(Long id);
 }

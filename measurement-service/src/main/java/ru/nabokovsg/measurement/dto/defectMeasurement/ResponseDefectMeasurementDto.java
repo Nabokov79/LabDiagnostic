@@ -1,4 +1,4 @@
-package ru.nabokovsg.measurement.dto.defect;
+package ru.nabokovsg.measurement.dto.defectMeasurement;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.Set;
 @Setter
 @Getter
 @AllArgsConstructor
-@Schema(description = "Данные измеренного дефекта")
+@Schema(description = "Данные дефекта с измеренными параметрами")
 public class ResponseDefectMeasurementDto {
 
     @Schema(description = "Идентификатор")
@@ -24,6 +24,6 @@ public class ResponseDefectMeasurementDto {
     private String defectName;
     @Schema(description = "Статус допустимости значений измерения дефекта")
     private String measurementStatus;
-    @Schema(description = "Рассчитанные параметры дефекта")
-    private String parametersString;
+    @Schema(description = "Измеренные параметры дефекта")
+    private Set<ResponseMeasuredParameterDto> measuredParameters;
 }

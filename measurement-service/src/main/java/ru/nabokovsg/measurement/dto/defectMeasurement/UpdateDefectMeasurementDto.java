@@ -1,4 +1,4 @@
-package ru.nabokovsg.measurement.dto.repair;
+package ru.nabokovsg.measurement.dto.defectMeasurement;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -14,13 +14,13 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor
-@Schema(description = "Изменение результатов измерения мест ремонта элемента, подэлемента оборудования")
-public class UpdateRepairMeasurementDto {
+@Schema(description = "Результаты измерения дефекта элемента, подэлемента оборудования")
+public class UpdateDefectMeasurementDto {
 
     @Schema(description = "Идентификатор")
     @NotNull(message = "id should not be null")
     @Positive(message = "id can only be positive")
     private Long id;
-    @Schema(description = "Измеренные параметры выполненного ремонта элемента")
+    @Schema(description = "Измеренные параметры дефекта элемента")
     private List<@Valid UpdateMeasuredParameterDto> measuredParameters;
 }

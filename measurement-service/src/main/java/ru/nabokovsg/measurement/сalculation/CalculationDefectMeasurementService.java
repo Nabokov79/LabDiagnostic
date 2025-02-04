@@ -6,6 +6,11 @@ import java.util.Set;
 
 public interface CalculationDefectMeasurementService {
 
-    void calculationManager(DefectMeasurement defect, Set<DefectMeasurement> defects);
-    void deleteManager(DefectMeasurement defect, Set<DefectMeasurement> defects);
+    void calculationCalculationDefectManager(DefectMeasurement defect, Set<DefectMeasurement> defects);
+
+     void deleteCalculationDefectManager(DefectMeasurement defect, Set<DefectMeasurement> defects);
+
+    void delete(DefectMeasurement defect);
+
+    void deleteByDefectId(DefectMeasurement defect);
 }

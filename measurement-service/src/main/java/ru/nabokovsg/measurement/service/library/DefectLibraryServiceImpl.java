@@ -52,7 +52,12 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
         addTypeCalculation(defect, defectDto.getCalculation());
         defect = repository.save(defect);
         defect.setMeasuredParameters(
-                parameterService.update(defect.getMeasuredParameters()
+                parameterService.update(new TypeMeasuredParameterBuilder.Builder()
+                                .libraryDataType(MeasurementType.DEFECT)
+                                .calculation(defect.getCalculation())
+                                .defect(defect)
+                                .measuredParameters(defect.getMeasuredParameters())
+                                .build()
                         , defectDto.getMeasuredParameters()));
         synchronizingService.updateDefectName(defect);
         return mapper.mapToResponseTypeDefectLibraryDto(defect);

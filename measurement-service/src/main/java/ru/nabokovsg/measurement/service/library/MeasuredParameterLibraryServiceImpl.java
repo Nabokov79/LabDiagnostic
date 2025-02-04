@@ -14,7 +14,9 @@ import ru.nabokovsg.measurement.repository.library.MeasuredParameterLibraryRepos
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,26 +29,31 @@ public class MeasuredParameterLibraryServiceImpl implements MeasuredParameterLib
     public Set<MeasurementParameterLibrary> save(TypeMeasuredParameterBuilder builder
             , List<NewMeasurementParameterLibraryDto> measuredParametersDto) {
         List<MeasurementParameterLibrary> parametersLibrary = measuredParametersDto.stream()
-                .map(parameter -> {
-                    parameter.setParameterName(MeasurementParameterType.valueOf(parameter.getParameterName()).label);
-                    parameter.setUnitMeasurement(UnitMeasurementType.valueOf(parameter.getUnitMeasurement()).label);
-                    return mapper.mapToMeasuredParameter(parameter);
-                })
+                .map(parameter -> mapper.mapToMeasuredParameter(
+                                                      MeasurementParameterType.valueOf(parameter.getParameterName()).label
+                                                    , UnitMeasurementType.valueOf(parameter.getUnitMeasurement()).label)
+                )
                 .toList();
         parametersLibrary.forEach(parameter -> map(builder, parameter));
         return new HashSet<>(repository.saveAll(parametersLibrary));
     }
 
     @Override
-    public Set<MeasurementParameterLibrary> update(Set<MeasurementParameterLibrary> measuredParametersDb
-            , List<UpdateMeasurementParameterLibraryDto> measuredParametersDto) {
-        return new HashSet<>(repository.saveAll(measuredParametersDto.stream()
-                .map(parameter -> {
-                    parameter.setParameterName(MeasurementParameterType.valueOf(parameter.getParameterName()).label);
-                    parameter.setUnitMeasurement(UnitMeasurementType.valueOf(parameter.getUnitMeasurement()).label);
-                    return mapper.mapToUpdateMeasuredParameter(parameter);
-                })
-                .toList()));
+    public Set<MeasurementParameterLibrary> update(TypeMeasuredParameterBuilder builder
+                                                 , List<UpdateMeasurementParameterLibraryDto> measuredParametersDto) {
+        Map<Long, UpdateMeasurementParameterLibraryDto> parametersLibraryDto =
+                measuredParametersDto.stream()
+                                     .collect(Collectors.toMap(UpdateMeasurementParameterLibraryDto::getId
+                                                             , parameter -> parameter));
+        builder.getMeasuredParameters().forEach(parameter -> {
+            UpdateMeasurementParameterLibraryDto parameterDto = parametersLibraryDto.get(parameter.getId());
+            mapper.mapToUpdateMeasuredParameter(parameter
+                                              , MeasurementParameterType.valueOf(parameterDto.getParameterName()).label
+                                              , UnitMeasurementType.valueOf(parameterDto.getUnitMeasurement()).label);
+            map(builder, parameter);
+        });
+        repository.saveAll(builder.getMeasuredParameters());
+        return builder.getMeasuredParameters();
     }
 
     private void map(TypeMeasuredParameterBuilder builder, MeasurementParameterLibrary parameter) {
