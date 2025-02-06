@@ -18,25 +18,23 @@ public class CalculationRepairMeasurementServiceImpl implements CalculationRepai
     private final CalculationRepairMeasurementMapper mapper;
     private final CalculationMeasuredParameterService calculationParameterService;
 
-    @Override
-    public void saveCalculationMinMax(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
+    private void saveCalculationMinMax(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
         Set<MeasuredParameter> parameters = repairs.stream()
                 .map(RepairMeasurement::getMeasuredParameters)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
-        CalculationRepairMeasurement calculationRepair = get(repair);
+        CalculationRepairMeasurement calculationDefect = get(repair);
         String parametersString = calculationParameterService.calculateMeasuredParameters(parameters
                 , repair.getCalculation());
-        if (calculationRepair == null) {
-            calculationRepair = mapper.mapToCalculationRepairMeasurement(repair, parametersString);
+        if (calculationDefect == null) {
+            calculationDefect = mapper.mapToCalculationRepairMeasurement(repair, parametersString);
         } else {
-            mapper.mapToUpdateMeasuredParameters(calculationRepair, parametersString);
+            mapper.mapToUpdateMeasuredParameters(calculationDefect, parametersString);
         }
-        repository.save(calculationRepair);
+        repository.save(calculationDefect);
     }
 
-    @Override
-    public void saveWithoutCalculation(RepairMeasurement repair) {
+    private void saveWithoutCalculation(RepairMeasurement repair) {
         CalculationRepairMeasurement calculationRepair = repository.findByRepairId(repair.getId());
         if (calculationRepair == null) {
             calculationRepair = mapper.mapToCalculationRepairMeasurement(repair, repair.getParametersString());
@@ -56,6 +54,28 @@ public class CalculationRepairMeasurementServiceImpl implements CalculationRepai
         return repository.findByEquipmentIdAndElementIdAndRepairName(repair.getEquipmentId()
                 , repair.getElementId()
                 , repair.getRepairName());
+    }
+
+    @Override
+    public void calculationCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
+        switch (repair.getCalculation()) {
+            case MIN, MAX, MAX_MIN -> saveCalculationMinMax(repair, repairs);
+            case NO_ACTION -> saveWithoutCalculation(repair);
+        }
+    }
+
+    @Override
+    public void deleteCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
+        switch (repair.getCalculation()) {
+            case MIN, MAX, MAX_MIN -> {
+                if (repairs.isEmpty()) {
+                    delete(repair);
+                } else {
+                    calculationCalculationRepairManager(repair, repairs);
+                }
+            }
+            case NO_ACTION -> deleteByDefectId(repair);
+        }
     }
 
     @Override

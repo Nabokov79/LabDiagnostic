@@ -6,9 +6,9 @@ import java.util.Set;
 
 public interface CalculationRepairMeasurementService {
 
-    void saveCalculationMinMax(RepairMeasurement repair, Set<RepairMeasurement> repairs);
+    void calculationCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs);
 
-    void saveWithoutCalculation(RepairMeasurement repair);
+    void deleteCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs);
 
     void delete(RepairMeasurement repair);
 

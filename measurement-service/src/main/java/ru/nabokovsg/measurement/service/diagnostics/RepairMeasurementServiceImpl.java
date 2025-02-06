@@ -36,24 +36,30 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
     private final CalculationRepairMeasurementService calculationService;
     private final MeasurementClient client;
     private final ConvertingMeasuredParameterToStringService stringBuilder;
+    private final MeasurementDuplicateService duplicateService;
 
     @Override
     public ResponseShortRepairMeasurementDto save(NewRepairMeasurementDto repairDto) {
         Set<RepairMeasurement> repairs = getAllByPredicate(repairDto.getEquipmentId()
-                , repairDto.getElementId()
-                , repairDto.getPartElementId()
-                , repairDto.getRepairLibraryId());
+                                                         , repairDto.getElementId()
+                                                         , repairDto.getPartElementId()
+                                                         , repairDto.getRepairLibraryId());
         Map<Long, Double> parameters = repairDto.getMeasuredParameters()
-                .stream()
-                .collect(Collectors.toMap(NewMeasuredParameterDto::getParameterLibraryId
-                        , NewMeasuredParameterDto::getValue));
-        RepairMeasurement repair = getDuplicate(create(repairDto), repairs, parameters);
+                                                .stream()
+                                                .collect(Collectors.toMap(NewMeasuredParameterDto::getParameterLibraryId
+                                                        , NewMeasuredParameterDto::getValue));
+        RepairMeasurement repair = Objects.requireNonNullElse(
+                duplicateService.searchRepairMeasurementDuplicate(repairs, parameters)
+                , create(repairDto));
         if (repair.getId() == null) {
             repair = repository.save(repair);
             measuredParameterService.save(getParameterMeasurementBuilder(repair));
             repairs.add(repair);
+        } else {
+            measuredParameterService.updateDuplicate(repair.getMeasuredParameters());
+            repair = repository.save(repair);
         }
-        calculationCalculationRepairManager(repair, repairs);
+        calculationService.calculationCalculationRepairManager(repair, repairs);
         return mapper.mapToResponseShortRepairMeasurementDto(repair);
     }
 
@@ -61,22 +67,24 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
     public ResponseShortRepairMeasurementDto update(UpdateRepairMeasurementDto repairDto) {
         RepairMeasurement repair = getById(repairDto.getId());
         Set<RepairMeasurement> repairs = getAllByPredicate(repair.getEquipmentId()
-                , repair.getElementId()
-                , repair.getPartElementId()
-                , repair.getRepairLibraryId());
-        Map<Long, Double> parameters = repairDto.getMeasuredParameters()
-                .stream()
-                .collect(Collectors.toMap(UpdateMeasuredParameterDto::getId
-                        , UpdateMeasuredParameterDto::getValue));
-        repair = getDuplicate(repair, repairs, parameters);
-        if (repair.getId().equals(repairDto.getId())) {
+                                                         , repair.getElementId()
+                                                         , repair.getPartElementId()
+                                                         , repair.getRepairLibraryId());
+        Map<Long, Double> parameters = setParameterLibraryId(repair.getMeasuredParameters(), repairDto);
+        RepairMeasurement duplicate = duplicateService.searchRepairMeasurementDuplicate(repairs, parameters);
+        if (duplicate == null || duplicate.getId().equals(repairDto.getId())) {
             mapper.mapToParametersString(repair
                     , stringBuilder.convertMeasuredParameter(
                             measuredParameterService.update(repair.getMeasuredParameters()
                                     , repairDto.getMeasuredParameters())));
             repair = repository.save(repair);
-            calculationCalculationRepairManager(repair, repairs);
+        } else {
+            deleteRepair(repair);
+            repairs.remove(repair);
+            measuredParameterService.updateDuplicate(duplicate.getMeasuredParameters());
+            repair = repository.save(duplicate);
         }
+        calculationService.calculationCalculationRepairManager(repair, repairs);
         return mapper.mapToResponseShortRepairMeasurementDto(repair);
     }
 
@@ -107,10 +115,13 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
     @Override
     public void delete(Long id) {
         RepairMeasurement repair = getById(id);
-        deleteCalculationRepairManager(repair, getAllByPredicate(repair.getEquipmentId()
-                                                               , repair.getElementId()
-                                                               , repair.getPartElementId()
-                                                               , repair.getRepairLibraryId()));
+        Set<RepairMeasurement> repairs = getAllByPredicate(repair.getEquipmentId()
+                                                         , repair.getElementId()
+                                                         , repair.getPartElementId()
+                                                         , repair.getRepairLibraryId());
+        repairs.remove(repair);
+        deleteRepair(repair);
+        calculationService.deleteCalculationRepairManager(repair, repairs);
     }
 
     private RepairMeasurement create(NewRepairMeasurementDto repairDto) {
@@ -125,67 +136,15 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
                                            , stringBuilder.convertMeasuredParameter(parameters));
     }
 
-    private RepairMeasurement getDuplicate(RepairMeasurement repair, Set<RepairMeasurement> repairs, Map<Long, Double> parameters) {
-        parameters = replaceParameters(repair, parameters);
-        if (!repairs.isEmpty()) {
-            for (RepairMeasurement duplicate : repairs) {
-                if (measuredParameterService.compare(duplicate.getMeasuredParameters(), parameters)) {
-                    mapper.mapToParametersString(duplicate, stringBuilder.convertMeasuredParameter(duplicate.getMeasuredParameters()));
-                    if (!duplicate.getId().equals(repair.getId())) {
-                        repairs.remove(repair);
-                    }
-                    if (repair.getId() == null || repair.getId().equals(duplicate.getId())) {
-                        return updateDuplicate(false, repair, duplicate, repairs);
-                    } else {
-                        return updateDuplicate(true, repair, duplicate, repairs);
-                    }
-                }
-            }
-        }
-        return repair;
-    }
-
-    private RepairMeasurement updateDuplicate(boolean update, RepairMeasurement repair
-                                            , RepairMeasurement duplicate, Set<RepairMeasurement> repairs) {
-        measuredParameterService.updateDuplicate(duplicate.getMeasuredParameters());
-        if (update) {
-            deleteRepair(repair);
-            deleteCalculationRepairManager(repair, repairs);
-        }
-        return repository.save(duplicate);
-    }
-
-    public void calculationCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
-        switch (repair.getCalculation()) {
-            case MIN, MAX, MAX_MIN -> calculationService.saveCalculationMinMax(repair, repairs);
-            case NO_ACTION -> calculationService.saveWithoutCalculation(repair);
-        }
-    }
-
-    public void deleteCalculationRepairManager(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
-        repairs.remove(repair);
-        deleteRepair(repair);
-        switch (repair.getCalculation()) {
-            case MIN, MAX, MAX_MIN -> {
-                if (repairs.isEmpty()) {
-                    calculationService.delete(repair);
-                } else {
-                    calculationCalculationRepairManager(repair, repairs);
-                }
-            }
-            case NO_ACTION -> calculationService.deleteByDefectId(repair);
-        }
-    }
-
-    private Map<Long, Double> replaceParameters(RepairMeasurement repair, Map<Long, Double> parameters) {
-        if (repair.getId() != null) {
-            return repair.getMeasuredParameters()
-                    .stream()
-                    .collect(Collectors.toMap(MeasuredParameter::getParameterId
-                            , parameter -> parameters.get(parameter.getId())));
-        } else {
-            return parameters;
-        }
+    private Map<Long, Double> setParameterLibraryId(Set<MeasuredParameter> measuredParameters
+            , UpdateRepairMeasurementDto repairDto) {
+        Map<Long, Double> parameters = repairDto.getMeasuredParameters()
+                .stream()
+                .collect(Collectors.toMap(UpdateMeasuredParameterDto::getId
+                        , UpdateMeasuredParameterDto::getValue));
+        return measuredParameters.stream()
+                .collect(Collectors.toMap(MeasuredParameter::getParameterId
+                        , parameter -> parameters.get(parameter.getId())));
     }
 
     public void deleteRepair(RepairMeasurement repair) {
@@ -211,7 +170,6 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
                                                                                , repairLibraryId);
         }
     }
-
 
     private ParameterMeasurementBuilder getParameterMeasurementBuilder(RepairMeasurement repair) {
         return new ParameterMeasurementBuilder.Builder()

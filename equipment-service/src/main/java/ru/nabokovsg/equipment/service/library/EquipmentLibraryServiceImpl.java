@@ -45,7 +45,7 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
             return mapper.mapResponseEquipmentLibraryDto(equipment);
         }
         throw new NotFoundException(
-                String.format("Equipment library with id=%s not found for update", equipmentDto.getId()));
+                String.format("Equipment library =%s not found for update", equipmentDto));
     }
 
     @Override

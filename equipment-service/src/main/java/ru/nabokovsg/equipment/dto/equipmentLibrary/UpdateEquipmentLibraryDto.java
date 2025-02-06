@@ -27,4 +27,15 @@ public class UpdateEquipmentLibraryDto {
     private String model;
     @Schema(description = "Положение оборудования")
     private String orientation;
+
+    @Override
+    public String toString() {
+        return "UpdateEquipmentLibraryDto{" +
+                "id=" + id +
+                ", equipmentName='" + equipmentName + '\'' +
+                ", volume=" + volume +
+                ", model='" + model + '\'' +
+                ", orientation='" + orientation + '\'' +
+                '}';
+    }
 }

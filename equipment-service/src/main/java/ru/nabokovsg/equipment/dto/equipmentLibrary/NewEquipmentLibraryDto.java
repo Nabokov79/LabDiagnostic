@@ -28,4 +28,15 @@ public class NewEquipmentLibraryDto {
     @Schema(description = "Идентификатор вида оборудования")
     @NotNull(groups = {Copy.class}, message = "equipmentLibraryId should not be null")
     private Long equipmentLibraryId;
+
+    @Override
+    public String toString() {
+        return "NewEquipmentLibraryDto{" +
+                "equipmentName='" + equipmentName + '\'' +
+                ", volume=" + volume +
+                ", model='" + model + '\'' +
+                ", orientation='" + orientation + '\'' +
+                ", equipmentLibraryId=" + equipmentLibraryId +
+                '}';
+    }
 }
