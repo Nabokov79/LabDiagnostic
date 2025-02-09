@@ -79,8 +79,7 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
                                     , repairDto.getMeasuredParameters())));
             repair = repository.save(repair);
         } else {
-            deleteRepair(repair);
-            repairs.remove(repair);
+            deleteRepair(repair, repairs);
             measuredParameterService.updateDuplicate(duplicate.getMeasuredParameters());
             repair = repository.save(duplicate);
         }
@@ -119,9 +118,7 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
                                                          , repair.getElementId()
                                                          , repair.getPartElementId()
                                                          , repair.getRepairLibraryId());
-        repairs.remove(repair);
-        deleteRepair(repair);
-        calculationService.deleteCalculationRepairManager(repair, repairs);
+        deleteRepair(repair, repairs);
     }
 
     private RepairMeasurement create(NewRepairMeasurementDto repairDto) {
@@ -147,9 +144,11 @@ public class RepairMeasurementServiceImpl implements RepairMeasurementService {
                         , parameter -> parameters.get(parameter.getId())));
     }
 
-    public void deleteRepair(RepairMeasurement repair) {
+    public void deleteRepair(RepairMeasurement repair, Set<RepairMeasurement> repairs) {
         measuredParameterService.deleteAll(repair.getMeasuredParameters());
         repository.deleteById(repair.getId());
+        repairs.remove(repair);
+        calculationService.deleteCalculationRepairManager(repair, repairs);
     }
 
     private RepairMeasurement getById(Long id) {

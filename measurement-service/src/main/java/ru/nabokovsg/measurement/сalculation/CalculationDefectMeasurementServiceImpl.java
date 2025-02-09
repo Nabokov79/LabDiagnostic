@@ -40,12 +40,12 @@ public class CalculationDefectMeasurementServiceImpl implements CalculationDefec
     }
 
     private void saveCalculationMinMax(DefectMeasurement defect, Set<DefectMeasurement> defects) {
-        Set<MeasuredParameter> parameters = defects.stream()
-                .map(DefectMeasurement::getMeasuredParameters)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        Set<MeasuredParameter> measuredParameters = defects.stream()
+                                                           .map(DefectMeasurement::getMeasuredParameters)
+                                                           .flatMap(Collection::stream)
+                                                           .collect(Collectors.toSet());
         CalculationDefectMeasurement calculationDefect = get(defect);
-        String parametersString = calculationParameterService.calculateMeasuredParameters(parameters
+        String parametersString = calculationParameterService.calculateMeasuredParameters(measuredParameters
                                                                                         , defect.getCalculation());
         if (calculationDefect == null) {
             calculationDefect = mapper.mapToCalculationDefectMeasurement(defect, parametersString);

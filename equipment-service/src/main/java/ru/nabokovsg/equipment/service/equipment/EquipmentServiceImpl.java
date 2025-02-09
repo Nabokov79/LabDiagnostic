@@ -37,7 +37,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public ResponseEquipmentDto update(UpdateEquipmentDto equipmentDto) {
         if (repository.existsById(equipmentDto.getId())) {
-            Equipment equipment = mapper.mapToUpdateEquipment(equipmentDto);
+            Equipment equipment = mapper.mapToUpdateEquipment(equipmentDto, equipmentLibraryService.getById(equipmentDto.getEquipmentLibraryId()));
             valid(equipment);
             return mapper.mapToResponseEquipmentDto(repository.save(equipment));
         }

@@ -27,6 +27,10 @@ public class UltrasonicResidualThicknessMeasurement {
     private Long elementId;
     @Column(name = "part_element_id")
     private Long partElementId;
+    @Column(name = "element_name")
+    private String elementName;
+    @Column(name = "part_element_name")
+    private String partElementName;
     @Column(name = "standard_size")
     private String standardSize;
     @Column(name = "measurement_number")

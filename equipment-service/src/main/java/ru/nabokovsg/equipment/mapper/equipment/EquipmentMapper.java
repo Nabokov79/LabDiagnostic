@@ -16,8 +16,10 @@ public interface EquipmentMapper {
     @Mapping(target = "elements", ignore = true)
     Equipment mapToEquipment(NewEquipmentDto equipmentDto, EquipmentLibrary equipmentLibrary);
 
+    @Mapping(source = "equipmentDto.id", target = "id")
+    @Mapping(target = "equipmentLibrary.id", ignore = true)
     @Mapping(target = "elements", ignore = true)
-    Equipment mapToUpdateEquipment(UpdateEquipmentDto equipmentDto);
+    Equipment mapToUpdateEquipment(UpdateEquipmentDto equipmentDto, EquipmentLibrary equipmentLibrary);
 
     ResponseShortEquipmentDto mapToResponseShortEquipmentDto(Equipment equipment);
 

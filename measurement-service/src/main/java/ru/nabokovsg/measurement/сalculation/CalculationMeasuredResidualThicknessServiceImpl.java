@@ -35,7 +35,7 @@ public class CalculationMeasuredResidualThicknessServiceImpl implements Calculat
                 , maxCorrosion
                 , acceptableThickness);
         double minAcceptableValue = countMinAcceptableValue(acceptableThickness, equipment);
-        mapper.mapWithDataCalculation(measurement, maxCorrosion, residualThickness, minAcceptableValue);
+        mapper.mapWithDataCalculation(measurement, equipment, maxCorrosion, residualThickness, minAcceptableValue);
         setMeasurementStatus(measurement, acceptableThickness);
     }
 
@@ -85,7 +85,8 @@ public class CalculationMeasuredResidualThicknessServiceImpl implements Calculat
         if (residualThickness < 0) {
             return 0;
         }
-        return residualThickness;
+        double scale = Math.pow(10, 1);
+        return Math.ceil(residualThickness * scale) / scale;
     }
 
     private double countMinAcceptableValue(AcceptableResidualThickness acceptableThickness

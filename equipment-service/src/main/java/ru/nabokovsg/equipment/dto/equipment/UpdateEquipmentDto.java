@@ -17,6 +17,10 @@ public class UpdateEquipmentDto {
     @NotNull(message = "document header id should not be null")
     @Positive(message = "document header id can only be positive")
     private Long id;
+    @Schema(description = "Идентификатор типа оборудования")
+    @NotNull(message = "equipmentType id should not be null")
+    @Positive(message = "equipmentType id can only be positive")
+    private Long equipmentLibraryId;
     @Schema(description = "Идентификатор адреса")
     @NotNull(message = "address id should not be null")
     @Positive(message = "address id can only be positive")

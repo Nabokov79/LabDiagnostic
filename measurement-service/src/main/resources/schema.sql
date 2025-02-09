@@ -149,6 +149,8 @@ CREATE TABLE IF NOT EXISTS ULTRASONIC_MEASUREMENTS
     equipment_id          BIGINT                                  NOT NULL,
     element_id            BIGINT                                  NOT NULL,
     part_element_id       BIGINT,
+    element_name          VARCHAR                                 NOT NULL,
+    part_element_name     VARCHAR,
     standard_size         VARCHAR                                 NOT NULL,
     measurement_number    INTEGER,
     min_measurement_value DOUBLE PRECISION                        NOT NULL,

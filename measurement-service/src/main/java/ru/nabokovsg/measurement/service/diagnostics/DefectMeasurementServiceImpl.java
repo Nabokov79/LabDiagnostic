@@ -82,8 +82,7 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
                                     , defectDto.getMeasuredParameters())));
             defect = repository.save(defect);
         } else {
-            deleteDefect(defect);
-            defects.remove(defect);
+            deleteDefect(defect, defects);
             measuredParameterService.updateDuplicate(duplicate.getMeasuredParameters());
             defect = repository.save(duplicate);
         }
@@ -122,9 +121,8 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
                                                          , defect.getElementId()
                                                          , defect.getPartElementId()
                                                          , defect.getDefectLibraryId());
-        defects.remove(defect);
-        deleteDefect(defect);
-        calculationService.deleteCalculationDefectManager(defect, defects);
+        deleteDefect(defect, defects);
+
     }
 
     private DefectMeasurement create(NewDefectMeasurementDto defectDto) {
@@ -150,9 +148,11 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
                         , parameter -> parameters.get(parameter.getId())));
     }
 
-    private void deleteDefect(DefectMeasurement defect) {
+    private void deleteDefect(DefectMeasurement defect, Set<DefectMeasurement> defects) {
         measuredParameterService.deleteAll(defect.getMeasuredParameters());
         repository.deleteById(defect.getId());
+        defects.remove(defect);
+        calculationService.deleteCalculationDefectManager(defect, defects);
     }
 
     private DefectMeasurement getById(Long id) {
@@ -160,17 +160,17 @@ public class DefectMeasurementServiceImpl implements DefectMeasurementService {
                 .orElseThrow(() -> new NotFoundException(String.format("Defect measurement with id=%s not found", id)));
     }
 
-    private Set<DefectMeasurement> getAllByPredicate(Long equipmentId, Long elementId, Long partElementId, Long defectLibraryId) {
+    private Set<DefectMeasurement> getAllByPredicate(Long equipmentId, Long elementId
+                                                   , Long partElementId, Long defectLibraryId) {
         if (partElementId != null) {
-            return repository.findAllByEquipmentIdAndElementIdAndPartElementIdAndDefectLibraryId(
-                    equipmentId
-                    , elementId
-                    , partElementId
-                    , defectLibraryId);
+            return repository.findAllByEquipmentIdAndElementIdAndPartElementIdAndDefectLibraryId(equipmentId
+                                                                                                , elementId
+                                                                                                , partElementId
+                                                                                                , defectLibraryId);
         } else {
             return repository.findAllByEquipmentIdAndElementIdAndDefectLibraryId(equipmentId
-                    , elementId
-                    , defectLibraryId);
+                                                                               , elementId
+                                                                               , defectLibraryId);
         }
     }
 }
