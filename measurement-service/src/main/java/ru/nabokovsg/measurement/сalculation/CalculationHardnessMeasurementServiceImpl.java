@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.client.MeasurementClient;
 import ru.nabokovsg.measurement.dto.client.EquipmentDto;
 import ru.nabokovsg.measurement.exceptions.BadRequestException;
+import ru.nabokovsg.measurement.exceptions.NotFoundException;
 import ru.nabokovsg.measurement.mapper.diagnostics.CalculationHardnessMeasurementMapper;
 import ru.nabokovsg.measurement.model.diagnostics.HardnessMeasurement;
 import ru.nabokovsg.measurement.model.diagnostics.MeasurementStatus;
@@ -14,6 +15,7 @@ import ru.nabokovsg.measurement.repository.diagnostics.UltrasonicResidualThickne
 import ru.nabokovsg.measurement.repository.library.AcceptableMetalHardnessRepository;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,25 +37,22 @@ public class CalculationHardnessMeasurementServiceImpl implements CalculationHar
         EquipmentDto equipment = client.getEquipment(measurement.getElementId(), measurement.getPartElementId());
         AcceptableMetalHardness acceptableHardness = getAcceptableMetalHardness(equipment);
         validateMeasurement(equipment, measurement, acceptableHardness);
+        String measurementStatus = null;
+        String status = null;
         if (acceptableHardness == null) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("NO_STANDARD").label
-                                          , "NO_STANDARD");
-            return;
+            measurementStatus = MeasurementStatus.NO_STANDARD.label;
+            status = "NO_STANDARD";
+        } else {
+            if (getStatus(measurement, acceptableHardness, true)) {
+                measurementStatus = MeasurementStatus.ACCEPTABLE.label;
+                status = "ACCEPTABLE";
+            }
+            if (getStatus(measurement, acceptableHardness, false)) {
+                measurementStatus = MeasurementStatus.INVALID.label;
+                status = "INVALID";
+            }
         }
-        if (compareMinAcceptable(measurement, acceptableHardness, true)
-                                               && compareMaxAcceptable(measurement, acceptableHardness, true)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("ACCEPTABLE").label
-                                          , "ACCEPTABLE");
-            return;
-        }
-        if (compareMinAcceptable(measurement, acceptableHardness, false)
-                                               || compareMaxAcceptable(measurement, acceptableHardness, false)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("INVALID").label
-                                          , "INVALID");
-        }
+        mapper.mapWithMeasurementStatus(measurement, measurementStatus, status);
     }
 
     private void validateMeasurement(EquipmentDto equipment
@@ -86,36 +85,30 @@ public class CalculationHardnessMeasurementServiceImpl implements CalculationHar
                                                                                 , measurement.getMeasurementNumber());
     }
 
-    private boolean compareMinAcceptable(HardnessMeasurement measurement
-                                       , AcceptableMetalHardness acceptableHardness
-                                       , boolean flag) {
+    private boolean getStatus(HardnessMeasurement measurement
+                            , AcceptableMetalHardness acceptableHardness
+                            , boolean flag) {
         if (flag) {
-            return measurement.getMeasurementValue() >= acceptableHardness.getMinAcceptableHardness();
+            return measurement.getMeasurementValue() >= acceptableHardness.getMinAcceptableHardness()
+                    && measurement.getMeasurementValue() <= acceptableHardness.getMaxAcceptableHardness();
         }
-        return measurement.getMeasurementValue() < acceptableHardness.getMinAcceptableHardness();
+        return measurement.getMeasurementValue() < acceptableHardness.getMinAcceptableHardness()
+                || measurement.getMeasurementValue() > acceptableHardness.getMaxAcceptableHardness();
     }
 
-    private boolean compareMaxAcceptable(HardnessMeasurement measurement
-                                       , AcceptableMetalHardness acceptableHardness
-                                       , boolean flag) {
-        if (flag) {
-            return measurement.getMeasurementValue() <= acceptableHardness.getMaxAcceptableHardness();
-        }
-        return measurement.getMeasurementValue() > acceptableHardness.getMaxAcceptableHardness();
-    }
-
-    public AcceptableMetalHardness getAcceptableMetalHardness(EquipmentDto equipment) {
+    private AcceptableMetalHardness getAcceptableMetalHardness(EquipmentDto equipment) {
+        Optional<AcceptableMetalHardness> acceptableHardness;
         if (equipment.getPartElementLibraryId() != null) {
-            return acceptableRepository
-                    .findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
+            acceptableHardness = acceptableRepository.findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(
                                                                                   equipment.getEquipmentLibraryId()
                                                                                 , equipment.getElementLibraryId()
-                                                                                , equipment.getPartElementLibraryId()
-                                                                                , equipment.getStandardSize());
+                                                                                , equipment.getPartElementLibraryId());
+        } else {
+            acceptableHardness = acceptableRepository.findByEquipmentLibraryIdAndElementLibraryId(equipment.getEquipmentLibraryId()
+                    , equipment.getElementLibraryId());
         }
-        return acceptableRepository.findByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(
-                                                                                      equipment.getEquipmentLibraryId()
-                                                                                    , equipment.getElementLibraryId()
-                                                                                    , equipment.getStandardSize());
+        return acceptableHardness.orElseThrow(
+                () ->  new NotFoundException(
+                        String.format("AcceptableMetalHardness by equipment not found: %s", equipment)));
     }
 }

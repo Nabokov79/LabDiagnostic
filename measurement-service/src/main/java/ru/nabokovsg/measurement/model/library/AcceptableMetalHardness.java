@@ -25,6 +25,8 @@ public class AcceptableMetalHardness {
     private Long partElementLibraryId;
     @Column(name = "standard_size_string")
     private String standardSize;
+    @Column(name = "thickness")
+    private Double thickness;
     @Column(name = "min_diameter")
     private Integer minAcceptableDiameter;
     @Column(name = "min_thickness")

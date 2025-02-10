@@ -22,8 +22,6 @@ CREATE TABLE IF NOT EXISTS ACCEPTABLE_METAL_HARDNESS
     thickness               DOUBLE PRECISION,
     min_diameter            INTEGER,
     min_thickness           DOUBLE PRECISION,
-    max_diameter            INTEGER,
-    max_thickness           DOUBLE PRECISION,
     min_hardness            INTEGER                                 NOT NULL,
     max_hardness            INTEGER,
     measurement_error       FLOAT,
