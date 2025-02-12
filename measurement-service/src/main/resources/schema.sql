@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS ACCEPTABLE_RESIDUAL_THICKNESS
     part_element_library_id BIGINT,
     standard_size           VARCHAR                                 NOT NULL,
     diameter                INTEGER,
-    thickness               DOUBLE PRECISION                        NOT NULL,
+    thickness               DOUBLE PRECISION,
     acceptable_thickness    DOUBLE PRECISION,
     acceptable_percent      INTEGER,
     measurement_error       FLOAT,

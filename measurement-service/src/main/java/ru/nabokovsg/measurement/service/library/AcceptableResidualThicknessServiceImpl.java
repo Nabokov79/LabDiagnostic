@@ -104,6 +104,7 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
             if (!standardSize.isBlank()) {
                 return String.join("х", standardSize, thicknessString);
             }
+            return thicknessString;
         }
         return standardSize;
     }
