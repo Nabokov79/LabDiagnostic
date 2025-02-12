@@ -27,16 +27,12 @@ public class UpdateAcceptableResidualThicknessDto {
     private Long elementLibraryId;
     @Schema(description = "Идентификатор подэлемента элемента оборудования")
     private Long partElementLibraryId;
-    @Schema(description = "Толщина элемента")
+    @Schema(description = "Минимальная допкстимая толщина элемента")
+    @NotNull(message = "thickness should not be null")
+    @Positive(message = "thickness can only be positive")
     private Double thickness;
-    @Schema(description = "Минимальный диаметр(для тройника, перехода)")
-    private Integer minDiameter;
-    @Schema(description = "Толщина стенки минимального диаметра")
-    private Double minThickness;
-    @Schema(description = "Максимальный диаметр(для тройника, перехода)")
-    private Integer maxDiameter;
-    @Schema(description = "Толщина стенки максимального диаметра")
-    private Double maxThickness;
+    @Schema(description = "Минимальный допустимый диаметр элемента")
+    private Integer diameter;
     @Schema(description = "Минимальная допустимая толщина стенки элемента")
     @NotNull(message = "AcceptableThickness should not be null")
     @Positive(message = "AcceptableThickness can only be positive")

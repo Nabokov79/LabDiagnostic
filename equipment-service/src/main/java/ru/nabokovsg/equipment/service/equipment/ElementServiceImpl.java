@@ -33,7 +33,7 @@ public class ElementServiceImpl implements ElementService {
             element = mapper.mapToElement(libraryService.getById(elementDto.getElementLibraryId())
                                         , equipmentService.getById(elementDto.getEquipmentId()));
             if (elementDto.getPartElementLibraryId() == null) {
-                mapper.mapWithStandardSize(element, standardSize);
+                mapper.mapWithStandardSize(element, elementDto, standardSize);
             }
             element = repository.save(element);
         } else if (elementDto.getPartElementLibraryId() == null){
@@ -51,6 +51,7 @@ public class ElementServiceImpl implements ElementService {
         String standardSize = standardSizeStringBuilder.convertToString(mapper.mapToUpdateStandardSize(elementDto));
         if (elementDto.getPartElementId() == null) {
             mapper.mapToUpdateElement(element
+                              , elementDto
                               , standardSizeStringBuilder.convertToString(mapper.mapToUpdateStandardSize(elementDto)));
         } else {
             partElementService.update(element.getPartsElement(), elementDto.getPartElementId(), standardSize);

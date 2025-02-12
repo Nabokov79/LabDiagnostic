@@ -23,13 +23,11 @@ public class AcceptableMetalHardness {
     private Long elementLibraryId;
     @Column(name = "part_element_library_id")
     private Long partElementLibraryId;
-    @Column(name = "standard_size_string")
+    @Column(name = "standard_size")
     private String standardSize;
-    @Column(name = "thickness")
-    private Double thickness;
-    @Column(name = "min_diameter")
+    @Column(name = "acceptable_diameter")
     private Integer minAcceptableDiameter;
-    @Column(name = "min_thickness")
+    @Column(name = "acceptable_thickness")
     private Double minAcceptableThickness;
     @Column(name = "min_hardness")
     private Integer minAcceptableHardness;

@@ -19,13 +19,12 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
 
     private final AcceptableResidualThicknessRepository repository;
     private final AcceptableResidualThicknessMapper mapper;
-    private final StandardSizeStringBuilder convertToString;
 
     @Override
     public ResponseAcceptableResidualThicknessDto save(NewAcceptableResidualThicknessDto thicknessDto) {
         AcceptableResidualThickness acceptableResidualThickness =
                 mapper.mapToAcceptableThickness(thicknessDto
-                        , convertToString.convertToString(mapper.mapToStandardSize(thicknessDto)));
+                        , getStandardSize(thicknessDto.getThickness(), thicknessDto.getDiameter()));
         if (getDuplicate(acceptableResidualThickness)) {
             throw new BadRequestException(
                     String.format("AcceptableResidualThickness thickness=%s is found", thicknessDto));
@@ -38,7 +37,7 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
         if (repository.existsById(thicknessDto.getId())) {
             AcceptableResidualThickness acceptableResidualThickness =
                     mapper.mapToUpdateAcceptableThickness(thicknessDto
-                                    , convertToString.convertToString(mapper.mapToUpdateStandardSize(thicknessDto)));
+                            , getStandardSize(thicknessDto.getThickness(), thicknessDto.getDiameter()));
             return mapper.mapToResponseAcceptableResidualThicknessDto(repository.save(acceptableResidualThickness));
         }
         throw new NotFoundException(
@@ -82,5 +81,30 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
                                                                           acceptableThickness.getEquipmentLibraryId()
                                                                         , acceptableThickness.getElementLibraryId()
                                                                         , acceptableThickness.getStandardSize());
+    }
+
+    private String getStandardSize(Double thickness, Integer diameter) {
+        if (thickness == null && diameter == null) {
+            throw new BadRequestException(
+                    String.format("diameter and thickness should not be null:" +
+                            " diameter=%s, thickness=%s", diameter, thickness));
+        }
+        String standardSize = "";
+        if (thickness != null && thickness <= 0) {
+            throw new BadRequestException(String.format("thickness can only be positive: thickness=%s", thickness));
+        }
+        if (diameter != null && diameter <= 0) {
+            throw new BadRequestException(String.format("diameter can only be positive: diameter=%s", diameter));
+        }
+        if (diameter != null) {
+            standardSize = String.valueOf(diameter);
+        }
+        if (thickness != null) {
+            String thicknessString = String.valueOf(thickness);
+            if (!standardSize.isBlank()) {
+                return String.join("х", standardSize, thicknessString);
+            }
+        }
+        return standardSize;
     }
 }

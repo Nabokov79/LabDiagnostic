@@ -15,6 +15,7 @@ import ru.nabokovsg.measurement.repository.diagnostics.UltrasonicResidualThickne
 import ru.nabokovsg.measurement.repository.library.AcceptableMetalHardnessRepository;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -59,16 +60,27 @@ public class CalculationHardnessMeasurementServiceImpl implements CalculationHar
                                    , HardnessMeasurement measurement
                                    , AcceptableMetalHardness acceptableHardness) {
         UltrasonicResidualThicknessMeasurement residualThickness = getUltrasonicResidualThicknessMeasurement(measurement);
-        if (measurement.getPartElementId() == null) {
-            if ((equipment.getMinDiameter() <= acceptableHardness.getMinAcceptableDiameter())
-                    || (residualThickness.getMinMeasurementValue() <= acceptableHardness.getMinAcceptableThickness())) {
-                throw new BadRequestException(
-                        String.format("The values of the element's standard size and residual thickness"
-                                        + " are below acceptable values, standardSize=%s, residualThickness=%s"
-                                , measurement.getStandardSize()
-                                , residualThickness.getResidualThickness()));
-            }
+        if (valid(equipment, acceptableHardness, residualThickness)) {
+            throw new BadRequestException(
+                    String.format("The values of the element's standard size and residual thickness"
+                                    + " are below acceptable values, standardSize=%s, residualThickness=%s"
+                            , measurement.getStandardSize()
+                            , residualThickness.getResidualThickness()));
         }
+    }
+
+    private boolean valid(EquipmentDto equipment
+                        , AcceptableMetalHardness acceptableHardness
+                        , UltrasonicResidualThicknessMeasurement residualThickness) {
+        boolean result = false;
+        if (acceptableHardness.getMinAcceptableDiameter() != null) {
+            Integer diameter = Objects.requireNonNullElse(equipment.getMinDiameter(), equipment.getMaxDiameter());
+            result = diameter <= acceptableHardness.getMinAcceptableDiameter();
+        }
+        if (acceptableHardness.getMinAcceptableThickness() != null) {
+            result = residualThickness.getMinMeasurementValue() <= acceptableHardness.getMinAcceptableThickness();
+        }
+        return result;
     }
 
     private UltrasonicResidualThicknessMeasurement getUltrasonicResidualThicknessMeasurement(HardnessMeasurement measurement) {
@@ -104,8 +116,9 @@ public class CalculationHardnessMeasurementServiceImpl implements CalculationHar
                                                                                 , equipment.getElementLibraryId()
                                                                                 , equipment.getPartElementLibraryId());
         } else {
-            acceptableHardness = acceptableRepository.findByEquipmentLibraryIdAndElementLibraryId(equipment.getEquipmentLibraryId()
-                    , equipment.getElementLibraryId());
+            acceptableHardness = acceptableRepository.findByEquipmentLibraryIdAndElementLibraryId(
+                                                                                      equipment.getEquipmentLibraryId()
+                                                                                    , equipment.getElementLibraryId());
         }
         return acceptableHardness.orElseThrow(
                 () ->  new NotFoundException(

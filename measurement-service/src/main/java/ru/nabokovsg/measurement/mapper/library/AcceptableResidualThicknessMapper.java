@@ -5,7 +5,6 @@ import ru.nabokovsg.measurement.dto.acceptableResidualThickness.NewAcceptableRes
 import ru.nabokovsg.measurement.dto.acceptableResidualThickness.ResponseAcceptableResidualThicknessDto;
 import ru.nabokovsg.measurement.dto.acceptableResidualThickness.UpdateAcceptableResidualThicknessDto;
 import ru.nabokovsg.measurement.model.library.AcceptableResidualThickness;
-import ru.nabokovsg.measurement.model.library.StandardSize;
 
 @Mapper(componentModel = "spring")
 public interface AcceptableResidualThicknessMapper {
@@ -15,8 +14,4 @@ public interface AcceptableResidualThicknessMapper {
     AcceptableResidualThickness mapToUpdateAcceptableThickness(UpdateAcceptableResidualThicknessDto thicknessDto, String standardSize);
 
     ResponseAcceptableResidualThicknessDto mapToResponseAcceptableResidualThicknessDto(AcceptableResidualThickness thickness);
-
-    StandardSize mapToStandardSize(NewAcceptableResidualThicknessDto thicknessDto);
-
-    StandardSize mapToUpdateStandardSize(UpdateAcceptableResidualThicknessDto thicknessDto);
 }

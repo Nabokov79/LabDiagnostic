@@ -26,10 +26,10 @@ public class NewAcceptableMetalHardnessDto {
     @Schema(description = "Идентификатор подэлемента элемента оборудования")
     private Long partElementLibraryId;
     @Schema(description = "Минимальный допустимый диаметр")
+    @NotNull(message = "minAcceptableDiameter should not be null")
+    @Positive(message = "minAcceptableDiameter can only be positive")
     private Integer minAcceptableDiameter;
     @Schema(description = "Минимальная допустимая толщина стенки")
-    @NotNull(message = "elementId should not be null")
-    @Positive(message = "elementId can only be positive")
     private Double minAcceptableThickness;
     @Schema(description = "Минимальная допустимая твердость металла элемента")
     @NotNull(message = "minHardness should not be null")

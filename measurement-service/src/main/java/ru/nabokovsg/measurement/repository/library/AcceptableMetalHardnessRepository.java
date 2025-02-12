@@ -21,7 +21,7 @@ public interface AcceptableMetalHardnessRepository extends JpaRepository<Accepta
                                                                                            , String standardSize);
 
     Optional<AcceptableMetalHardness> findByEquipmentLibraryIdAndElementLibraryId(Long equipmentLibraryId
-                                                                      , Long elementLibraryId);
+                                                                                , Long elementLibraryId);
 
     Optional<AcceptableMetalHardness> findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(
                                                                                           Long equipmentLibraryId

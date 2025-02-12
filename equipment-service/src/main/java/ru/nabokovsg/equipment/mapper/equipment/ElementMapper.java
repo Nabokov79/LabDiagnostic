@@ -20,12 +20,13 @@ public interface ElementMapper {
     @Mapping(target = "standardSize", ignore = true)
     @Mapping(target = "partsElement", ignore = true)
     @Mapping(target = "id", ignore = true)
-    Element mapToElement(ElementLibrary elementLibrary
-                                , Equipment equipment);
+    Element mapToElement(ElementLibrary elementLibrary, Equipment equipment);
 
-    void mapWithStandardSize(@MappingTarget Element element, String standardSize);
+    void mapWithStandardSize(@MappingTarget Element element, NewElementDto elementDto, String standardSize);
 
-    void mapToUpdateElement(@MappingTarget Element element, String standardSize);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "partsElement", ignore = true)
+    void mapToUpdateElement(@MappingTarget Element element, UpdateElementDto elementDto, String standardSize);
 
     ResponseElementDto mapToResponseEquipmentElementDto(Element element);
 

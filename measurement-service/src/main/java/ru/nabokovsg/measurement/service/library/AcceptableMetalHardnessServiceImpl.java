@@ -19,13 +19,12 @@ public class AcceptableMetalHardnessServiceImpl implements AcceptableMetalHardne
 
     private final AcceptableMetalHardnessRepository repository;
     private final AcceptableMetalHardnessMapper mapper;
-    private final StandardSizeStringBuilder convertToString;
 
     @Override
     public ResponseAcceptableMetalHardnessDto save(NewAcceptableMetalHardnessDto hardnessDto) {
         AcceptableMetalHardness acceptableMetalHardness = mapper.mapToAcceptableHardness(hardnessDto
-                  , convertToString.convertToString(mapper.mapToStandardSize(hardnessDto.getMinAcceptableDiameter()
-                                                                           , hardnessDto.getMinAcceptableThickness())));
+                                                          , getStandardSize(hardnessDto.getMinAcceptableDiameter()
+                                                                          , hardnessDto.getMinAcceptableThickness()));
         if (getDuplicate(acceptableMetalHardness)) {
             throw new BadRequestException(
                     String.format("AcceptableHardness for hardness=%s is found", hardnessDto));
@@ -38,9 +37,8 @@ public class AcceptableMetalHardnessServiceImpl implements AcceptableMetalHardne
         if (repository.existsById(hardnessDto.getId())) {
             return mapper.mapToResponseAcceptableMetalHardnessDto(
                     repository.save(mapper.mapToUpdateAcceptableHardness(hardnessDto
-                                     , convertToString.convertToString(
-                                             mapper.mapToStandardSize(hardnessDto.getMinAcceptableDiameter()
-                                                                    , hardnessDto.getMinAcceptableThickness())))));
+                                                           , getStandardSize(hardnessDto.getMinAcceptableDiameter()
+                                                                          , hardnessDto.getMinAcceptableThickness()))));
         }
         throw new NotFoundException(
                 String.format("AcceptableHardness with id=%s not found for update", hardnessDto.getId())
@@ -84,5 +82,17 @@ public class AcceptableMetalHardnessServiceImpl implements AcceptableMetalHardne
                                                                   acceptableMetalHardness.getEquipmentLibraryId()
                                                                 , acceptableMetalHardness.getElementLibraryId()
                                                                 , acceptableMetalHardness.getStandardSize());
+    }
+
+    private String getStandardSize(Integer diameter, Double thickness) {
+        String standardSize = String.valueOf(diameter);
+        if (thickness != null && thickness <= 0 ) {
+            throw new BadRequestException(
+                    String.format("Thickness can only be positive: thickness=%s", thickness));
+        }
+        if(thickness == null) {
+            return standardSize;
+        }
+        return String.join("x", standardSize, String.valueOf(thickness));
     }
 }
