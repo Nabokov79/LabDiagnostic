@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS ACCEPTABLE_RESIDUAL_THICKNESS
     equipment_library_id    BIGINT                                  NOT NULL,
     element_library_id      BIGINT                                  NOT NULL,
     part_element_library_id BIGINT,
-    standard_size           VARCHAR                                 NOT NULL,
+    standard_size           VARCHAR,
     diameter                INTEGER,
     thickness               DOUBLE PRECISION,
     acceptable_thickness    DOUBLE PRECISION,

@@ -30,8 +30,6 @@ public class NewAcceptableResidualThicknessDto {
     @Schema(description = "Минимальный допустимый диаметр элемента")
     private Integer diameter;
     @Schema(description = "Минимальная допустимая толщина стенки элемента")
-    @NotNull(message = "AcceptableThickness should not be null")
-    @Positive(message = "AcceptableThickness can only be positive")
     private Double acceptableThickness;
     @Schema(description = "Минимальная допустимая толщина стенки элемента в процентах")
     private Integer acceptablePercent;

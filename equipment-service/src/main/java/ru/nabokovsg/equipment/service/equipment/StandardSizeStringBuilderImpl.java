@@ -12,39 +12,42 @@ public class StandardSizeStringBuilderImpl implements StandardSizeStringBuilder 
         if (standardSize.getThickness() != null) {
             return String.valueOf(standardSize.getThickness());
         }
-        String standardSizeString = "";
-        if (validByDiameter(standardSize.getMinDiameter(), standardSize.getMinThickness())) {
-            standardSizeString = minDiameterToString(standardSize);
+        String minSize = " ";
+        if (standardSize.getMinDiameter() != null
+                && validByDiameter(standardSize.getMinDiameter(), standardSize.getMinThickness())) {
+            minSize = buildStandardSize(standardSize.getMinDiameter(), standardSize.getMinThickness());
         }
-        if (validByDiameter(standardSize.getMaxDiameter(), standardSize.getMaxThickness())) {
-            standardSizeString = joinMaxDiameter(standardSizeString, standardSize);
+        if (standardSize.getMaxDiameter() != null
+                && validByDiameter(standardSize.getMaxDiameter(), standardSize.getMaxThickness())) {
+            String maxSize = buildStandardSize(standardSize.getMaxDiameter(), standardSize.getMaxThickness());
+            if (minSize.isBlank()) {
+                return maxSize;
+            } else {
+                minSize = String.join("/", minSize, maxSize);
+            }
         }
-        return standardSizeString;
+        return minSize;
     }
 
     private boolean validByDiameter(Integer diameter, Double thickness) {
-        if (diameter == null || thickness == null) {
+        if (diameter == null) {
             throw new BadRequestException(
-                    String.format("unacceptable standard size: diameter=%s, thickness=%s", diameter, thickness));
+                    String.format("Unacceptable standard size: diameter=%s, thickness=%s", diameter, thickness));
         }
-        if (diameter <= 0 || thickness <= 0) {
-            throw new BadRequestException(
-                    String.format("Diameter and thickness can only be positive: minDiameter=%s, thickness=%s", diameter, thickness));
+        if (diameter <= 0) {
+            throw new BadRequestException(String.format("Diameter can only be positive: %s", diameter));
+        }
+        if (thickness != null && thickness <= 0) {
+            throw new BadRequestException(String.format("Thickness can only be positive: %s", thickness));
         }
         return true;
     }
 
-    private String minDiameterToString( StandardSize standardSize) {
-        return String.join("x", String.valueOf(standardSize.getMinDiameter())
-                , String.valueOf(standardSize.getMinThickness()));
-    }
-
-    private String joinMaxDiameter(String standardSizeString, StandardSize standardSize) {
-        String diameter = String.join("x", String.valueOf(standardSize.getMaxDiameter())
-                                                  , String.valueOf(standardSize.getMaxThickness()));
-        if (standardSizeString.isBlank()) {
-            return diameter;
+    private String buildStandardSize(Integer diameter, Double thickness) {
+        String diameterString = String.valueOf(diameter);
+        if (thickness != null) {
+            return String.join("x", diameterString, String.valueOf(thickness));
         }
-        return String.join("/", standardSizeString, diameter);
+        return diameterString;
     }
 }

@@ -13,6 +13,10 @@ public interface AcceptableResidualThicknessRepository extends JpaRepository<Acc
                                                                        , Long elementLibraryId
                                                                        , String standardSize);
 
+    boolean existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(Long equipmentLibraryId
+                                                                               , Long elementLibraryId
+                                                                               , Long partElementLibraryId);
+
     boolean existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
                                                                                            Long equipmentLibraryId
                                                                                          , Long elementLibraryId
