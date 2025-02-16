@@ -22,7 +22,7 @@ public class ResponseAcceptableMetalHardnessDto {
     @Schema(description = "Минимальный  диаметр элемента, допустимый измерения твердости металла")
     private Integer minAcceptableDiameter;
     @Schema(description = "Минимальная толщина стенки элемента, домустимая для измерения измерения твердости металла")
-    private Integer minAcceptableThickness;
+    private Double minAcceptableThickness;
     @Schema(description = "Минимальная допустимая твердость металла элемента")
     private Integer minAcceptableHardness;
     @Schema(description = "Максимальная допустимая твердость металла элемента")

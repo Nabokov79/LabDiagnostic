@@ -58,6 +58,6 @@ public class ElementController {
     public ResponseEntity<String> delete(@PathVariable @NotNull @Positive
                                          @Parameter(description = "Идентификатор") Long id) {
         service.delete(id);
-        return ResponseEntity.ok("Элемент оборудования успешно удалено.");
+        return ResponseEntity.ok("Элемент оборудования успешно удален.");
     }
 }

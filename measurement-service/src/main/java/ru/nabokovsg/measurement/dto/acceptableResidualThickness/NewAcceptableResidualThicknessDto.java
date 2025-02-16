@@ -25,9 +25,7 @@ public class NewAcceptableResidualThicknessDto {
     private Long elementLibraryId;
     @Schema(description = "Идентификатор подэлемента элемента оборудования")
     private Long partElementLibraryId;
-    @Schema(description = "Минимальная допкстимая толщина элемента")
-    private Double thickness;
-    @Schema(description = "Минимальный допустимый диаметр элемента")
+    @Schema(description = "Диаметр элемента")
     private Integer diameter;
     @Schema(description = "Минимальная допустимая толщина стенки элемента")
     private Double acceptableThickness;
@@ -37,18 +35,4 @@ public class NewAcceptableResidualThicknessDto {
     @NotNull(message = "measurementError should not be null")
     @Positive(message = "measurementError can only be positive")
     private Float measurementError;
-
-    @Override
-    public String toString() {
-        return "NewAcceptableResidualThicknessDto{" +
-                "equipmentLibraryId=" + equipmentLibraryId +
-                ", elementLibraryId=" + elementLibraryId +
-                ", partElementLibraryId=" + partElementLibraryId +
-                ", thickness=" + thickness +
-                ", diameter=" + diameter +
-                ", acceptableThickness=" + acceptableThickness +
-                ", acceptablePercent=" + acceptablePercent +
-                ", measurementError=" + measurementError +
-                '}';
-    }
 }

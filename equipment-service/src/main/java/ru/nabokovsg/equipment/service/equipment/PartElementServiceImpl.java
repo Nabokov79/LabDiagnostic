@@ -6,6 +6,7 @@ import ru.nabokovsg.equipment.exceptions.BadRequestException;
 import ru.nabokovsg.equipment.mapper.equipment.PartElementMapper;
 import ru.nabokovsg.equipment.model.equipment.Element;
 import ru.nabokovsg.equipment.model.equipment.PartElement;
+import ru.nabokovsg.equipment.model.equipment.StandardSize;
 import ru.nabokovsg.equipment.model.library.PartElementLibrary;
 import ru.nabokovsg.equipment.repository.equipment.PartElementRepository;
 import ru.nabokovsg.equipment.service.library.PartElementLibraryService;
@@ -24,12 +25,12 @@ public class PartElementServiceImpl implements PartElementService {
     private final PartElementLibraryService libraryService;
 
     @Override
-    public void save(Element element, Long partElementLibraryId, String standardSize) {
+    public void save(Element element, Long partElementLibraryId, String standardSizeString, StandardSize standardSize) {
         PartElementLibrary partElementLibrary = libraryService.getById(partElementLibraryId);
-        exists(element.getPartsElement(), partElementLibrary.getPartElementName(), standardSize);
-        PartElement partElement = repository.save(mapper.mapToEquipmentPartElement(element
-                                                                                          , partElementLibrary
-                                                                                          , standardSize));
+        exists(element.getPartsElement(), partElementLibrary.getPartElementName(), standardSizeString);
+        PartElement partElement = mapper.mapToEquipmentPartElement(element, partElementLibrary);
+        mapper.mapWithStandardSize(partElement, standardSizeString, standardSize);
+        partElement = repository.save(partElement);
         if (element.getPartsElement() == null) {
             element.setPartsElement(Set.of(partElement));
             return;
@@ -38,11 +39,11 @@ public class PartElementServiceImpl implements PartElementService {
     }
 
     @Override
-    public void update(Set<PartElement> partsElement, Long partElementId, String standardSize) {
+    public void update(Set<PartElement> partsElement, Long partElementId, String standardSizeString, StandardSize standardSize) {
         List<PartElement> parts = new ArrayList<>(1);
         partsElement.forEach(partElement -> {
             if (Objects.equals(partElement.getId(), partElementId)) {
-                mapper.mapToUpdateEquipmentPartElement(partElement, standardSize);
+                mapper.mapWithStandardSize(partElement, standardSizeString, standardSize);
                 parts.add(partElement);
             }
         });

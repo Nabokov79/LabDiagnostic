@@ -9,11 +9,9 @@ import ru.nabokovsg.measurement.model.library.AcceptableMetalHardness;
 @Mapper(componentModel = "spring")
 public interface AcceptableMetalHardnessMapper {
 
-    AcceptableMetalHardness mapToAcceptableHardness(NewAcceptableMetalHardnessDto hardnessDto
-                                                  , String standardSize);
+    AcceptableMetalHardness mapToAcceptableHardness(NewAcceptableMetalHardnessDto hardnessDto);
 
-    AcceptableMetalHardness mapToUpdateAcceptableHardness(UpdateAcceptableMetalHardnessDto hardnessDto
-                                                        , String standardSize);
+    AcceptableMetalHardness mapToUpdateAcceptableHardness(UpdateAcceptableMetalHardnessDto hardnessDto);
 
     ResponseAcceptableMetalHardnessDto mapToResponseAcceptableMetalHardnessDto(AcceptableMetalHardness hardness);
 }

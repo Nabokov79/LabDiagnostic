@@ -23,8 +23,6 @@ public class AcceptableMetalHardness {
     private Long elementLibraryId;
     @Column(name = "part_element_library_id")
     private Long partElementLibraryId;
-    @Column(name = "standard_size")
-    private String standardSize;
     @Column(name = "acceptable_diameter")
     private Integer minAcceptableDiameter;
     @Column(name = "acceptable_thickness")
@@ -35,4 +33,19 @@ public class AcceptableMetalHardness {
     private Integer maxAcceptableHardness;
     @Column(name = "measurement_error")
     private Float measurementError;
+
+    @Override
+    public String toString() {
+        return "AcceptableMetalHardness{" +
+                "id=" + id +
+                ", equipmentLibraryId=" + equipmentLibraryId +
+                ", elementLibraryId=" + elementLibraryId +
+                ", partElementLibraryId=" + partElementLibraryId +
+                ", minAcceptableDiameter=" + minAcceptableDiameter +
+                ", minAcceptableThickness=" + minAcceptableThickness +
+                ", minAcceptableHardness=" + minAcceptableHardness +
+                ", maxAcceptableHardness=" + maxAcceptableHardness +
+                ", measurementError=" + measurementError +
+                '}';
+    }
 }

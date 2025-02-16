@@ -1,5 +1,8 @@
 package ru.nabokovsg.measurement.service.library;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.dto.acceptableMetalHardness.NewAcceptableMetalHardnessDto;
@@ -9,9 +12,11 @@ import ru.nabokovsg.measurement.exceptions.BadRequestException;
 import ru.nabokovsg.measurement.exceptions.NotFoundException;
 import ru.nabokovsg.measurement.mapper.library.AcceptableMetalHardnessMapper;
 import ru.nabokovsg.measurement.model.library.AcceptableMetalHardness;
+import ru.nabokovsg.measurement.model.library.QAcceptableMetalHardness;
 import ru.nabokovsg.measurement.repository.library.AcceptableMetalHardnessRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,26 +24,21 @@ public class AcceptableMetalHardnessServiceImpl implements AcceptableMetalHardne
 
     private final AcceptableMetalHardnessRepository repository;
     private final AcceptableMetalHardnessMapper mapper;
+    private final EntityManager em;
 
     @Override
     public ResponseAcceptableMetalHardnessDto save(NewAcceptableMetalHardnessDto hardnessDto) {
-        AcceptableMetalHardness acceptableMetalHardness = mapper.mapToAcceptableHardness(hardnessDto
-                                                          , getStandardSize(hardnessDto.getMinAcceptableDiameter()
-                                                                          , hardnessDto.getMinAcceptableThickness()));
-        if (getDuplicate(acceptableMetalHardness)) {
-            throw new BadRequestException(
-                    String.format("AcceptableHardness for hardness=%s is found", hardnessDto));
-        }
-        return mapper.mapToResponseAcceptableMetalHardnessDto(repository.save(acceptableMetalHardness));
+        validateAcceptableStandards(hardnessDto.getMinAcceptableDiameter(), hardnessDto.getMinAcceptableThickness());
+        return mapper.mapToResponseAcceptableMetalHardnessDto(
+                repository.save(searchDuplicate(mapper.mapToAcceptableHardness(hardnessDto))));
     }
 
     @Override
     public ResponseAcceptableMetalHardnessDto update(UpdateAcceptableMetalHardnessDto hardnessDto) {
+        validateAcceptableStandards(hardnessDto.getMinAcceptableDiameter(), hardnessDto.getMinAcceptableThickness());
         if (repository.existsById(hardnessDto.getId())) {
             return mapper.mapToResponseAcceptableMetalHardnessDto(
-                    repository.save(mapper.mapToUpdateAcceptableHardness(hardnessDto
-                                                           , getStandardSize(hardnessDto.getMinAcceptableDiameter()
-                                                                          , hardnessDto.getMinAcceptableThickness()))));
+                    repository.save(searchDuplicate(mapper.mapToUpdateAcceptableHardness(hardnessDto))));
         }
         throw new NotFoundException(
                 String.format("AcceptableHardness with id=%s not found for update", hardnessDto.getId())
@@ -69,30 +69,46 @@ public class AcceptableMetalHardnessServiceImpl implements AcceptableMetalHardne
         throw new NotFoundException(String.format("AcceptableHardness with id=%s not found for delete", id));
     }
 
-
-    private boolean getDuplicate(AcceptableMetalHardness acceptableMetalHardness) {
+    private AcceptableMetalHardness searchDuplicate(AcceptableMetalHardness acceptableMetalHardness) {
+        QAcceptableMetalHardness metalHardness = QAcceptableMetalHardness.acceptableMetalHardness;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(metalHardness.equipmentLibraryId.eq(acceptableMetalHardness.getEquipmentLibraryId()));
+        builder.and(metalHardness.elementLibraryId.eq(acceptableMetalHardness.getElementLibraryId()));
         if (acceptableMetalHardness.getPartElementLibraryId() != null) {
-            return repository.existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
-                                                                      acceptableMetalHardness.getEquipmentLibraryId()
-                                                                    , acceptableMetalHardness.getElementLibraryId()
-                                                                    , acceptableMetalHardness.getPartElementLibraryId()
-                                                                    , acceptableMetalHardness.getStandardSize());
+            builder.and(metalHardness.partElementLibraryId.eq(acceptableMetalHardness.getPartElementLibraryId()));
         }
-        return repository.existsByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(
-                                                                  acceptableMetalHardness.getEquipmentLibraryId()
-                                                                , acceptableMetalHardness.getElementLibraryId()
-                                                                , acceptableMetalHardness.getStandardSize());
+        if (acceptableMetalHardness.getMinAcceptableThickness() != null) {
+            builder.and(metalHardness.minAcceptableThickness.eq(acceptableMetalHardness.getMinAcceptableThickness()));
+        }
+        if (acceptableMetalHardness.getMinAcceptableDiameter() != null) {
+            builder.and(metalHardness.minAcceptableDiameter.eq(acceptableMetalHardness.getMinAcceptableDiameter()));
+        }
+        AcceptableMetalHardness duplicate = new JPAQueryFactory(em).select(metalHardness)
+                .from(metalHardness)
+                .where(builder)
+                .fetchOne();
+        if (duplicate != null && (acceptableMetalHardness.getId() == null
+                                            || !Objects.equals(duplicate.getId(), acceptableMetalHardness.getId()))) {
+            throw new BadRequestException(
+                    String.format("AcceptableMetalHardness duplicate=%s is found", acceptableMetalHardness));
+        } else {
+            return acceptableMetalHardness;
+        }
     }
 
-    private String getStandardSize(Integer diameter, Double thickness) {
-        String standardSize = String.valueOf(diameter);
-        if (thickness != null && thickness <= 0 ) {
+    private void validateAcceptableStandards(Integer minAcceptableDiameter, Double minAcceptableThickness) {
+        if (minAcceptableDiameter == null &&  minAcceptableThickness == null) {
             throw new BadRequestException(
-                    String.format("Thickness can only be positive: thickness=%s", thickness));
+                    String.format("There are no min acceptable: minAcceptableDiameter=%s, minAcceptableThickness=%s"
+                            , minAcceptableDiameter, minAcceptableThickness));
         }
-        if(thickness == null) {
-            return standardSize;
+        if (minAcceptableDiameter != null && minAcceptableDiameter <= 0) {
+            throw new BadRequestException(
+                    String.format("minAcceptableDiameter can only be positive: %s", minAcceptableDiameter));
         }
-        return String.join("x", standardSize, String.valueOf(thickness));
+        if (minAcceptableThickness != null && minAcceptableThickness <= 0) {
+            throw new BadRequestException(
+                    String.format("minAcceptableThickness can only be positive: %s", minAcceptableThickness));
+        }
     }
 }

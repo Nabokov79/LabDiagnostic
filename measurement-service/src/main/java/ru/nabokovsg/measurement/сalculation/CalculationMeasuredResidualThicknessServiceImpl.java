@@ -30,29 +30,55 @@ public class CalculationMeasuredResidualThicknessServiceImpl implements Calculat
     public void calculation(UltrasonicResidualThicknessMeasurement measurement) {
         EquipmentDto equipment = client.getEquipment(measurement.getElementId(), measurement.getPartElementId());
         AcceptableResidualThickness acceptableThickness = getAcceptableResidualThickness(equipment);
-        Double maxCorrosion = getMaxCorrosionValue(measurement.getElementId(), measurement.getPartElementId());
-        double residualThickness = countResidualThickness(measurement.getMinMeasurementValue()
-                , maxCorrosion
-                , acceptableThickness);
-        double minAcceptableValue = countMinAcceptableValue(acceptableThickness, equipment);
+        Double minAcceptableValue = null;
+        double lowerLimit = 0.0;
+        if (acceptableThickness != null) {
+            minAcceptableValue = countMinAcceptableValue(acceptableThickness, equipment);
+            lowerLimit = getLowerLimit(minAcceptableValue, acceptableThickness.getMeasurementError());
+        }
+        double measurementValue = getMeasurementValue(measurement.getMinMeasurementValue(), lowerLimit, minAcceptableValue);
+        double maxCorrosion = getMaxCorrosionValue(measurement.getElementId(), measurement.getPartElementId());
+        double residualThickness = countResidualThickness(measurementValue, maxCorrosion, acceptableThickness, minAcceptableValue);
         mapper.mapWithDataCalculation(measurement, equipment, maxCorrosion, residualThickness, minAcceptableValue);
         setMeasurementStatus(measurement, acceptableThickness);
     }
 
-    public AcceptableResidualThickness getAcceptableResidualThickness(EquipmentDto equipment) {
-        if (equipment.getPartElementLibraryId() != null) {
-            return repository.findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
-                                                                                    equipment.getEquipmentLibraryId()
-                                                                                  , equipment.getElementLibraryId()
-                                                                                  , equipment.getPartElementLibraryId()
-                                                                                  , equipment.getStandardSize());
+    private double countMinAcceptableValue(AcceptableResidualThickness acceptableThickness, EquipmentDto equipment) {
+        if (acceptableThickness.getAcceptablePercent() != null) {
+            double acceptableResidualThickness = equipment.getThickness() * ((double) acceptableThickness.getAcceptablePercent() / 100.0);
+            return equipment.getThickness() - acceptableResidualThickness;
         } else {
-            return repository.findByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(
-                                                                                      equipment.getEquipmentLibraryId()
-                                                                                    , equipment.getElementLibraryId()
-                                                                                    , equipment.getStandardSize());
+            return acceptableThickness.getAcceptableThickness();
         }
     }
+
+    private double getLowerLimit(Double minAcceptableValue, Float measurementError) {
+        double lowerLimit = minAcceptableValue - measurementError;
+        double scale = Math.pow(10, 1);
+        return Math.ceil(lowerLimit * scale) / scale;
+    }
+
+    private double getMeasurementValue(Double minMeasurementValue, double lowerLimit, Double minAcceptableValue) {
+        if (minAcceptableValue != null && lowerLimit < minMeasurementValue && minMeasurementValue < minAcceptableValue) {
+            return minAcceptableValue;
+        } else {
+            return minMeasurementValue;
+        }
+    }
+
+    private AcceptableResidualThickness getAcceptableResidualThickness(EquipmentDto equipment) {
+        if (equipment.getPartElementLibraryId() != null) {
+            return repository.findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(
+                                                                                  equipment.getEquipmentLibraryId()
+                                                                                , equipment.getElementLibraryId()
+                                                                                , equipment.getPartElementLibraryId());
+        } else {
+            return repository.findByEquipmentLibraryIdAndElementLibraryId(equipment.getEquipmentLibraryId()
+                                                                        , equipment.getElementLibraryId());
+        }
+    }
+
+
 
     private Double getMaxCorrosionValue(Long elementId, Long partElementId) {
         QDefectMeasurement defect = QDefectMeasurement.defectMeasurement;
@@ -71,93 +97,63 @@ public class CalculationMeasuredResidualThicknessServiceImpl implements Calculat
                 .fetchOne();
     }
 
-    private double countResidualThickness(Double minMeasurementValue
+    private double countResidualThickness(double measurementValue
                                         , Double maxCorrosion
-                                        , AcceptableResidualThickness acceptableThickness) {
-        double residualThickness = minMeasurementValue;
+                                        , AcceptableResidualThickness acceptableThickness
+                                        , Double minAcceptableValue) {
+        double residualThickness = measurementValue;
         if (maxCorrosion != null) {
-            residualThickness = minMeasurementValue - maxCorrosion;
+            residualThickness = measurementValue - maxCorrosion;
         }
-        if (acceptableThickness != null && residualThickness
-                        == (acceptableThickness.getAcceptableThickness() - acceptableThickness.getMeasurementError())) {
-            return acceptableThickness.getAcceptableThickness();
-        }
-        if (residualThickness < 0) {
-            return 0;
+        if (minAcceptableValue != null && (residualThickness == (minAcceptableValue - acceptableThickness.getMeasurementError()))) {
+            return minAcceptableValue;
         }
         double scale = Math.pow(10, 1);
         return Math.ceil(residualThickness * scale) / scale;
     }
 
-    private double countMinAcceptableValue(AcceptableResidualThickness acceptableThickness
-                                         , EquipmentDto equipment) {
-        if (acceptableThickness.getAcceptablePercent() != null) {
-            return equipment.getThickness()
-                    - (equipment.getThickness() * (double) (acceptableThickness.getAcceptablePercent() / 100));
-        } else {
-            return acceptableThickness.getAcceptableThickness();
-        }
-    }
-
     private void setMeasurementStatus(UltrasonicResidualThicknessMeasurement measurement
                                     , AcceptableResidualThickness acceptableThickness) {
-        if (acceptableThickness == null) {
-            mapper.mapWithMeasurementStatus(measurement
-                    , MeasurementStatus.valueOf("NO_STANDARD").label
-                    , "NO_STANDARD");
-            return;
+        MeasurementStatus measurementStatus = MeasurementStatus.NO_STANDARD;
+        if (acceptableThickness != null) {
+            boolean compare = true;
+            if (getAcceptable(measurement, acceptableThickness.getMeasurementError())) {
+                measurementStatus = MeasurementStatus.ACCEPTABLE;
+                compare = false;
+            }
+            if (compare && getInvalid(measurement)) {
+                measurementStatus = MeasurementStatus.INVALID;
+                compare = false;
+            }
+            if (compare && getApproachingInvalid(measurement, acceptableThickness.getMeasurementError())) {
+                measurementStatus = MeasurementStatus.APPROACHING_INVALID;
+                compare = false;
+            }
+            if (compare && getReachedInvalid(measurement, acceptableThickness.getMeasurementError())) {
+                measurementStatus = MeasurementStatus.REACHED_INVALID;
+            }
         }
-        if (getAcceptable(measurement, acceptableThickness)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("ACCEPTABLE").label
-                                          , "ACCEPTABLE");
-            return;
-        }
-        if (getInvalid(measurement, acceptableThickness)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("INVALID").label
-                                          , "INVALID");
-            return;
-        }
-        if (getApproachingInvalid(measurement, acceptableThickness)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("APPROACHING_INVALID").label
-                                          , "APPROACHING_INVALID");
-            return;
-        }
-        if (getReachedInvalid(measurement, acceptableThickness)) {
-            mapper.mapWithMeasurementStatus(measurement
-                                          , MeasurementStatus.valueOf("REACHED_INVALID").label
-                                          , "REACHED_INVALID");
-        }
+        mapper.mapWithMeasurementStatus(measurement, measurementStatus.label, String.valueOf(measurementStatus));
     }
 
-    private boolean getAcceptable(UltrasonicResidualThicknessMeasurement measurement
-                                , AcceptableResidualThickness acceptableThickness) {
-        return measurement.getResidualThickness()
-                >= (acceptableThickness.getAcceptableThickness() + acceptableThickness.getMeasurementError());
+    private boolean getAcceptable(UltrasonicResidualThicknessMeasurement measurement, Float measurementError) {
+        return measurement.getResidualThickness() >= (measurement.getMinAcceptableValue() + measurementError);
     }
 
-   private boolean getInvalid(UltrasonicResidualThicknessMeasurement measurement
-                            , AcceptableResidualThickness acceptableThickness) {
-        return (measurement.getResidualThickness() + acceptableThickness.getMeasurementError())
-                                                                        < acceptableThickness.getAcceptableThickness();
+   private boolean getInvalid(UltrasonicResidualThicknessMeasurement measurement) {
+        return measurement.getResidualThickness() < measurement.getMinAcceptableValue();
     }
 
-    private boolean getApproachingInvalid(UltrasonicResidualThicknessMeasurement measurement
-                                        , AcceptableResidualThickness acceptableThickness) {
-        return (measurement.getResidualThickness() > acceptableThickness.getAcceptableThickness())
-                && (acceptableThickness.getAcceptableThickness() + acceptableThickness.getMeasurementError())
-                                                                                > measurement.getResidualThickness();
+    private boolean getApproachingInvalid(UltrasonicResidualThicknessMeasurement measurement, Float measurementError) {
+        return (measurement.getResidualThickness() > measurement.getMinAcceptableValue()) &&
+                (measurement.getMinAcceptableValue() + measurementError) > measurement.getResidualThickness();
     }
 
-    private boolean getReachedInvalid(UltrasonicResidualThicknessMeasurement measurement
-                                    , AcceptableResidualThickness acceptableThickness) {
-        boolean reachedInvalid = Objects.equals(measurement.getResidualThickness()
-                                              , acceptableThickness.getAcceptableThickness());
+    private boolean getReachedInvalid(UltrasonicResidualThicknessMeasurement measurement, Float measurementError) {
+        boolean reachedInvalid = Objects.equals(measurement.getResidualThickness(), measurement.getMinAcceptableValue());
         if (!reachedInvalid) {
-            reachedInvalid = (measurement.getResidualThickness() + acceptableThickness.getMeasurementError())
-                                                                        == acceptableThickness.getAcceptableThickness();
+            reachedInvalid = (measurement.getResidualThickness() + measurementError)
+                                                                        == measurement.getMinMeasurementValue();
         }
         return reachedInvalid;
     }

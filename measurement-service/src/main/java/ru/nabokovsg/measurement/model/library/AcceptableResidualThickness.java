@@ -23,8 +23,6 @@ public class AcceptableResidualThickness {
     private Long elementLibraryId;
     @Column(name = "part_element_library_id")
     private Long partElementLibraryId;
-    @Column(name = "standard_size")
-    private String standardSize;
     @Column(name = "diameter")
     private Integer diameter;
     @Column(name = "thickness")
@@ -35,4 +33,19 @@ public class AcceptableResidualThickness {
     private Integer acceptablePercent;
     @Column(name = "measurement_error")
     private Float measurementError;
+
+    @Override
+    public String toString() {
+        return "AcceptableResidualThickness{" +
+                "id=" + id +
+                ", equipmentLibraryId=" + equipmentLibraryId +
+                ", elementLibraryId=" + elementLibraryId +
+                ", partElementLibraryId=" + partElementLibraryId +
+                ", diameter=" + diameter +
+                ", thickness=" + thickness +
+                ", acceptableThickness=" + acceptableThickness +
+                ", acceptablePercent=" + acceptablePercent +
+                ", measurementError=" + measurementError +
+                '}';
+    }
 }

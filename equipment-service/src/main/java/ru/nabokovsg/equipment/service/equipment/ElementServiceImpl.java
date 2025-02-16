@@ -9,6 +9,7 @@ import ru.nabokovsg.equipment.exceptions.BadRequestException;
 import ru.nabokovsg.equipment.exceptions.NotFoundException;
 import ru.nabokovsg.equipment.mapper.equipment.ElementMapper;
 import ru.nabokovsg.equipment.model.equipment.Element;
+import ru.nabokovsg.equipment.model.equipment.StandardSize;
 import ru.nabokovsg.equipment.repository.equipment.ElementRepository;
 import ru.nabokovsg.equipment.service.library.ElementLibraryService;
 
@@ -27,20 +28,21 @@ public class ElementServiceImpl implements ElementService {
 
     @Override
     public ResponseElementDto save(NewElementDto elementDto) {
-        String standardSize = standardSizeStringBuilder.convertToString(mapper.mapToStandardSize(elementDto));
-        Element element = getByPredicate(elementDto, standardSize);
+        StandardSize standardSize = mapper.mapToStandardSize(elementDto);
+        String standardSizeString = standardSizeStringBuilder.convertToString(standardSize);
+        Element element = getByPredicate(elementDto, standardSizeString);
         if (element == null) {
             element = mapper.mapToElement(libraryService.getById(elementDto.getElementLibraryId())
                                         , equipmentService.getById(elementDto.getEquipmentId()));
             if (elementDto.getPartElementLibraryId() == null) {
-                mapper.mapWithStandardSize(element, elementDto, standardSize);
+                mapper.mapWithStandardSize(element, elementDto, standardSizeString);
             }
             element = repository.save(element);
         } else if (elementDto.getPartElementLibraryId() == null){
             throw new BadRequestException(String.format("Equipment element: %s; is found", elementDto));
         }
         if (elementDto.getPartElementLibraryId() != null) {
-            partElementService.save(element, elementDto.getPartElementLibraryId(), standardSize);
+            partElementService.save(element, elementDto.getPartElementLibraryId(), standardSizeString, standardSize);
         }
         return mapper.mapToResponseEquipmentElementDto(element);
     }
@@ -48,13 +50,15 @@ public class ElementServiceImpl implements ElementService {
     @Override
     public ResponseElementDto update(UpdateElementDto elementDto) {
         Element element = get(elementDto.getId());
-        String standardSize = standardSizeStringBuilder.convertToString(mapper.mapToUpdateStandardSize(elementDto));
+        StandardSize standardSize = mapper.mapToUpdateStandardSize(elementDto);
+        String standardSizeString = standardSizeStringBuilder.convertToString(standardSize);
         if (elementDto.getPartElementId() == null) {
             mapper.mapToUpdateElement(element
                               , elementDto
                               , standardSizeStringBuilder.convertToString(mapper.mapToUpdateStandardSize(elementDto)));
         } else {
-            partElementService.update(element.getPartsElement(), elementDto.getPartElementId(), standardSize);
+            partElementService.update(element.getPartsElement(), elementDto.getPartElementId()
+                                    , standardSizeString, standardSize);
         }
         return mapper.mapToResponseEquipmentElementDto(repository.save(element));
     }

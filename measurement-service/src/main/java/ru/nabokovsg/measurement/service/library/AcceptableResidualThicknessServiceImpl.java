@@ -1,5 +1,8 @@
 package ru.nabokovsg.measurement.service.library;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.measurement.dto.acceptableResidualThickness.NewAcceptableResidualThicknessDto;
@@ -9,9 +12,11 @@ import ru.nabokovsg.measurement.exceptions.BadRequestException;
 import ru.nabokovsg.measurement.exceptions.NotFoundException;
 import ru.nabokovsg.measurement.mapper.library.AcceptableResidualThicknessMapper;
 import ru.nabokovsg.measurement.model.library.AcceptableResidualThickness;
+import ru.nabokovsg.measurement.model.library.QAcceptableResidualThickness;
 import ru.nabokovsg.measurement.repository.library.AcceptableResidualThicknessRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,28 +24,21 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
 
     private final AcceptableResidualThicknessRepository repository;
     private final AcceptableResidualThicknessMapper mapper;
+    private final EntityManager em;
 
     @Override
     public ResponseAcceptableResidualThicknessDto save(NewAcceptableResidualThicknessDto thicknessDto) {
         validateAcceptableStandards(thicknessDto.getAcceptableThickness(), thicknessDto.getAcceptablePercent());
-        AcceptableResidualThickness acceptableResidualThickness =
-                mapper.mapToAcceptableThickness(thicknessDto
-                        , getStandardSize(thicknessDto.getThickness(), thicknessDto.getDiameter()));
-        if (getDuplicate(acceptableResidualThickness)) {
-            throw new BadRequestException(
-                    String.format("AcceptableResidualThickness thickness=%s is found", thicknessDto));
-        }
-        return mapper.mapToResponseAcceptableResidualThicknessDto(repository.save(acceptableResidualThickness));
+        return mapper.mapToResponseAcceptableResidualThicknessDto(
+                repository.save(searchDuplicate(mapper.mapToAcceptableThickness(thicknessDto))));
     }
 
     @Override
     public ResponseAcceptableResidualThicknessDto update(UpdateAcceptableResidualThicknessDto thicknessDto) {
         validateAcceptableStandards(thicknessDto.getAcceptableThickness(), thicknessDto.getAcceptablePercent());
         if (repository.existsById(thicknessDto.getId())) {
-            AcceptableResidualThickness acceptableResidualThickness =
-                    mapper.mapToUpdateAcceptableThickness(thicknessDto
-                            , getStandardSize(thicknessDto.getThickness(), thicknessDto.getDiameter()));
-            return mapper.mapToResponseAcceptableResidualThicknessDto(repository.save(acceptableResidualThickness));
+            return mapper.mapToResponseAcceptableResidualThicknessDto(
+                        repository.save(searchDuplicate(mapper.mapToUpdateAcceptableThickness(thicknessDto))));
         }
         throw new NotFoundException(
                 String.format("AcceptableResidualThickness with id=%s not found for update", thicknessDto.getId())
@@ -71,24 +69,30 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
         throw new NotFoundException(String.format("AcceptableThickness with id=%s not found for delete", id));
     }
 
-    private boolean getDuplicate(AcceptableResidualThickness acceptableThickness) {
+    private AcceptableResidualThickness searchDuplicate(AcceptableResidualThickness acceptableThickness) {
+        QAcceptableResidualThickness thickness = QAcceptableResidualThickness.acceptableResidualThickness;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(thickness.equipmentLibraryId.eq(acceptableThickness.getEquipmentLibraryId()));
+        builder.and(thickness.elementLibraryId.eq(acceptableThickness.getElementLibraryId()));
         if (acceptableThickness.getPartElementLibraryId() != null) {
-            if (acceptableThickness.getDiameter() == null && acceptableThickness.getThickness() == null) {
-                return repository.existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(
-                                                                      acceptableThickness.getEquipmentLibraryId()
-                                                                    , acceptableThickness.getElementLibraryId()
-                                                                    , acceptableThickness.getPartElementLibraryId());
-            }
-            return repository.existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
-                                                                      acceptableThickness.getEquipmentLibraryId()
-                                                                    , acceptableThickness.getElementLibraryId()
-                                                                    , acceptableThickness.getPartElementLibraryId()
-                                                                    , acceptableThickness.getStandardSize());
+            builder.and(thickness.partElementLibraryId.eq(acceptableThickness.getPartElementLibraryId()));
         }
-        return repository.existsByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(
-                                                                          acceptableThickness.getEquipmentLibraryId()
-                                                                        , acceptableThickness.getElementLibraryId()
-                                                                        , acceptableThickness.getStandardSize());
+        if (acceptableThickness.getThickness() != null) {
+            builder.and(thickness.thickness.eq(acceptableThickness.getThickness()));
+        }
+        if (acceptableThickness.getDiameter() != null) {
+            builder.and(thickness.diameter.eq(acceptableThickness.getDiameter()));
+        }
+        AcceptableResidualThickness duplicate = new JPAQueryFactory(em).select(thickness)
+                                                                       .from(thickness)
+                                                                       .where(builder)
+                                                                       .fetchOne();
+        if (duplicate != null && (acceptableThickness.getId() == null || !Objects.equals(duplicate.getId(), acceptableThickness.getId()))) {
+            throw new BadRequestException(
+                    String.format("AcceptableResidualThickness duplicate=%s is found", acceptableThickness));
+        } else {
+            return acceptableThickness;
+        }
     }
 
     private void validateAcceptableStandards(Double acceptableThickness, Integer acceptablePercent) {
@@ -104,28 +108,6 @@ public class AcceptableResidualThicknessServiceImpl implements AcceptableResidua
         if (acceptablePercent != null && acceptablePercent <= 0) {
             throw new BadRequestException(
                     String.format("acceptablePercent can only be positive: %s", acceptablePercent));
-        }
-    }
-
-    private String getStandardSize(Double thickness, Integer diameter) {
-        if (thickness == null && diameter == null) {
-           return null;
-        }
-        String standardSize;
-        if (diameter != null && diameter <= 0) {
-            throw new BadRequestException(String.format("diameter can only be positive: %s", diameter));
-        } else {
-            standardSize = String.valueOf(diameter);
-        }
-        if (thickness != null && thickness <= 0) {
-            throw new BadRequestException(String.format("thickness can only be positive: %s", thickness));
-        } else {
-            String thicknessString = String.valueOf(thickness);
-            if (!standardSize.isBlank()) {
-                return String.join("х", standardSize, thicknessString);
-            } else {
-                return thicknessString;
-            }
         }
     }
 }

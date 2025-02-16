@@ -9,27 +9,11 @@ public interface AcceptableResidualThicknessRepository extends JpaRepository<Acc
 
     Set<AcceptableResidualThickness> findAllByEquipmentLibraryId(Long equipmentLibraryId);
 
-    boolean existsByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(Long equipmentLibraryId
-                                                                       , Long elementLibraryId
-                                                                       , String standardSize);
+    AcceptableResidualThickness findByEquipmentLibraryIdAndElementLibraryId(Long equipmentLibraryId
+                                                                          , Long elementLibraryId);
 
-    boolean existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(Long equipmentLibraryId
-                                                                               , Long elementLibraryId
-                                                                               , Long partElementLibraryId);
-
-    boolean existsByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
-                                                                                           Long equipmentLibraryId
-                                                                                         , Long elementLibraryId
-                                                                                         , Long partElementLibraryId
-                                                                                         , String standardSize);
-
-    AcceptableResidualThickness findByEquipmentLibraryIdAndElementLibraryIdAndStandardSize(Long equipmentLibraryId
-                                                                                         , Long elementLibraryId
-                                                                                         , String standardSize);
-
-    AcceptableResidualThickness findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryIdAndStandardSize(
-                                                                                              Long equipmentLibraryId
-                                                                                            , Long elementLibraryId
-                                                                                            , Long partElementLibraryId
-                                                                                            , String standardSize);
+    AcceptableResidualThickness findByEquipmentLibraryIdAndElementLibraryIdAndPartElementLibraryId(
+                                                                                            Long equipmentLibraryId
+                                                                                          , Long elementLibraryId
+                                                                                          , Long partElementLibraryId);
 }
