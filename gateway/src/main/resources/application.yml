@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: Gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: reference-books
+              uri: lb://reference-books
+              predicates:
+                - Path=/LabDiagnostic/library/**
+            - id: equipment
+              uri: lb://equipment
+              predicates:
+                - Path=/LabDiagnostic/equipment/**
+            - id: laboratory-lnk
+              uri: lb://laboratory-lnk
+              predicates:
+                - Path=/LabDiagnostic/lnk/**
+            - id: diagnosis-lnk
+              uri: lb://diagnosis-lnk
+              predicates:
+                 - Path=/LabDiagnostic/lnk/diagnosis/**
+
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://eureka-discovery:8761/eureka
+#    register-with-eureka: false
+
+#spring boot:
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    healthcheck:
+      enabled: true
+  instance:
+    preferIpAddress: true
