@@ -3,6 +3,7 @@ package ru.nabokovsg.referencebooks.service_factory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
+import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.mapper.CopyEquipmentElementsMapper;
 import ru.nabokovsg.referencebooks.mapper.ElementLibraryMapper;
 import ru.nabokovsg.referencebooks.model.ElementLibrary;
@@ -25,6 +26,9 @@ public class CopyEquipmentElementsServiceImpl implements CopyEquipmentElementsSe
 
     @Override
     public List<ResponseShortElementLibraryDto> copyElements(EquipmentLibrary equipment, EquipmentLibrary copyEquipment) {
+        if (!equipment.getElements().isEmpty()) {
+            throw new BadRequestException("Все элементы скопированы.");
+        }
         Map<String, Set<PartElementLibrary>> partsElement = new HashMap<>();
         List<ElementLibrary> elements = copyEquipment.getElements().stream()
                 .map(element -> {
