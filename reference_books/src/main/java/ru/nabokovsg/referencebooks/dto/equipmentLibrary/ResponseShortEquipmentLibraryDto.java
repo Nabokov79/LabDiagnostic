@@ -4,15 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
-
-import java.util.List;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @Schema(description = "Данные вида оборудования")
-public class ResponseEquipmentLibraryDto {
+public class ResponseShortEquipmentLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
@@ -28,6 +25,4 @@ public class ResponseEquipmentLibraryDto {
     private String dimensions;
     @Schema(description = "Период стабилизации основания")
     private Integer periodStabilization;
-    @Schema(description = "Элементы")
-    private List<ResponseShortElementLibraryDto> elements;
 }

@@ -1,9 +1,6 @@
 package ru.nabokovsg.referencebooks.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +27,8 @@ public class EquipmentLibrary {
     private Integer volume;
     @Column(name = "model")
     private String model;
+    @Column(name = "period_stabilization")
+    private Integer periodStabilization;
     @Column(name = "diameter")
     private Integer diameter;
     @Column(name = "length")
@@ -38,10 +37,11 @@ public class EquipmentLibrary {
     private Integer height;
     @Column(name = "width")
     private Integer width;
+    @Column(name = "dimensions")
+    private String dimensions;
     @OneToMany(mappedBy = "equipment",
             orphanRemoval = true,
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY)
-    @JsonIgnore
     private Set<ElementLibrary> elements;
 }

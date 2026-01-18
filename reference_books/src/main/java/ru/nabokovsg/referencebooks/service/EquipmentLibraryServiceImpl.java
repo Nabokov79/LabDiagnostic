@@ -5,19 +5,20 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.equipmentLibrary.NewEquipmentLibraryDto;
+import ru.nabokovsg.referencebooks.dto.equipmentLibrary.ResponseShortEquipmentLibraryDto;
 import ru.nabokovsg.referencebooks.dto.equipmentLibrary.ResponseEquipmentLibraryDto;
 import ru.nabokovsg.referencebooks.dto.equipmentLibrary.UpdateEquipmentLibraryDto;
-import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
+import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.EquipmentLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
-import ru.nabokovsg.referencebooks.model.QEquipmentLibrary;
 import ru.nabokovsg.referencebooks.repository.EquipmentLibraryRepository;
+import ru.nabokovsg.referencebooks.service_factory.CopyEquipmentElementsService;
+import ru.nabokovsg.referencebooks.service_factory.ElementNameFactory;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,22 +27,36 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
 
     private final EquipmentLibraryRepository repository;
     private final EquipmentLibraryMapper mapper;
+    private final ElementNameFactory factory;
     private final EntityManager em;
+    private final CopyEquipmentElementsService copyService;
     private final static String NO_FOUND = "Оборудование не обнаружено";
 
     @Override
-    public ResponseEquipmentLibraryDto save(NewEquipmentLibraryDto equipmentDto) {
+    public ResponseShortEquipmentLibraryDto save(NewEquipmentLibraryDto equipmentDto) {
         EquipmentLibrary equipment = mapper.mapToEquipmentLibrary(equipmentDto);
         validByDuplicate(equipment);
-        return mapper.mapToResponseEquipmentLibraryDto(repository.save(equipment));
+        mapper.mapToDimensions(equipment, factory.createDimensions(equipment.getDiameter(), equipment.getLength()
+                                                                 , equipment.getHeight(), equipment.getWidth()));
+        return mapper.mapToResponseShortEquipmentLibraryDto(repository.save(equipment));
     }
 
     @Override
-    public ResponseEquipmentLibraryDto update(UpdateEquipmentLibraryDto equipmentDto) {
+    public ResponseShortEquipmentLibraryDto update(UpdateEquipmentLibraryDto equipmentDto) {
         EquipmentLibrary equipment = getById(equipmentDto.getId());
         mapper.mapToUpdateEquipmentLibrary(equipment, equipmentDto);
+        mapper.mapToDimensions(equipment, factory.createDimensions(equipment.getDiameter(), equipment.getLength()
+                , equipment.getHeight(), equipment.getWidth()));
         validByDuplicate(equipment);
-        return mapper.mapToResponseEquipmentLibraryDto(repository.save(equipment));
+        return mapper.mapToResponseShortEquipmentLibraryDto(repository.save(equipment));
+    }
+
+    @Override
+    public List<ResponseShortElementLibraryDto> copyElements(Long id, Long copyId) {
+        Map<Long, EquipmentLibrary> equipments = repository.findAllById(List.of(id, copyId))
+                                            .stream()
+                                            .collect(Collectors.toMap(EquipmentLibrary::getId, equipment -> equipment));
+        return copyService.copyElements(equipments.get(id), equipments.get(copyId));
     }
 
     @Override
@@ -50,19 +65,21 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
     }
 
     @Override
-    public List<ResponseEquipmentLibraryDto> getAll(String name) {
+    public List<ResponseShortEquipmentLibraryDto> getAll(String name) {
         List<EquipmentLibrary> equipments = repository.findAll();
         if (!equipments.isEmpty() && name != null) {
             final String equipmentName = name.toLowerCase();
             return equipments.stream()
                              .filter(equipment -> equipment.getFullName().toLowerCase().contains(equipmentName)
-                                               || equipment.getShortName().toLowerCase().contains(equipmentName))
-                             .map(mapper::mapToResponseEquipmentLibraryDto)
+                                               || equipment.getShortName().toLowerCase().contains(equipmentName)
+                                               || equipment.getModel().toLowerCase().contains(equipmentName)
+                                               || String.valueOf(equipment.getVolume()).contains(equipmentName))
+                             .map(mapper::mapToResponseShortEquipmentLibraryDto)
                              .toList();
         }
         return equipments.stream()
                          .sorted(Comparator.comparing(EquipmentLibrary::getFullName))
-                         .map(mapper::mapToResponseEquipmentLibraryDto)
+                         .map(mapper::mapToResponseShortEquipmentLibraryDto)
                          .collect(Collectors.toList());
     }
 

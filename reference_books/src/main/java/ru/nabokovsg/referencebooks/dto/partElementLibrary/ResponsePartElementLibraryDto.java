@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-@Schema(description = "Информация о подэлементе о элемента оборудования")
+@Schema(description = "Данные подэлемента элемента оборудования")
 public class ResponsePartElementLibraryDto {
 
     @Schema(description = "Идентификатор")
@@ -25,6 +25,8 @@ public class ResponsePartElementLibraryDto {
     private Integer height;
     @Schema(description = "Ширина")
     private Integer width;
+    @Schema(description = "Диаметр (типоразмер)")
+    private Integer diameterSize;
     @Schema(description = "Толщина")
-    private Double thickness;
+    private Double thicknessSize;
 }

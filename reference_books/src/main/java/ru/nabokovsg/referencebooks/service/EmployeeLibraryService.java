@@ -1,20 +1,21 @@
 package ru.nabokovsg.referencebooks.service;
 
-import ru.nabokovsg.referencebooks.dto.branchLibrary.NewBranchLibraryDto;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.UpdateBranchLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.NewEmployeeLibraryDto;
 import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseShortEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.UpdateEmployeeLibraryDto;
 
 import java.util.List;
 
 public interface EmployeeLibraryService {
 
-    ResponseEmployeeLibraryDto save(NewBranchLibraryDto branchDto);
+    ResponseShortEmployeeLibraryDto save(NewEmployeeLibraryDto employeeDto);
 
-    ResponseEmployeeLibraryDto update(UpdateBranchLibraryDto branchDto);
+    ResponseShortEmployeeLibraryDto update(UpdateEmployeeLibraryDto employeeDto);
 
     ResponseEmployeeLibraryDto get(Long id);
 
-    List<ResponseEmployeeLibraryDto> getAll(Long id, String department, String name);
+    List<ResponseShortEmployeeLibraryDto> getAll(Long id, String department, String name);
 
     void delete(Long id);
 }

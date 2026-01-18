@@ -30,6 +30,9 @@ public class NewEquipmentLibraryDto {
     @Schema(description = "Модель")
     @NotBlank(message = "model should not be blank")
     private String model;
+    @Schema(description = "Период стабилизации основания")
+    @Positive(message = "periodStabilization can only be positive")
+    private Integer periodStabilization;
     @Schema(description = "Диаметр")
     @Positive(message = "diameter can only be positive")
     private Integer diameter;

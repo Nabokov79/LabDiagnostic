@@ -17,6 +17,8 @@ public class PartElementLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "full_name")
+    private String fullName;
     @Column(name = "name")
     private String name;
     @Column(name = "place")
@@ -29,8 +31,14 @@ public class PartElementLibrary {
     private Integer height;
     @Column(name = "width")
     private Integer width;
-    @Column(name = "thickness")
-    private Double thickness;
+    @Column(name = "diameter_size")
+    private Integer diameterSize;
+    @Column(name = "thickness_size")
+    private Double thicknessSize;
+    @Column(name = "standard_size")
+    private String standardSize;
+    @Column(name = "dimensions")
+    private String dimensions;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "element_id")
     private ElementLibrary element;

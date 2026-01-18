@@ -12,4 +12,6 @@ public interface EmployeeLibraryRepository extends JpaRepository<EmployeeLibrary
     Set<EmployeeLibrary> findAllByDepartmentId(Long departmentId);
 
     Set<EmployeeLibrary> findAllBySourceId(Long sourceId);
+
+    boolean existsByEmail(String email);
 }

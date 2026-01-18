@@ -15,14 +15,16 @@ public class ResponseElementLibraryDto {
     private Long id;
     @Schema(description = "Наименование элемента")
     private String name;
-    @Schema(description = "Диаметр")
+    @Schema(description = "Диаметр (габаритный размер)")
     private Integer diameter;
-    @Schema(description = "Длина")
+    @Schema(description = "Длина (габаритный размер)")
     private Integer length;
-    @Schema(description = "Высота")
+    @Schema(description = "Высота (габаритный размер)")
     private Integer height;
-    @Schema(description = "Ширина")
+    @Schema(description = "Ширина (габаритный размер)")
     private Integer width;
-    @Schema(description = "Толщина")
-    private Double thickness;
+    @Schema(description = "Диаметр (типоразмер)")
+    private Integer diameterSize;
+    @Schema(description = "Толщина(типоразмер)")
+    private Double thicknessSize;
 }

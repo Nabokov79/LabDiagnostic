@@ -11,11 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.NewBranchLibraryDto;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.ResponseBranchLibraryDto;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.ResponseShortBranchLibraryDto;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.UpdateBranchLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.NewEmployeeLibraryDto;
 import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseShortEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.UpdateEmployeeLibraryDto;
 import ru.nabokovsg.referencebooks.service.EmployeeLibraryService;
 
 import java.util.List;
@@ -34,28 +33,28 @@ public class EmployeeLibraryController {
 
     @Operation(summary = "Добавить сотрудника")
     @PostMapping("/employee")
-    public ResponseEntity<ResponseEmployeeLibraryDto> save(@RequestBody @Valid
-                                               @Parameter(description = "Сотрудник") NewBranchLibraryDto branchDto) {
-        return ResponseEntity.ok().body(service.save(branchDto));
+    public ResponseEntity<ResponseShortEmployeeLibraryDto> save(@RequestBody @Valid
+                                                                @Parameter(description = "Сотрудник") NewEmployeeLibraryDto employeeDto) {
+        return ResponseEntity.ok().body(service.save(employeeDto));
     }
 
     @Operation(summary = "Изменить данные сотрудник")
     @PatchMapping("/employee")
-    public ResponseEntity<ResponseEmployeeLibraryDto> update(@RequestBody @Valid
-                                              @Parameter(description = "Сотрудник") UpdateBranchLibraryDto branchDto) {
-        return ResponseEntity.ok().body(service.update(branchDto));
+    public ResponseEntity<ResponseShortEmployeeLibraryDto> update(@RequestBody @Valid
+                                                                  @Parameter(description = "Сотрудник") UpdateEmployeeLibraryDto employeeDto) {
+        return ResponseEntity.ok().body(service.update(employeeDto));
     }
 
     @Operation(summary = "Получить данные сотрудника")
     @GetMapping("/employee/{id}")
     public ResponseEntity<ResponseEmployeeLibraryDto> get(@PathVariable @NotNull @Positive
-                                                        @Parameter(description = "Идентификатор") Long id) {
+                                                          @Parameter(description = "Идентификатор") Long id) {
         return ResponseEntity.ok().body(service.get(id));
     }
 
     @Operation(summary = "Получить данные всех сотрудников филиала")
     @GetMapping("/employees/branch/{id}")
-    public ResponseEntity<List<ResponseEmployeeLibraryDto>> getAllByBranch(
+    public ResponseEntity<List<ResponseShortEmployeeLibraryDto>> getAllByBranch(
             @PathVariable(name = "id") @NotNull @Positive
             @Parameter(description = "Идентификатор филиала") Long id,
             @RequestParam(name = "name", required = false)
@@ -65,7 +64,7 @@ public class EmployeeLibraryController {
 
     @Operation(summary = "Получить данные всех сотрудников подразделения")
     @GetMapping("/employees/department/{id}")
-    public ResponseEntity<List<ResponseEmployeeLibraryDto>> getAllByDepartment(
+    public ResponseEntity<List<ResponseShortEmployeeLibraryDto>> getAllByDepartment(
             @PathVariable(name = "id") @NotNull @Positive
             @Parameter(description = "Идентификатор подразделения") Long id,
             @RequestParam(name = "name", required = false)
@@ -75,7 +74,7 @@ public class EmployeeLibraryController {
 
     @Operation(summary = "Получить данные всех сотрудников источника теплоснабжения")
     @GetMapping("/employees/source/{id}")
-    public ResponseEntity<List<ResponseEmployeeLibraryDto>> getAllBySource(
+    public ResponseEntity<List<ResponseShortEmployeeLibraryDto>> getAllBySource(
             @PathVariable(name = "id") @NotNull @Positive
             @Parameter(description = "Идентификатор источника теплоснабжения") Long id,
             @RequestParam(name = "name", required = false)

@@ -22,11 +22,9 @@ public class NewEmployeeLibraryDto {
     @Positive(message = "branch id can only be positive")
     private Long branchId;
     @Schema(description = "Идентификатор")
-    @NotNull(message = "department id should not be null")
     @Positive(message = "department id can only be positive")
     private Long departmentId;
     @Schema(description = "Идентификатор")
-    @NotNull(message = "source id should not be null")
     @Positive(message = "source id can only be positive")
     private Long sourceId;
     @Schema(description = "Имя")

@@ -27,8 +27,12 @@ public class EmployeeLibrary {
     private String branch;
     @Column(name = "department")
     private String department;
+    @Column(name = "source")
+    private String source;
     @Column(name = "initials")
     private String initials;
+    @Column(name = "full_name")
+    private String fullName;
     @Column(name = "name")
     private String name;
     @Column(name = "patronymic")

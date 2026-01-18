@@ -9,9 +9,12 @@ import java.util.Set;
 
 public interface ElementLibraryRepository extends JpaRepository<ElementLibrary, Long> {
 
+    @Query("select e.id from ElementLibrary e where e.equipment.id = ?1 and e.name = ?2")
+    Long findByEquipmentIdAndName(Long equipmentId, String name);
+
     boolean existsByEquipmentIdAndName(Long equipmentId, String name);
 
-    Set<ElementLibrary> findAllByEquipmentId(Long id);
+    Set<ElementLibrary> findAllByEquipmentIdOrderByName(Long id);
 
     @Query("select e.name from ElementLibrary e where e.id = ?1")
     Optional<String> findNameByElementLibraryId(Long id);

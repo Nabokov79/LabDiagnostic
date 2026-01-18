@@ -77,6 +77,12 @@ public class BranchLibraryServiceImpl implements BranchLibraryService {
 
     }
 
+    @Override
+    public String getFullNameById(long id) {
+        return repository.findFullNameById(id)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND));
+    }
+
     private void exists(Long id, String fullName) {
         boolean exists;
         if (id != null) {

@@ -1,44 +1,52 @@
 package ru.nabokovsg.referencebooks.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.NewElementLibraryDto;
+import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.UpdateElementLibraryDto;
 import ru.nabokovsg.referencebooks.model.ElementLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.ElementLibraryMapper;
-import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.ElementLibraryRepository;
+import ru.nabokovsg.referencebooks.service_factory.ElementNameFactory;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ElementLibraryServiceImpl implements ElementLibraryService {
 
     private final ElementLibraryRepository repository;
     private final ElementLibraryMapper mapper;
     private final EquipmentLibraryService equipmentLibraryService;
+    private final ElementNameFactory factory;
     private final static String NO_FOUND = "Элемент не обнаружен";
 
     @Override
-    public ResponseElementLibraryDto save(NewElementLibraryDto elementDto) {
-        exists(elementDto.getEquipmentLibraryId(), elementDto.getName());
-        return mapper.mapToResponseElementLibraryDto(
+    public ResponseShortElementLibraryDto save(NewElementLibraryDto elementDto) {
+        exists(null, elementDto.getEquipmentLibraryId(), elementDto.getName());
+        return mapper.mapToResponseShortElementLibraryDto(
                 repository.save(mapper.mapToElementLibrary(elementDto
-                        , equipmentLibraryService.getById(elementDto.getEquipmentLibraryId()))));
+                        , equipmentLibraryService.getById(elementDto.getEquipmentLibraryId())
+                        , factory.createDimensions(elementDto.getDiameter(), elementDto.getLength(), elementDto.getHeight(), elementDto.getWidth())
+                        , factory.createStandardSize(elementDto.getDiameterSize(), elementDto.getThicknessSize()))));
     }
 
     @Override
-    public ResponseElementLibraryDto update(UpdateElementLibraryDto elementDto) {
+    public ResponseShortElementLibraryDto update(UpdateElementLibraryDto elementDto) {
         ElementLibrary elementLibrary = getById(elementDto.getId());
-        exists(elementLibrary.getEquipment().getId(), elementDto.getName());
-        mapper.mapToUpdateElementLibrary(elementLibrary, elementDto);
-        return mapper.mapToResponseElementLibraryDto(repository.save(elementLibrary));
+        mapper.mapToUpdateElementLibrary(elementLibrary, elementDto
+                , factory.createDimensions(elementDto.getDiameter(), elementDto.getLength(), elementDto.getHeight(), elementDto.getWidth())
+                , factory.createStandardSize(elementDto.getDiameterSize(), elementDto.getThicknessSize()));
+        exists(elementLibrary.getId(), elementLibrary.getEquipment().getId(), elementLibrary.getName());
+        return mapper.mapToResponseShortElementLibraryDto(repository.save(elementLibrary));
     }
 
     @Override
@@ -46,32 +54,19 @@ public class ElementLibraryServiceImpl implements ElementLibraryService {
         return mapper.mapToResponseElementLibraryDto(getById(id));
     }
 
-    private void exists(Long equipmentLibraryId, String name) {
-        if (repository.existsByEquipmentIdAndName(equipmentLibraryId, name)) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+
+    @Override
+    public List<ResponseShortElementLibraryDto> getAll(Long id, String name) {
+        Set<ElementLibrary> elements = repository.findAllByEquipmentIdOrderByName(id);
+        if (name != null) {
+            final String elementName = name.toLowerCase();
+            elements = elements.stream()
+                                .filter(element -> element.getName().toLowerCase().contains(elementName))
+                                .collect(Collectors.toSet());
         }
-    }
-
-    @Override
-    public List<ResponseElementLibraryDto> getAll(Long equipmentLibraryId) {
-        return repository.findAllByEquipmentId(equipmentLibraryId)
-                         .stream()
-                         .sorted(Comparator.comparing(ElementLibrary::getName))
-                         .map(mapper::mapToResponseElementLibraryDto)
-                         .toList();
-    }
-
-    @Override
-    public List<ResponseElementLibraryDto> copy(Long equipmentLibraryId) {
-        EquipmentLibrary equipment = equipmentLibraryService.getById(equipmentLibraryId);
-        return repository.saveAll(repository.findAllByEquipmentId(equipmentLibraryId)
-                                             .stream()
-                                             .map(element -> mapper.mapToCopyElementLibrary(element, equipment))
-                                             .toList())
-                         .stream()
-                         .sorted(Comparator.comparing(ElementLibrary::getName))
-                         .map(mapper::mapToResponseElementLibraryDto)
-                         .toList();
+        return elements.stream()
+                       .map(mapper::mapToResponseShortElementLibraryDto)
+                       .toList();
     }
 
     @Override
@@ -86,5 +81,20 @@ public class ElementLibraryServiceImpl implements ElementLibraryService {
     @Override
     public ElementLibrary getById(long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
+    }
+
+    private void exists(Long id, Long equipmentLibraryId, String name) {
+        boolean exists = false;
+        if (id == null) {
+            exists = repository.existsByEquipmentIdAndName(equipmentLibraryId, name);
+        } else {
+            Long elementId = repository.findByEquipmentIdAndName(equipmentLibraryId, name);
+            if (elementId != null) {
+                exists = !Objects.equals(id, elementId);
+            }
+        }
+        if (exists) {
+            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+        }
     }
 }

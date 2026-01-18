@@ -2,12 +2,15 @@ package ru.nabokovsg.referencebooks.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.NewBranchLibraryDto;
-import ru.nabokovsg.referencebooks.dto.branchLibrary.UpdateBranchLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.NewEmployeeLibraryDto;
 import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.ResponseShortEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.dto.employeeLibrary.UpdateEmployeeLibraryDto;
+import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.EmployeeLibraryMapper;
 import ru.nabokovsg.referencebooks.model.EmployeeLibrary;
+import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.EmployeeLibraryRepository;
 
 import java.util.ArrayList;
@@ -21,26 +24,37 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
 
     private final EmployeeLibraryRepository repository;
     private final EmployeeLibraryMapper mapper;
+    private final BranchLibraryService branchService;
+    private final DepartmentLibraryService departmentService;
+    private final HeatSupplySourceLibraryService sourceService;
     private final static String NOT_FOUND = "Сотрудник не найден.";
 
     @Override
-    public ResponseEmployeeLibraryDto save(NewBranchLibraryDto branchDto) {
-        return null;
+    public ResponseShortEmployeeLibraryDto save(NewEmployeeLibraryDto employeeDto) {
+        exists(employeeDto.getEmail());
+        EmployeeLibrary employee = mapper.mapToEmployeeLibrary(employeeDto);
+        create(employee);
+        return mapper.mapToResponseShortEmployeeLibraryDto(repository.save(employee));
     }
 
     @Override
-    public ResponseEmployeeLibraryDto update(UpdateBranchLibraryDto branchDto) {
-        return null;
+    public ResponseShortEmployeeLibraryDto update(UpdateEmployeeLibraryDto employeeDto) {
+        if (repository.existsById(employeeDto.getId())) {
+            EmployeeLibrary employee = getById(employeeDto.getId());
+            mapper.mapToUpdateEmployeeLibrary(employee, employeeDto);
+            create(employee);
+            return mapper.mapToResponseShortEmployeeLibraryDto(repository.save(employee));
+        }
+        throw new NotFoundException(String.format(NOT_FOUND));
     }
 
     @Override
     public ResponseEmployeeLibraryDto get(Long id) {
-        return mapper.mapToResponseEmployeeLibraryDto(
-                repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND)));
+        return mapper.mapToResponseEmployeeLibraryDto(getById(id));
     }
 
     @Override
-    public List<ResponseEmployeeLibraryDto> getAll(Long id, String department, String name) {
+    public List<ResponseShortEmployeeLibraryDto> getAll(Long id, String department, String name) {
         Set<EmployeeLibrary> employees = new HashSet<>();
         switch (department) {
             case "branch" -> employees = repository.findAllByBranchId(id);
@@ -53,15 +67,13 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
         if (name != null) {
             String employee = name.toLowerCase();
             return employees.stream()
-                            .filter(employeeLibrary -> employeeLibrary.getSurname().toLowerCase().contains(employee)
-                                                 || employeeLibrary.getPatronymic().toLowerCase().contains(employee)
-                                                 || employeeLibrary.getName().toLowerCase().contains(employee))
-                            .map(mapper::mapToResponseEmployeeLibraryDto)
-                            .toList();
+                    .filter(employeeLibrary -> employeeLibrary.getFullName().toLowerCase().contains(employee))
+                    .map(mapper::mapToResponseShortEmployeeLibraryDto)
+                    .toList();
         }
         return employees.stream()
-                        .map(mapper::mapToResponseEmployeeLibraryDto)
-                        .toList();
+                .map(mapper::mapToResponseShortEmployeeLibraryDto)
+                .toList();
     }
 
     @Override
@@ -73,11 +85,35 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
         throw new NotFoundException(NOT_FOUND);
     }
 
-    private void addDepartmentFields() {
-
+    private void exists(String email) {
+        if (repository.existsByEmail(email)) {
+            throw new BadRequestException(
+                    String.join("", ExceptionMassage.DUPLICATE.label, email));
+        }
     }
 
-    private String createInitials(String name, String patronymic, String surname) {
-        return String.join(" ", surname, patronymic, name);
+    public EmployeeLibrary getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+    }
+
+    private void create(EmployeeLibrary employee) {
+        createInitials(employee);
+        if (employee.getSourceId() != null) {
+            mapper.mapToSourceEmployee(employee, sourceService.getById(employee.getSourceId()));
+            return;
+        }
+        if (employee.getDepartmentId() != null) {
+            mapper.mapToDepartmentEmployee(employee, departmentService.getById(employee.getDepartmentId()));
+            return;
+        }
+        mapper.mapToBranchEmployee(employee, branchService.getFullNameById(employee.getBranchId()));
+    }
+
+    private void createInitials(EmployeeLibrary employee) {
+        mapper.mapToInitialsEmployee(employee
+                , String.join(" ", employee.getSurname()
+                        , String.join("", String.valueOf(employee.getName().charAt(0)), ".")
+                        , String.join("", String.valueOf(employee.getPatronymic().charAt(0)), "."))
+                , String.join(" ", employee.getSurname(), employee.getName(), employee.getPatronymic()));
     }
 }

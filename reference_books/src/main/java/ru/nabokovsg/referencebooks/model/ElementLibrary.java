@@ -30,8 +30,14 @@ public class ElementLibrary {
     private Integer height;
     @Column(name = "width")
     private Integer width;
-    @Column(name = "thickness")
-    private Double thickness;
+    @Column(name = "diameter_size")
+    private Integer diameterSize;
+    @Column(name = "thickness_size")
+    private Double thicknessSize;
+    @Column(name = "standard_size")
+    private String standardSize;
+    @Column(name = "dimensions")
+    private String dimensions;
     @OneToMany(mappedBy = "element",
             orphanRemoval = true,
             cascade = CascadeType.REMOVE,

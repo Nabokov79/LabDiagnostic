@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.NewElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseElementLibraryDto;
+import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.UpdateElementLibraryDto;
 import ru.nabokovsg.referencebooks.model.CopyElement;
 import ru.nabokovsg.referencebooks.model.NewElement;
@@ -35,17 +36,17 @@ public class ElementLibraryController {
 
     @Operation(summary = "Добавление нового элемента")
     @PostMapping("/element")
-    public ResponseEntity<ResponseElementLibraryDto> save(@RequestBody @Validated
-                                                          @Parameter(description = "Элемент")
-                                                          NewElementLibraryDto elementDto) {
+    public ResponseEntity<ResponseShortElementLibraryDto> save(@RequestBody @Validated
+                                                               @Parameter(description = "Элемент")
+                                                               NewElementLibraryDto elementDto) {
         return ResponseEntity.ok().body(service.save(elementDto));
     }
 
     @Operation(summary = "Изменение данных элемента")
     @PatchMapping("/element")
-    public ResponseEntity<ResponseElementLibraryDto> update(@RequestBody @Valid
-                                                            @Parameter(description = "Элемент")
-                                                            UpdateElementLibraryDto elementDto) {
+    public ResponseEntity<ResponseShortElementLibraryDto> update(@RequestBody @Valid
+                                                                 @Parameter(description = "Элемент")
+                                                                 UpdateElementLibraryDto elementDto) {
         return ResponseEntity.ok().body(service.update(elementDto));
     }
 
@@ -58,18 +59,12 @@ public class ElementLibraryController {
 
     @Operation(summary = "Получить все элементы оборудования")
     @GetMapping("/elements/{id}")
-    public ResponseEntity<List<ResponseElementLibraryDto>> getAll(
+    public ResponseEntity<List<ResponseShortElementLibraryDto>> getAll(
             @PathVariable(name = "id") @NotNull @Positive
-            @Parameter(description = "Идентификатор типа оборудования") Long equipmentLibraryId) {
-        return ResponseEntity.ok().body(service.getAll(equipmentLibraryId));
-    }
-
-    @Operation(summary = "Копировать элементы")
-    @PostMapping("/element/copy/{id}")
-    public ResponseEntity<List<ResponseElementLibraryDto>> copy(@RequestBody @Validated({CopyElement.class})
-                                                                    @PathVariable(name = "id") @NotNull @Positive
-                                                                    @Parameter(description = "Идентификатор типа оборудования") Long equipmentLibraryId) {
-        return ResponseEntity.ok().body(service.copy(equipmentLibraryId));
+            @Parameter(description = "Идентификатор типа оборудования") Long id
+            , @RequestParam(name = "name", required = false)
+            @Parameter(description = "Наименование элемента") String name) {
+        return ResponseEntity.ok().body(service.getAll(id, name));
     }
 
     @Operation(summary = "Удаление элемента оборудования")

@@ -1,15 +1,16 @@
 package ru.nabokovsg.referencebooks.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.nabokovsg.referencebooks.model.PartElementLibrary;
 
 import java.util.Set;
 
 public interface PartElementLibraryRepository extends JpaRepository<PartElementLibrary, Long> {
 
-    boolean existsByElementIdAndName(Long elementId, String name);
+    boolean existsByElementIdAndFullName(Long elementId, String fullName);
+    @Query("select p.id from PartElementLibrary p where p.element.id = ?1 and p.fullName = ?2")
+    Long findIdByElementIdAndFullName(Long elementId, String fullName);
 
-    boolean existsByElementIdAndNameAndPlace(Long elementId, String name, String place);
-
-    Set<PartElementLibrary> findAllByElementId(Long elementId);
+    Set<PartElementLibrary> findAllByElementIdOrderByFullName(Long elementId);
 }

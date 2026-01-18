@@ -21,4 +21,6 @@ public interface BranchLibraryService {
     void delete(Long id);
 
     BranchLibrary getById(Long id);
+
+    String getFullNameById(long id);
 }

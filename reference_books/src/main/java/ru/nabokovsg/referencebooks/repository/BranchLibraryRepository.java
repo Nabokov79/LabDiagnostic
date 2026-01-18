@@ -15,4 +15,7 @@ public interface BranchLibraryRepository extends JpaRepository<BranchLibrary, Lo
     Optional<Long> findIdByFullName(String fullName);
 
     boolean existsByFullName(String fullName);
+
+    @Query("select b.fullName from BranchLibrary b where b.id = ?1")
+    Optional<String> findFullNameById(Long id);
 }

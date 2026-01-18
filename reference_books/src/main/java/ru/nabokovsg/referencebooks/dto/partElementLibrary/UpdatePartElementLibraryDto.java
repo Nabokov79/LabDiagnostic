@@ -18,6 +18,10 @@ public class UpdatePartElementLibraryDto {
     @NotNull(message = "id should not be null")
     @Positive(message = "id can only be positive")
     private Long id;
+    @Schema(description = "Идентификатор элемента")
+    @NotNull(message = "element id should not be null")
+    @Positive(message = "element id can only be positive")
+    private Long elementLibraryId;
     @Schema(description = "Наименование подэлемента")
     @NotNull(message = "name should not be null")
     @NotBlank(message = "name should not be blank")
@@ -25,19 +29,22 @@ public class UpdatePartElementLibraryDto {
     @Schema(description = "Место на подэлементе")
     @NotBlank(message = "place should not be blank")
     private String place;
-    @Schema(description = "Диаметр")
+    @Schema(description = "Диаметр (габаритный размер)")
     @Positive(message = "diameter can only be positive")
     private Integer diameter;
-    @Schema(description = "Длина")
+    @Schema(description = "Длина (габаритный размер)")
     @Positive(message = "length can only be positive")
     private Integer length;
-    @Schema(description = "Высота")
+    @Schema(description = "Высота (габаритный размер)")
     @Positive(message = "height can only be positive")
     private Integer height;
-    @Schema(description = "Ширина")
+    @Schema(description = "Ширина (габаритный размер)")
     @Positive(message = "width can only be positive")
     private Integer width;
-    @Schema(description = "Толщина")
+    @Schema(description = "Диаметр (типоразмер)")
+    @Positive(message = "diameter can only be positive")
+    private Integer diameterSize;
+    @Schema(description = "Толщина(типоразмер)")
     @Positive(message = "thickness can only be positive")
-    private Double thickness;
+    private Double thicknessSize;
 }
