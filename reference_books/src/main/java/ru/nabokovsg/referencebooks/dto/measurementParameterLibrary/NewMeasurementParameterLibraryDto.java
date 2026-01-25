@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Objects;
-
 @Setter
 @Getter
 @AllArgsConstructor
@@ -39,18 +37,4 @@ public class NewMeasurementParameterLibraryDto {
     @Schema(description = "Параметр для расчета остаточной толщины")
     @NotNull(message = "calculateByResidualThickness should not be null")
     private Boolean calculateByResidualThickness;
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NewMeasurementParameterLibraryDto that = (NewMeasurementParameterLibraryDto) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
 }

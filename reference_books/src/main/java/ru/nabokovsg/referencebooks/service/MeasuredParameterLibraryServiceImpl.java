@@ -3,11 +3,9 @@ package ru.nabokovsg.referencebooks.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.NewMeasurementParameterLibraryDto;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.ResponseMeasurementParameterLibraryDto;
 import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.UpdateMeasurementParameterLibraryDto;
 import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
-import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.MeasurementParameterLibraryMapper;
 import ru.nabokovsg.referencebooks.repository.MeasurementParameterLibraryRepository;
 
@@ -19,109 +17,54 @@ public class MeasuredParameterLibraryServiceImpl implements MeasuredParameterLib
 
     private final MeasurementParameterLibraryRepository repository;
     private final MeasurementParameterLibraryMapper mapper;
-    private final static String MASSAGE = "Измеряемый параметр не обнаружен.";
 
     @Override
-    public List<MeasurementParameterLibrary> saveNewDefectParameter(DefectLibrary defect
-                                                        , List<NewMeasurementParameterLibraryDto> measuredParameters) {
-        return repository.saveAll(measuredParameters.stream()
-                                 .map(mapper::mapToMeasuredParameter)
-                                 .peek(parameter -> {
-                                     setNameDefectParameter(parameter
-                                             , defect.getDefectsQuantity()
-                                             , defect.getAssessmentAreaMM()
-                                             , defect.getAssessmentAreaPercentage());
-                                     mapper.mapUpdateUnitMeasurement(parameter
-                                                        , getUnitMeasurementType(parameter.getUnitMeasurement()).label);
-                                     setParameterCalculationType(parameter);
-                                     mapper.mapWithDefectLibrary(parameter, defect);
-                                 })
-                                 .toList());
+    public void saveDefectParameter(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
+       if (measuredParameters != null) {
+           measuredParameters.forEach(parameter -> mapper.mapWithDefectLibrary(parameter, defect));
+           repository.saveAll(measuredParameters);
+       }
     }
 
     @Override
-    public List<MeasurementParameterLibrary> saveNewRepairParameter(RepairLibrary repair
-                                                        , List<NewMeasurementParameterLibraryDto> measuredParameters) {
-        return repository.saveAll(measuredParameters.stream()
-                                                    .map(mapper::mapToMeasuredParameter)
-                                                    .peek(parameter -> {
-                                                        setName(parameter);
-                                                        mapper.mapUpdateUnitMeasurement(parameter
-                                                       , getUnitMeasurementType(parameter.getUnitMeasurement()).label);
-                                                        setParameterCalculationType(parameter);
-                                                        mapper.mapWithRepairLibrary(parameter, repair);
-                                                    })
-                                                    .toList());
+    public void saveRepairParameter(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters) {
+       if (measuredParameters != null) {
+           measuredParameters.forEach(parameter -> mapper.mapWithRepairLibrary(parameter, repair));
+           repository.saveAll(measuredParameters);
+       }
     }
 
     @Override
-    public List<MeasurementParameterLibrary> update(List<UpdateMeasurementParameterLibraryDto> measuredParameters) {
+    public List<MeasurementParameterLibrary> createNew(List<NewMeasurementParameterLibraryDto> measuredParameters) {
         if (measuredParameters != null) {
-            return repository.saveAll(measuredParameters.stream()
-                    .map(mapper::mapToUpdateMeasuredParameter)
-                    .peek(parameter -> {
-                        mapper.mapUpdateName(parameter, getMeasurementParameterType(parameter.getName()).label);
-                        mapper.mapUpdateUnitMeasurement(parameter
-                                                      , getUnitMeasurementType(parameter.getUnitMeasurement()).label);
-                        setParameterCalculationType(parameter);
-                    })
-                    .toList());
+            return measuredParameters.stream()
+                    .map(mapper::mapToMeasuredParameter)
+                    .peek(this::replace)
+                    .toList();
         }
         return null;
     }
 
     @Override
-    public ResponseMeasurementParameterLibraryDto get(Long id) {
-        return mapper.mapToResponseMeasurementParameterLibraryDto(getById(id));
+    public List<MeasurementParameterLibrary> createUpdate(List<UpdateMeasurementParameterLibraryDto> measuredParameters) {
+       if (measuredParameters != null) {
+           return measuredParameters.stream()
+                   .map(mapper::mapToUpdateMeasuredParameter)
+                   .peek(this::replace)
+                   .toList();
+       }
+       return null;
     }
 
-    @Override
-    public void delete(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return;
-        }
-        throw new NotFoundException(MASSAGE);
-    }
-
-    private MeasurementParameterLibrary getById(long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
-    }
-
-    private void setName(MeasurementParameterLibrary parameter) {
-        mapper.mapUpdateName(parameter, getMeasurementParameterType(parameter.getName()).label);
-    }
-
-    private void setNameDefectParameter(MeasurementParameterLibrary parameter, Integer defectsQuantity, Double assessmentAreaMM, Double assessmentAreaPercentage) {
-        MeasurementParameterType measurementParameterType = getMeasurementParameterType(parameter.getName());
-        if (measurementParameterType.equals(MeasurementParameterType.QUANTITY) && defectsQuantity != null) {
-            if (assessmentAreaMM != null) {
-                mapper.mapUpdateName(parameter
-                        , String.join(" ", measurementParameterType.label, "на", String.valueOf(assessmentAreaMM), "мм"));
-                return;
-            }
-            if (assessmentAreaPercentage != null) {
-                mapper.mapUpdateName(parameter
-                        , String.join(" ", measurementParameterType.label, "на", String.valueOf(assessmentAreaPercentage), "% от Р св.соед."));
-                return;
-            }
-        }
-        mapper.mapUpdateName(parameter, measurementParameterType.label);
-    }
-
-    private MeasurementParameterType getMeasurementParameterType(String name) {
-        return MeasurementParameterType.from(name)
-                .orElseThrow(() -> new BadRequestException(String.format("Недопустимое наименование параметра: %s", name)));
-    }
-
-    private UnitMeasurementType getUnitMeasurementType(String unitMeasurement) {
-        return UnitMeasurementType.from(unitMeasurement)
-                .orElseThrow(() -> new BadRequestException(String.format("Недопустимая единица измерения: %s", unitMeasurement)));
-    }
-
-    private void setParameterCalculationType(MeasurementParameterLibrary parameter) {
+    private void replace(MeasurementParameterLibrary parameter){
         ParameterCalculationType calculationType = ParameterCalculationType.from(parameter.getCalculation())
                 .orElseThrow(() -> new BadRequestException(String.format("Недопустимый тип расчета: %s", parameter.getCalculation())));
-        mapper.mapUpdateParameterCalculationType(parameter, calculationType, calculationType.label);
+        mapper.mapToReplacement(parameter
+                            , MeasurementParameterType.from(parameter.getName()).orElseThrow(
+                                      () -> new BadRequestException(String.format("Недопустимое наименование параметра: %s", parameter.getName()))).label
+                            , UnitMeasurementType.from(parameter.getUnitMeasurement()).orElseThrow(
+                                     () -> new BadRequestException(String.format("Недопустимая единица измерения: %s", parameter.getUnitMeasurement()))).label
+                            , calculationType
+                            , calculationType.label);
     }
 }

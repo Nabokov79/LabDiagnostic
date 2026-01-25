@@ -1,11 +1,14 @@
 package ru.nabokovsg.referencebooks.validators;
 
-import ru.nabokovsg.referencebooks.dto.defectLibrary.NewDefectLibraryDto;
-import ru.nabokovsg.referencebooks.dto.defectLibrary.UpdateDefectLibraryDto;
+import ru.nabokovsg.referencebooks.model.DefectLibrary;
+import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
+import ru.nabokovsg.referencebooks.model.QualityAssessment;
+
+import java.util.List;
 
 public interface DefectValidator {
 
-    void validNew(NewDefectLibraryDto defect);
-
-    void validUpdate(UpdateDefectLibraryDto defect);
+    void validateDefectLibrary(QualityAssessment qualityAssessmentType
+            , DefectLibrary defect
+            , List<MeasurementParameterLibrary> measuredParametersLibrary);
 }

@@ -8,6 +8,7 @@ import ru.nabokovsg.referencebooks.dto.equipmentLibrary.UpdateEquipmentLibraryDt
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 
 import java.util.List;
+import java.util.Set;
 
 public interface EquipmentLibraryService {
 
@@ -24,4 +25,8 @@ public interface EquipmentLibraryService {
     void delete(Long id);
 
     EquipmentLibrary getById(Long id);
+
+    String getFullName(Long id);
+
+    Set<EquipmentLibrary> getAllByIds(List<Long> ids);
 }

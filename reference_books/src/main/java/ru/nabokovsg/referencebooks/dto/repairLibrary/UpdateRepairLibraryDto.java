@@ -29,5 +29,5 @@ public class UpdateRepairLibraryDto {
     @NotNull(message = "withoutNamingParameter should not be null")
     private boolean withoutNamingParameter;
     @Schema(description = "Измеряемые параметры")
-    private List<UpdateMeasurementParameterLibraryDto> measuredParameters;
+    private List<UpdateMeasurementParameterLibraryDto> measuredParametersLibrary;
 }

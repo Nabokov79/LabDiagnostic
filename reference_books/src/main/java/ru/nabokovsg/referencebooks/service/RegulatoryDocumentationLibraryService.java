@@ -2,6 +2,7 @@ package ru.nabokovsg.referencebooks.service;
 
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.NewRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseRegulatoryDocumentationLibraryDto;
+import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseShortRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.UpdateRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibrary;
 
@@ -15,9 +16,11 @@ public interface RegulatoryDocumentationLibraryService {
 
     ResponseRegulatoryDocumentationLibraryDto get(Long id);
 
-    List<ResponseRegulatoryDocumentationLibraryDto> getAll(String text);
+    List<ResponseShortRegulatoryDocumentationLibraryDto> getAll(String text);
 
     void delete(Long id);
 
     RegulatoryDocumentationLibrary getById(Long id);
+
+    String getDocument(Long id);
 }

@@ -1,8 +1,6 @@
 package ru.nabokovsg.referencebooks.dto.defectLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,12 +18,8 @@ public class ResponseDefectLibraryDto {
     @Schema(description = "Идентификатор")
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentLibrary id should not be null")
-    @Positive(message = "equipmentLibrary id can only be positive")
     private Long equipmentLibraryId;
     @Schema(description = "Идентификатор нормативно-технического документа")
-    @NotNull(message = "documentationLibraryId should not be null")
-    @Positive(message = "documentationLibraryId can only be positive")
     private Long documentationLibraryId;
     @Schema(description = "Наименование дефекта")
     private String name;
@@ -33,8 +27,6 @@ public class ResponseDefectLibraryDto {
     private boolean withoutNamingParameter;
     @Schema(description = "Оценка качества")
     private QualityAssessment qualityAssessmentType;
-    @Schema(description = "Типоразмер элемента")
-    private String standardSize;
     @Schema(description = "Оценочный участок в мм")
     private Double assessmentAreaMM;
     @Schema(description = "Оценочный участок в процентах")
@@ -50,5 +42,5 @@ public class ResponseDefectLibraryDto {
     @Schema(description = "Максимальная толщина элемента")
     private Float maxThickness;
     @Schema(description = "Измеряемые параметры")
-    private List<ResponseMeasurementParameterLibraryDto> measuredParameters;
+    private List<ResponseMeasurementParameterLibraryDto> measuredParametersLibrary;
 }

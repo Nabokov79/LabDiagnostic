@@ -34,14 +34,14 @@ public class RepairLibraryController {
 
     @Operation(summary = "Добавление способа ремонта")
     @PostMapping("/repair")
-    public ResponseEntity<ResponseRepairLibraryDto> save(
+    public ResponseEntity<ResponseShortRepairLibraryDto> save(
             @RequestBody @Valid @Parameter(description = "Тип ремонта") NewRepairLibraryDto repairDto) {
         return ResponseEntity.ok().body(service.save(repairDto));
     }
 
     @Operation(summary = "Изменение данных способа ремонта")
     @PatchMapping("/repair")
-    public ResponseEntity<ResponseRepairLibraryDto> update(
+    public ResponseEntity<ResponseShortRepairLibraryDto> update(
             @RequestBody @Valid @Parameter(description = "Тип ремонта") UpdateRepairLibraryDto repairDto) {
         return ResponseEntity.ok().body(service.update(repairDto));
     }

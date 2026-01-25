@@ -1,10 +1,7 @@
 package ru.nabokovsg.referencebooks.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -44,4 +41,11 @@ public class EquipmentLibrary {
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY)
     private Set<ElementLibrary> elements;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "documentations_equipments",
+            joinColumns =  {@JoinColumn(name = "equipment_id")},
+            inverseJoinColumns = {@JoinColumn(name = "document_id")})
+    @ToString.Exclude
+    private Set<RegulatoryDocumentationLibrary> documentations;
 }

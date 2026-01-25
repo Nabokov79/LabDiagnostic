@@ -7,6 +7,7 @@ import ru.nabokovsg.referencebooks.dto.repairLibrary.ResponseRepairLibraryDto;
 import ru.nabokovsg.referencebooks.dto.repairLibrary.ResponseShortRepairLibraryDto;
 import ru.nabokovsg.referencebooks.dto.repairLibrary.UpdateRepairLibraryDto;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 import ru.nabokovsg.referencebooks.model.RepairLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
@@ -25,20 +26,21 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     private final static String MASSAGE = "Ремонт не обнаружен.";
 
     @Override
-    public ResponseRepairLibraryDto save(NewRepairLibraryDto repairDto) {
+    public ResponseShortRepairLibraryDto save(NewRepairLibraryDto repairDto) {
         validateByDuplicate(repairDto.getName());
+        List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.createNew(repairDto.getMeasuredParametersLibrary());
         RepairLibrary repair = repository.save(mapper.mapToRepairLibrary(repairDto));
-        return mapper.mapWithMeasurementParameter(repair, measuredParameterService.saveNewRepairParameter(repair, repairDto.getMeasuredParameters()));
+        measuredParameterService.saveRepairParameter(repair, measuredParameters);
+        return mapper.mapToResponseShortRepairLibraryDto(repair);
     }
 
     @Override
-    public ResponseRepairLibraryDto update(UpdateRepairLibraryDto repairDto) {
-        if (repository.existsById(repairDto.getId())) {
-            validateByDuplicate(repairDto.getName());
-            RepairLibrary repair = repository.save(mapper.mapToUpdateRepairLibrary(repairDto));
-            return mapper.mapWithMeasurementParameter(repair, measuredParameterService.update(repairDto.getMeasuredParameters()));
-        }
-        throw new NotFoundException(MASSAGE);
+    public ResponseShortRepairLibraryDto update(UpdateRepairLibraryDto repairDto) {
+        RepairLibrary repair = getById(repairDto.getId());
+        List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.createUpdate(repairDto.getMeasuredParametersLibrary());
+        mapper.mapToUpdateRepairLibrary(repair, repairDto);
+        measuredParameterService.saveRepairParameter(repository.save(repair), measuredParameters);
+        return mapper.mapToResponseShortRepairLibraryDto(repair);
     }
 
     @Override

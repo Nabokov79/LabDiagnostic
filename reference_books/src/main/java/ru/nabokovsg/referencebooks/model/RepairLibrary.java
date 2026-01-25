@@ -23,11 +23,11 @@ public class RepairLibrary {
     private String name;
     @Column(name = "without_naming_parameter")
     private Boolean withoutNamingParameter;
-    @Column(name = "measurement_parameters")
-    private String measurementParameters;
+    @Column(name = "measured_parameters")
+    private String measuredParameters;
     @OneToMany(mappedBy = "repair",
                orphanRemoval = true,
                cascade = CascadeType.REMOVE,
                fetch = FetchType.EAGER)
-    private List<MeasurementParameterLibrary> measuredParameters;
+    private List<MeasurementParameterLibrary> measuredParametersLibrary;
 }

@@ -1,10 +1,9 @@
 package ru.nabokovsg.referencebooks.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Set;
 
 @Setter
 @Getter
@@ -17,10 +16,29 @@ public class RegulatoryDocumentationLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "view")
-    private String view;
-    @Column(name = "number")
-    private String number;
-    @Column(name = "title")
-    private String title;
+    @Column(name = "full_name")
+    private String fullName;
+    @Column(name = "document")
+    private String document;
+    @Column(name = "document_name")
+    private String documentName;
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private RegulatoryDocumentationLibraryType type;
+    @Column(name = "document_type")
+    private String documentType;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private RegulatoryDocumentationLibraryStatus status;
+    @Column(name = "document_status")
+    private String documentStatus;
+    @Column(name = "area_distribution")
+    private String areaDistribution;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "documentations_equipments",
+            joinColumns =  {@JoinColumn(name = "document_id")},
+            inverseJoinColumns = {@JoinColumn(name = "equipment_id")})
+    @ToString.Exclude
+    private Set<EquipmentLibrary> equipments;
 }

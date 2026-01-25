@@ -15,6 +15,6 @@ public class ResponseShortRepairLibraryDto {
     private Long id;
     @Schema(description = "Наименование типа ремонта")
     private String name;
-    @Schema(description = "Измеряемые параметры дефекта")
-    private String measurementParameters;
+    @Schema(description = "Измеряемые параметры ремонта")
+    private String measuredParameters;
 }

@@ -15,11 +15,13 @@ public interface EquipmentLibraryMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "elements", ignore = true)
     @Mapping(target = "dimensions", ignore = true)
+    @Mapping(target = "documentations", ignore = true)
     EquipmentLibrary mapToEquipmentLibrary(NewEquipmentLibraryDto equipment);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "elements", ignore = true)
     @Mapping(target = "dimensions", ignore = true)
+    @Mapping(target = "documentations", ignore = true)
     void mapToUpdateEquipmentLibrary(@MappingTarget EquipmentLibrary equipment, UpdateEquipmentLibraryDto equipmentDto);
 
     @Mapping(target = "id", ignore = true)
@@ -33,6 +35,7 @@ public interface EquipmentLibraryMapper {
     @Mapping(target = "height", ignore = true)
     @Mapping(target = "width", ignore = true)
     @Mapping(target = "elements", ignore = true)
+    @Mapping(target = "documentations", ignore = true)
     void mapToDimensions(@MappingTarget EquipmentLibrary equipment, String dimensions);
 
     ResponseShortEquipmentLibraryDto mapToResponseShortEquipmentLibraryDto(EquipmentLibrary equipment);

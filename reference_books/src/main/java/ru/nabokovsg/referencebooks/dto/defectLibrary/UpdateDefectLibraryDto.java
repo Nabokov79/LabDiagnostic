@@ -64,5 +64,5 @@ public class UpdateDefectLibraryDto {
     @Positive(message = " maxThickness can only be positive")
     private Float maxThickness;
     @Schema(description = "Измеряемые параметры")
-    private List<UpdateMeasurementParameterLibraryDto> measuredParameters;
+    private List<UpdateMeasurementParameterLibraryDto> measuredParametersLibrary;
 }

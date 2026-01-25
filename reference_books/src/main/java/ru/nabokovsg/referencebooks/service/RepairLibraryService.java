@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface RepairLibraryService {
 
-    ResponseRepairLibraryDto save(NewRepairLibraryDto repairDto);
+    ResponseShortRepairLibraryDto save(NewRepairLibraryDto repairDto);
 
-    ResponseRepairLibraryDto update(UpdateRepairLibraryDto repairDto);
+    ResponseShortRepairLibraryDto update(UpdateRepairLibraryDto repairDto);
 
     ResponseRepairLibraryDto get(Long id);
 

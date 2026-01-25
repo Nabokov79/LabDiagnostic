@@ -26,6 +26,9 @@ public class CopyEquipmentElementsServiceImpl implements CopyEquipmentElementsSe
 
     @Override
     public List<ResponseShortElementLibraryDto> copyElements(EquipmentLibrary equipment, EquipmentLibrary copyEquipment) {
+        if (copyEquipment.getElements().isEmpty()) {
+            throw new BadRequestException("Отсутствуют элементы для копирования.");
+        }
         if (!equipment.getElements().isEmpty()) {
             throw new BadRequestException("Все элементы скопированы.");
         }

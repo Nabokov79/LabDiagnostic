@@ -4,6 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import ru.nabokovsg.referencebooks.dto.equipmentLibrary.ResponseShortEquipmentLibraryDto;
+import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryStatus;
+import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryType;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -12,11 +17,19 @@ import lombok.Setter;
 public class ResponseRegulatoryDocumentationLibraryDto {
 
     @Schema(description = "Идентификатор")
-    private Long id;
-    @Schema(description = "Вид документа")
-    private String view;
-    @Schema(description = "Номер документа")
-    private String number;
-    @Schema(description = "Заголовок документа")
-    private String title;
+    private long id;
+    @Schema(description = "Полное наименование документа")
+    private String fullName;
+    @Schema(description = "Тип и номер документа")
+    private String document;
+    @Schema(description = "Наименование документа")
+    private String documentName;
+    @Schema(description = "Тип документа")
+    private RegulatoryDocumentationLibraryType type;
+    @Schema(description = "Статус документа")
+    private RegulatoryDocumentationLibraryStatus status;
+    @Schema(description = "Область распространения документа")
+    private String areaDistribution;
+    @Schema(description = "Типы оборудования")
+    private List<ResponseShortEquipmentLibraryDto> equipments;
 }

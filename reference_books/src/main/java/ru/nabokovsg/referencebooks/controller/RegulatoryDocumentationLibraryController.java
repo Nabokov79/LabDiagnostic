@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.NewRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseRegulatoryDocumentationLibraryDto;
+import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseShortRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.UpdateRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.service.RegulatoryDocumentationLibraryService;
 
@@ -56,9 +57,9 @@ public class RegulatoryDocumentationLibraryController {
 
     @Operation(summary = "Получить все документы")
     @GetMapping("/documentations")
-    public ResponseEntity<List<ResponseRegulatoryDocumentationLibraryDto>> getAll(
+    public ResponseEntity<List<ResponseShortRegulatoryDocumentationLibraryDto>> getAll(
             @RequestParam(name = "text", required = false)
-            @Parameter(description = "Номер документа, Название документа") String text) {
+            @Parameter(description = "Тип, номер, наименование документа") String text) {
         return ResponseEntity.ok().body(service.getAll(text));
     }
 
@@ -66,6 +67,6 @@ public class RegulatoryDocumentationLibraryController {
     @DeleteMapping("/documentation/{id}")
     public ResponseEntity<String> delete(@PathVariable @Parameter(description = "Идентификатор") Long id) {
         service.delete(id);
-        return ResponseEntity.ok("Документ успешно удален.");
+        return ResponseEntity.ok("Документ удален.");
     }
 }

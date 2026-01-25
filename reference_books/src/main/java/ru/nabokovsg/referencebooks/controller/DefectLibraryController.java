@@ -16,7 +16,6 @@ import ru.nabokovsg.referencebooks.dto.defectLibrary.ResponseDefectLibraryDto;
 import ru.nabokovsg.referencebooks.dto.defectLibrary.ResponseShortDefectLibraryDto;
 import ru.nabokovsg.referencebooks.dto.defectLibrary.UpdateDefectLibraryDto;
 import ru.nabokovsg.referencebooks.service.DefectLibraryService;
-import ru.nabokovsg.referencebooks.validators.DefectValidator;
 
 import java.util.List;
 
@@ -31,21 +30,18 @@ import java.util.List;
 public class DefectLibraryController {
 
     private final DefectLibraryService service;
-    private final DefectValidator validator;
 
     @Operation(summary = "Добавление новых дефектов оборудования")
     @PostMapping("/defect")
-    public ResponseEntity<ResponseDefectLibraryDto> save(
+    public ResponseEntity<ResponseShortDefectLibraryDto> save(
             @RequestBody @Valid @Parameter(description = "Дефект") NewDefectLibraryDto defectDto) {
-        validator.validNew(defectDto);
         return ResponseEntity.ok().body(service.save(defectDto));
     }
 
     @Operation(summary = "Изменение данных дефектов оборудования")
     @PatchMapping("/defect")
-    public ResponseEntity<ResponseDefectLibraryDto> update(
+    public ResponseEntity<ResponseShortDefectLibraryDto> update(
             @RequestBody @Valid @Parameter(description = "Дефект") UpdateDefectLibraryDto defectDto) {
-        validator.validUpdate(defectDto);
         return ResponseEntity.ok().body(service.update(defectDto));
     }
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
+import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseShortRegulatoryDocumentationLibraryDto;
 
 import java.util.List;
 
@@ -30,4 +31,6 @@ public class ResponseEquipmentLibraryDto {
     private Integer periodStabilization;
     @Schema(description = "Элементы")
     private List<ResponseShortElementLibraryDto> elements;
+    @Schema(description = "Нормативно-техническая документация")
+    private List<ResponseShortRegulatoryDocumentationLibraryDto> documentations;
 }

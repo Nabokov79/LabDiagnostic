@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface DefectLibraryService {
 
-    ResponseDefectLibraryDto save(NewDefectLibraryDto defectDto);
+    ResponseShortDefectLibraryDto save(NewDefectLibraryDto defectDto);
 
-    ResponseDefectLibraryDto update(UpdateDefectLibraryDto defectDto);
+    ResponseShortDefectLibraryDto update(UpdateDefectLibraryDto defectDto);
 
     ResponseDefectLibraryDto get(Long id);
 

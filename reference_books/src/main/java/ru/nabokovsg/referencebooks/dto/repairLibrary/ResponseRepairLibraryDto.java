@@ -21,5 +21,5 @@ public class ResponseRepairLibraryDto {
     @Schema(description = "Объединить наименование с измерением параметра")
     private boolean withoutNamingParameter;
     @Schema(description = "Измеряемые параметры")
-    private List<ResponseMeasurementParameterLibraryDto> measuredParameters;
+    private List<ResponseMeasurementParameterLibraryDto> measuredParametersLibrary;
 }
