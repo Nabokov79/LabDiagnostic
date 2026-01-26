@@ -17,8 +17,9 @@ import ru.nabokovsg.referencebooks.repository.DefectLibraryRepository;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 import ru.nabokovsg.referencebooks.validators.DefectValidator;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,23 +63,18 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     }
 
     @Override
-    public List<ResponseShortDefectLibraryDto> getAll(String name, String documentation) {
-        List<DefectLibrary> defects = repository.findAll();
-        if (name != null) {
-            final String defectName = name.toLowerCase();
-            defects = defects.stream()
-                    .filter(defect -> defect.getName().toLowerCase().contains(defectName))
-                    .toList();
-        }
-        if (documentation != null) {
-            final String documentationLibrary = documentation.toLowerCase();
-            defects = defects.stream()
-                    .filter(defect -> defect.getDocumentationLibrary() != null)
-                    .filter(defect -> defect.getDocumentationLibrary().toLowerCase().contains(documentationLibrary))
-                    .toList();
+    public List<ResponseShortDefectLibraryDto> getAll(String defect) {
+        Set<DefectLibrary> defects = repository.findAllOrderByName();
+        if (defect != null) {
+            final String defectName = defect.toLowerCase();
+            return defects.stream()
+                          .filter(d -> d.getEquipmentLibrary().toLowerCase().contains(defectName)
+                                    || d.getDocumentationLibrary().toLowerCase().contains(defectName)
+                                    || d.getName().toLowerCase().contains(defectName))
+                          .map(mapper::mapToResponseShortDefectLibraryDto)
+                          .toList();
         }
         return defects.stream()
-                .sorted(Comparator.comparing(DefectLibrary::getName))
                 .map(mapper::mapToResponseShortDefectLibraryDto)
                 .toList();
     }
@@ -140,11 +136,47 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
         builder.and(defectLibrary.equipmentLibraryId.eq(defect.getEquipmentLibraryId()));
         builder.and(defectLibrary.name.eq(defect.getName()));
         builder.and(defectLibrary.documentationLibraryId.eq(defect.getDocumentationLibraryId()));
-        builder.and(defectLibrary.minThickness.eq(defect.getMinThickness()));
-        builder.and(defectLibrary.maxThickness.eq(defect.getMaxThickness()));
-        return new JPAQueryFactory(em).select(defectLibrary.id)
-                .from(defectLibrary)
-                .where(builder)
-                .fetchOne();
+        if (defect.getMinThickness() != null || defect.getMaxThickness() != null) {
+            if (defect.getMinThickness() != null) {
+                builder.and(defectLibrary.minThickness.eq(defect.getMinThickness()));
+            }
+            if (defect.getMaxThickness() != null) {
+                builder.and(defectLibrary.maxThickness.eq(defect.getMaxThickness()));
+            }
+            return new JPAQueryFactory(em).select(defectLibrary.id)
+                                          .from(defectLibrary)
+                                          .where(builder)
+                                          .fetchOne();
+        }
+        return filterDuplicates(defect, new JPAQueryFactory(em).select(defectLibrary)
+                                                               .from(defectLibrary)
+                                                               .where(builder)
+                                                               .fetch());
+    }
+
+    private Long filterDuplicates(DefectLibrary defect, List<DefectLibrary> defects) {
+        Long[] id = {null};
+        if (defect.getMinThickness() != null && defect.getMaxThickness() != null) {
+            defects.forEach(v -> {
+                if (v.getMinThickness() != null && v.getMaxThickness() != null) {
+                    id[0] = v.getId();
+                }
+            });
+        }
+        if (defect.getMinThickness() == null) {
+            defects.forEach(v -> {
+                if (v.getMinThickness() == null) {
+                    id[0] = v.getId();
+                }
+            });
+        }
+        if (defect.getMaxThickness() == null) {
+            defects.forEach(v -> {
+                if (v.getMaxThickness() == null) {
+                    id[0] = v.getId();
+                }
+            });
+        }
+        return id[0];
     }
 }

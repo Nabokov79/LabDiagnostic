@@ -55,15 +55,14 @@ public class DefectLibraryController {
     @Operation(summary = "Получить дефекты")
     @GetMapping("/defects")
     public ResponseEntity<List<ResponseShortDefectLibraryDto>> getAll(
-                                                        @RequestParam(name = "name", required = false) String name,
-                                        @RequestParam(name = "documentation", required = false) String documentation) {
-        return ResponseEntity.ok().body(service.getAll(name, documentation));
+                                          @RequestParam(name = "defect", required = false) String defect) {
+        return ResponseEntity.ok().body(service.getAll(defect));
     }
 
     @Operation(summary = "Удалить дефект")
     @DeleteMapping("/defect/{id}")
     public ResponseEntity<String> delete(@PathVariable @NotNull @Positive @Parameter(name = "Идентификатор") Long id) {
         service.delete(id);
-        return ResponseEntity.ok("Данные дефекта успешно удалены.");
+        return ResponseEntity.ok("Данные дефекта удалены.");
     }
 }

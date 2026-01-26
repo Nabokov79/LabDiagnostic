@@ -39,9 +39,6 @@ public class DefectValidatorImpl implements DefectValidator {
                 }
             }
             default -> {
-                if (defectsQuantity != null && totalLengthMM != null && totalLengthPercentage != null) {
-                    throw new BadRequestException("Оценка участка сварного шва по двум параметрам не возможна.");
-                }
                 if (assessmentAreaMM != null && assessmentAreaPercentage != null) {
                     throw new BadRequestException("Недопустимое количество оценочных участков.");
                 }
