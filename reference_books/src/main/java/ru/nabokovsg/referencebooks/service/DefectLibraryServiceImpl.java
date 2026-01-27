@@ -19,7 +19,6 @@ import ru.nabokovsg.referencebooks.validators.DefectValidator;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +95,7 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
 
     private DefectLibrary build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParametersLibrary) {
         QualityAssessment qualityAssessmentType = getQualityAssessment(defect.getQualityAssessment());
-        validator.validateDefectLibrary(qualityAssessmentType, defect, measuredParametersLibrary);
+        validator.validate(defect);
         mapper.mapWithFields(defect
                 , equipmentService.getFullName(defect.getEquipmentLibraryId())
                 , documentationService.getDocument(defect.getDocumentationLibraryId())

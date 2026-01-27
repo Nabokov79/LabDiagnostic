@@ -60,10 +60,6 @@ public class MeasuredParameterLibraryServiceImpl implements MeasuredParameterLib
         ParameterCalculationType calculationType = ParameterCalculationType.from(parameter.getCalculation())
                 .orElseThrow(() -> new BadRequestException(String.format("Недопустимый тип расчета: %s", parameter.getCalculation())));
         mapper.mapToReplacement(parameter
-                            , MeasurementParameterType.from(parameter.getName()).orElseThrow(
-                                      () -> new BadRequestException(String.format("Недопустимое наименование параметра: %s", parameter.getName()))).label
-                            , UnitMeasurementType.from(parameter.getUnitMeasurement()).orElseThrow(
-                                     () -> new BadRequestException(String.format("Недопустимая единица измерения: %s", parameter.getUnitMeasurement()))).label
                             , calculationType
                             , calculationType.label);
     }

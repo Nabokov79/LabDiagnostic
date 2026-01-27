@@ -26,13 +26,14 @@ public interface MeasurementParameterLibraryMapper {
     MeasurementParameterLibrary mapToUpdateMeasuredParameter(UpdateMeasurementParameterLibraryDto parameterLibraryDto);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", ignore = true)
+    @Mapping(target = "unitMeasurement", ignore = true)
     @Mapping(target = "acceptableMinValue", ignore = true)
     @Mapping(target = "acceptableMaxValue", ignore = true)
     @Mapping(target = "calculateByResidualThickness", ignore = true)
     @Mapping(target = "repair", ignore = true)
     @Mapping(target = "defect", ignore = true)
     void mapToReplacement(@MappingTarget MeasurementParameterLibrary parameter
-                                       , String name, String unitMeasurement
                                        , ParameterCalculationType calculationType, String calculation);
 
     @Mapping(target = "id", ignore = true)
