@@ -3,6 +3,7 @@ package ru.nabokovsg.referencebooks.toStringService;
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -14,7 +15,9 @@ public class ToStringServiceImpl implements ToStringService {
         if (measuredParametersLibrary == null) {
             return null;
         }
-        measuredParametersLibrary.forEach(parameter -> {
+        measuredParametersLibrary.stream()
+                                 .sorted(Comparator.comparing(MeasurementParameterLibrary::getName))
+                                 .forEach(parameter -> {
             String measuredParameter = String.join(", ", parameter.getName()
                                              , String.join("",  parameter.getUnitMeasurement(), ";"));
             if (measuredParameters[0] != null) {

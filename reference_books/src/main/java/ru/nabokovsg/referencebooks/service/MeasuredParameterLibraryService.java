@@ -2,8 +2,7 @@ package ru.nabokovsg.referencebooks.service;
 
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.NewMeasurementParameterLibraryDto;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.UpdateMeasurementParameterLibraryDto;
+import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 import ru.nabokovsg.referencebooks.model.RepairLibrary;
@@ -17,7 +16,11 @@ public interface MeasuredParameterLibraryService {
 
     void saveRepairParameter(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters);
 
-    List<MeasurementParameterLibrary> createNew(List<@Valid NewMeasurementParameterLibraryDto> measuredParameters);
+//    List<MeasurementParameterLibrary> createNew(List<@Valid NewMeasurementParameterLibraryDto> measuredParametersDto);
+//
+//    List<MeasurementParameterLibrary> createUpdate(List<@Valid UpdateMeasurementParameterLibraryDto> measuredParametersDto);
 
-    List<MeasurementParameterLibrary> createUpdate(List<@Valid UpdateMeasurementParameterLibraryDto> measuredParameters);
+    List<MeasurementParameterLibrary> create(List<@Valid MeasurementParameterLibraryDto> measuredParametersDto);
+
+    List<MeasurementParameterLibrary> update(List<MeasurementParameterLibrary> measuredParametersLibrary, List<@Valid MeasurementParameterLibraryDto> measuredParametersDto);
 }

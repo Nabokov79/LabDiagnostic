@@ -19,8 +19,14 @@ public class ResponseMeasurementParameterLibraryDto {
     private String unitMeasurement;
     @Schema(description = "Требуемые вычисления параметра")
     private String calculation;
-    @Schema(description = "Минимальное допустимое значение")
-    private Float acceptableMinValue;
+    @Schema(description = "Минимальное допустимое значение в мм")
+    private Float acceptableMinValueMM;
+    @Schema(description = "Минимальное допустимое значение в процентах")
+    private Float acceptableMinValuePercentage;
     @Schema(description = "Максимальное допустимое значение")
-    private Float acceptableMaxValue;
+    private Float acceptableMaxValueMM;
+    @Schema(description = "Минимальное допустимое значение в процентах")
+    private Float acceptableMaxValuePercentage;
+    @Schema(description = "Параметр для расчета остаточной толщины")
+    private Boolean calculateByResidualThickness;
 }

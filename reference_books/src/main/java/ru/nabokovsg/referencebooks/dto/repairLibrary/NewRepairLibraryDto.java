@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.NewMeasurementParameterLibraryDto;
+import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 
 import java.util.List;
 
@@ -26,5 +26,5 @@ public class NewRepairLibraryDto {
     @NotNull(message = "withoutNamingParameter should not be null")
     private boolean withoutNamingParameter;
     @Schema(description = "Измеряемые параметры")
-    private List<NewMeasurementParameterLibraryDto> measuredParametersLibrary;
+    private List<MeasurementParameterLibraryDto> measuredParametersLibrary;
 }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.UpdateMeasurementParameterLibraryDto;
+import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 
 import java.util.List;
 
@@ -29,5 +29,5 @@ public class UpdateRepairLibraryDto {
     @NotNull(message = "withoutNamingParameter should not be null")
     private boolean withoutNamingParameter;
     @Schema(description = "Измеряемые параметры")
-    private List<UpdateMeasurementParameterLibraryDto> measuredParametersLibrary;
+    private List<MeasurementParameterLibraryDto> measuredParametersLibrary;
 }

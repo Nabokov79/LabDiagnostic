@@ -1,72 +1,104 @@
 package ru.nabokovsg.referencebooks.validators;
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
-import java.util.Objects;
+import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 
-@Component
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
 public class DefectValidatorImpl implements DefectValidator {
 
-    @Override
-    public void validate(DefectLibrary defect) {
-        validNominalWallThicknessElements(defect.getMinThickness(), defect.getMaxThickness());
-        validAdditionalQualityAssessmentParameters(defect.getQualityAssessment()
-                                                 , defect.getAssessmentAreaMM(), defect.getAssessmentAreaPercentage()
-                                                 , defect.getTotalLengthMM(), defect.getTotalLengthPercentage()
-                                                 , defect.getDefectsQuantity());
-    }
+    private final MeasurementParameterValidator parameterValidator;
 
-    private void validAdditionalQualityAssessmentParameters(String qualityAssessmentType
-            , Double assessmentAreaMM, Double assessmentAreaPercentage
-            , Double totalLengthMM, Double totalLengthPercentage
-            , Integer defectsQuantity) {
-        switch (qualityAssessmentType) {
-            case "RESIDUAL_THICKNESS", "NOT_PRODUCE", "NOT_ACCEPTABLE" ->
-                 unacceptableQualityAssessment(assessmentAreaMM, assessmentAreaPercentage
-                                             , totalLengthMM, totalLengthPercentage, defectsQuantity);
+    @Override
+    public void validate(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
+        switch (defect.getQualityAssessmentType()) {
+            case RESIDUAL_THICKNESS -> {
+                parameterValidator.validateByQuantityMeasuredParameters(defect.getWithoutNamingParameter(), measuredParameters);
+                measuredParameters.forEach(parameterValidator::validateNullAcceptableSizes);
+                parameterValidator.validCalculateByResidualThickness(measuredParameters);
+                validateNotNullEvaluationAreaUnacceptable(defect);
+                validateNotNullTotalLengthUnacceptable(defect);
+                validateNotNullDefectsQuantity(defect);
+                validStandardSize(defect);
+            }
+            case NOT_PRODUCE -> {
+                parameterValidator.validateByQuantityMeasuredParameters(defect.getWithoutNamingParameter(), measuredParameters);
+                measuredParameters.forEach(parameterValidator::validateNullAcceptableSizes);
+                validateNotNullEvaluationAreaUnacceptable(defect);
+                validateNotNullTotalLengthUnacceptable(defect);
+                validateNotNullDefectsQuantity(defect);
+                validStandardSize(defect);
+            }
+            case PARAMETER, PARAMETERS -> {
+                parameterValidator.validateByQuantityMeasuredParameters(defect.getWithoutNamingParameter(), measuredParameters);
+                measuredParameters.forEach(parameterValidator::validateNotNullAcceptableSizes);
+                validateAssessmentArea(defect);
+                validStandardSize(defect);
+            }
+            //"NOT_ACCEPTABLE"
             default -> {
-                validAssessmentArea(assessmentAreaMM, assessmentAreaPercentage);
-                validTotalLength(totalLengthMM, totalLengthPercentage);
+                parameterValidator.validateByWithoutNamingParameter(defect.getWithoutNamingParameter(), measuredParameters);
+                validateNotNullEvaluationAreaUnacceptable(defect);
+                validateNotNullTotalLengthUnacceptable(defect);
+                validateNotNullDefectsQuantity(defect);
+                parameterValidator.validateNullMeasurementParameters(measuredParameters);
             }
         }
     }
 
-    private void validAssessmentArea(Double assessmentAreaMM, Double assessmentAreaPercentage) {
-        if (assessmentAreaMM != null && assessmentAreaPercentage != null) {
+    private void validateAssessmentArea(DefectLibrary defect) {
+        if (defect.getAssessmentAreaMM() != null && defect.getAssessmentAreaPercentage() != null) {
             throw new BadRequestException("Недопустимое количество оценочных участков.");
         }
     }
 
-    private void validTotalLength(Double totalLengthMM, Double totalLengthPercentage) {
-        if (totalLengthMM != null && totalLengthPercentage != null) {
-            throw new BadRequestException("Недопустимое количество значений суммарной длины.");
+    private void validateNotNullEvaluationAreaUnacceptable(DefectLibrary defect) {
+        if (defect.getAssessmentAreaMM() != null || defect.getAssessmentAreaPercentage() != null) {
+            throw new BadRequestException("Оценка по участку недопустима.");
         }
     }
 
-    private void unacceptableQualityAssessment(Double assessmentAreaMM, Double assessmentAreaPercentage
-                          , Double totalLengthMM, Double totalLengthPercentage, Integer defectsQuantity) {
-        Boolean[] additionalQualityAssessmentParameter = {assessmentAreaMM != null};
-        if (!additionalQualityAssessmentParameter[0]) {
-            additionalQualityAssessmentParameter[0] = assessmentAreaPercentage != null;
-        }
-        if (!additionalQualityAssessmentParameter[0]) {
-            additionalQualityAssessmentParameter[0] = totalLengthMM != null;
-        }
-        if (!additionalQualityAssessmentParameter[0]) {
-            additionalQualityAssessmentParameter[0] = totalLengthPercentage != null;
-        }
-        if (!additionalQualityAssessmentParameter[0]) {
-            additionalQualityAssessmentParameter[0] = defectsQuantity != null;
-        }
-        if (additionalQualityAssessmentParameter[0]) {
-            throw new BadRequestException("Недопустимая оценка качества.");
+    private void validateNotNullTotalLengthUnacceptable(DefectLibrary defect) {
+        if (defect.getTotalLengthMM() != null || defect.getTotalLengthPercentage() != null) {
+            throw new BadRequestException("Оценка по суммарной длине недопустима.");
         }
     }
 
-    private void validNominalWallThicknessElements(Float minThickness, Float maxThickness) {
-        if (minThickness != null && maxThickness != null && Objects.equals(minThickness, maxThickness)) {
-            throw new BadRequestException("Номинальные толщины соединяемых элементов не могут быть равны");
+    private void validateNotNullDefectsQuantity(DefectLibrary defect) {
+        if (defect.getDefectsQuantity() != null) {
+            throw new BadRequestException("Оценка по количеству дефектов недопустима.");
+        }
+    }
+
+    private void validStandardSize(DefectLibrary defect) {
+        validNominalDiameters(defect);
+        validNominalThicknesses(defect);
+    }
+
+    private void validNominalDiameters(DefectLibrary defect) {
+        if (defect.getMinDiameter() != null && defect.getMaxDiameter() != null) {
+            if (defect.getMinDiameter().equals(defect.getMaxDiameter())) {
+                throw new BadRequestException("Номинальные диаметры соединяемых элементов не могут быть равны.");
+            }
+            if (defect.getMaxDiameter() < defect.getMinDiameter()) {
+                throw new BadRequestException("Не верно заданы номинальные диаметры соединяемых элементов.");
+            }
+        }
+    }
+
+    private void validNominalThicknesses(DefectLibrary defect) {
+        if (defect.getMinThickness() != null && defect.getMaxThickness() != null) {
+            if (defect.getMinThickness().equals(defect.getMaxThickness())) {
+                throw new BadRequestException("Номинальные толщины соединяемых элементов не могут быть равны.");
+            }
+            if (defect.getMaxThickness() < defect.getMinThickness()) {
+                throw new BadRequestException("Не верно заданы номинальные толщины соединяемых элементов.");
+            }
         }
     }
 }

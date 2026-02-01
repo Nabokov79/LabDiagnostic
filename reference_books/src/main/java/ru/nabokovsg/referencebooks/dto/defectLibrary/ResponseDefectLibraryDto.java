@@ -37,6 +37,10 @@ public class ResponseDefectLibraryDto {
     private Integer totalLengthMM;
     @Schema(description = "Суммарная длина в процентах")
     private Integer totalLengthPercentage;
+    @Schema(description = "Минимальная диаметр элемента")
+    private Float minDiameter;
+    @Schema(description = "Максимальный диаметр элемента")
+    private Float maxDiameter;
     @Schema(description = "Минимальная толщина элемента")
     private Float minThickness;
     @Schema(description = "Максимальная толщина элемента")

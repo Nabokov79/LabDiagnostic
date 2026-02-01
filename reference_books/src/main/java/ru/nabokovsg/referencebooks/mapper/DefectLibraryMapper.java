@@ -48,6 +48,8 @@ public interface DefectLibraryMapper {
     @Mapping(target = "assessmentAreaPercentage", ignore = true)
     @Mapping(target = "totalLengthMM", ignore = true)
     @Mapping(target = "totalLengthPercentage", ignore = true)
+    @Mapping(target = "minDiameter", ignore = true)
+    @Mapping(target = "maxDiameter", ignore = true)
     @Mapping(target = "minThickness", ignore = true)
     @Mapping(target = "maxThickness", ignore = true)
     @Mapping(target = "measuredParametersLibrary", ignore = true)

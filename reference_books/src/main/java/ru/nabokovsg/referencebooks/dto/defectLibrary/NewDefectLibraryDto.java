@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.NewMeasurementParameterLibraryDto;
+import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 
 import java.util.List;
 
@@ -50,6 +50,12 @@ public class NewDefectLibraryDto {
     @Schema(description = "Количество дефектов")
     @Positive(message = "defectsQuantity can only be positive")
     private Integer defectsQuantity;
+    @Schema(description = "Минимальная диаметр элемента")
+    @Positive(message = "minDiameter can only be positive")
+    private Float minDiameter;
+    @Schema(description = "Максимальный диаметр элемента")
+    @Positive(message = " maxDiameter can only be positive")
+    private Float maxDiameter;
     @Schema(description = "Минимальная толщина элемента")
     @Positive(message = "minThickness can only be positive")
     private Float minThickness;
@@ -57,5 +63,5 @@ public class NewDefectLibraryDto {
     @Positive(message = " maxThickness can only be positive")
     private Float maxThickness;
     @Schema(description = "Измеряемые параметры")
-    private List<NewMeasurementParameterLibraryDto> measuredParametersLibrary;
+    private List<MeasurementParameterLibraryDto> measuredParametersLibrary;
 }

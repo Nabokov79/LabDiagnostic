@@ -13,6 +13,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.RepairLibraryMapper;
 import ru.nabokovsg.referencebooks.repository.RepairLibraryRepository;
+import ru.nabokovsg.referencebooks.toStringService.ToStringService;
+import ru.nabokovsg.referencebooks.validators.MeasurementParameterValidator;
 
 import java.util.List;
 
@@ -23,13 +25,16 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     private final RepairLibraryRepository repository;
     private final RepairLibraryMapper mapper;
     private final MeasuredParameterLibraryService measuredParameterService;
+    private final MeasurementParameterValidator parameterValidator;
+    private final ToStringService toString;
     private final static String MASSAGE = "Ремонт не обнаружен.";
 
     @Override
     public ResponseShortRepairLibraryDto save(NewRepairLibraryDto repairDto) {
-        validateByDuplicate(repairDto.getName());
-        List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.createNew(repairDto.getMeasuredParametersLibrary());
-        RepairLibrary repair = repository.save(mapper.mapToRepairLibrary(repairDto));
+        List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.create(repairDto.getMeasuredParametersLibrary());
+        RepairLibrary repair = mapper.mapToRepairLibrary(repairDto);
+        build(mapper.mapToRepairLibrary(repairDto), measuredParameters);
+        repair = repository.save(repair);
         measuredParameterService.saveRepairParameter(repair, measuredParameters);
         return mapper.mapToResponseShortRepairLibraryDto(repair);
     }
@@ -37,10 +42,10 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     @Override
     public ResponseShortRepairLibraryDto update(UpdateRepairLibraryDto repairDto) {
         RepairLibrary repair = getById(repairDto.getId());
-        List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.createUpdate(repairDto.getMeasuredParametersLibrary());
         mapper.mapToUpdateRepairLibrary(repair, repairDto);
-        measuredParameterService.saveRepairParameter(repository.save(repair), measuredParameters);
-        return mapper.mapToResponseShortRepairLibraryDto(repair);
+        build(repair, measuredParameterService.update(repair.getMeasuredParametersLibrary(), repairDto.getMeasuredParametersLibrary()));
+        measuredParameterService.saveRepairParameter(repair, repair.getMeasuredParametersLibrary());
+        return mapper.mapToResponseShortRepairLibraryDto(repository.save(repair));
     }
 
     @Override
@@ -76,9 +81,29 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
     }
 
-    private void validateByDuplicate(String name) {
-        if (repository.existsByName(name)) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+    private void build(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters) {
+        validate(repair, measuredParameters);
+        exists(repair);
+        mapper.mapWithMeasuredParameters(repair, toString.measuredParameters(measuredParameters));
+    }
+
+    private void exists(RepairLibrary repair) {
+        boolean exists = false;
+        if (repair.getId() == null) {
+            exists = repository.existsByName(repair.getName());
+        } else {
+            Long id = repository.findIdByName(repair.getName());
+            if (id != null) {
+                exists = !repair.getId().equals(id);
+            }
         }
+        if (exists) {
+            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, repair.getName()));
+        }
+    }
+
+    private void validate(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters) {
+        parameterValidator.validateByQuantityMeasuredParameters(repair.getWithoutNamingParameter(), measuredParameters);
+        measuredParameters.forEach(parameterValidator::validateAcceptableValue);
     }
 }

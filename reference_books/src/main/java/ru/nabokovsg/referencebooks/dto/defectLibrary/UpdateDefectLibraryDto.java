@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.UpdateMeasurementParameterLibraryDto;
+import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 
 import java.util.List;
 
@@ -42,21 +42,27 @@ public class UpdateDefectLibraryDto {
     private String qualityAssessment;
     @Schema(description = "Оценочный участок в мм")
     @Positive(message = "assessmentAreaMM can only be positive")
-    private Integer assessmentAreaMM;
+    private Double assessmentAreaMM;
     @Schema(description = "Оценочный участок в процентах")
     @Positive(message = "assessmentAreaMM can only be positive")
     @Max(value = 100, message = "assessmentAreaPercentage can't be more than 100")
     private Double assessmentAreaPercentage;
-    @Schema(description = "Количество дефектов")
-    @Positive(message = "defectsQuantity can only be positive")
-    private Integer defectsQuantity;
     @Schema(description = "Суммарная длина в мм")
     @Positive(message = "totalLengthMM can only be positive")
-    private Integer totalLengthMM;
+    private Double totalLengthMM;
     @Schema(description = "Суммарная длина в процентах")
     @Positive(message = "totalLengthPercentage can only be positive")
     @Max(value = 100, message = "totalLengthPercentage can't be more than 100")
     private Double totalLengthPercentage;
+    @Schema(description = "Количество дефектов")
+    @Positive(message = "defectsQuantity can only be positive")
+    private Integer defectsQuantity;
+    @Schema(description = "Минимальная диаметр элемента")
+    @Positive(message = "minDiameter can only be positive")
+    private Float minDiameter;
+    @Schema(description = "Максимальный диаметр элемента")
+    @Positive(message = " maxDiameter can only be positive")
+    private Float maxDiameter;
     @Schema(description = "Минимальная толщина элемента")
     @Positive(message = "minThickness can only be positive")
     private Float minThickness;
@@ -64,5 +70,5 @@ public class UpdateDefectLibraryDto {
     @Positive(message = " maxThickness can only be positive")
     private Float maxThickness;
     @Schema(description = "Измеряемые параметры")
-    private List<UpdateMeasurementParameterLibraryDto> measuredParametersLibrary;
+    private List<MeasurementParameterLibraryDto> measuredParametersLibrary;
 }

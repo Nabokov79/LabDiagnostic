@@ -54,6 +54,10 @@ public class DefectLibrary {
     private Double totalLengthMM;
     @Column(name = "total_length_percentage")
     private Double totalLengthPercentage;
+    @Column(name = "min_diameter")
+    private Float minDiameter;
+    @Column(name = "max_diameter")
+    private Float maxDiameter;
     @Column(name = "min_thickness")
     private Float minThickness;
     @Column(name = "max_thickness")

@@ -36,9 +36,9 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     @Override
     public ResponseShortDefectLibraryDto save(NewDefectLibraryDto defectDto) {
         List<MeasurementParameterLibrary> measuredParameters =
-                measuredParameterService.createNew(defectDto.getMeasuredParametersLibrary());
-        DefectLibrary defect = build(mapper.mapToDefectLibrary(defectDto), measuredParameters);
-        exists(defect);
+                measuredParameterService.create(defectDto.getMeasuredParametersLibrary());
+        DefectLibrary defect = mapper.mapToDefectLibrary(defectDto);
+        build(defect, measuredParameters);
         defect = repository.save(defect);
         measuredParameterService.saveDefectParameter(defect, measuredParameters);
         return mapper.mapToResponseShortDefectLibraryDto(defect);
@@ -48,10 +48,10 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     public ResponseShortDefectLibraryDto update(UpdateDefectLibraryDto defectDto) {
         DefectLibrary defect = getById(defectDto.getId());
         List<MeasurementParameterLibrary> measuredParameters =
-                measuredParameterService.createUpdate(defectDto.getMeasuredParametersLibrary());
+                measuredParameterService.update(defect.getMeasuredParametersLibrary(), defectDto.getMeasuredParametersLibrary());
         mapper.mapToUpdateDefectLibrary(defect, defectDto);
-        exists(defect);
-        defect = repository.save(build(defect, measuredParameters));
+        build(defect, measuredParameters);
+        defect = repository.save(defect);
         measuredParameterService.saveDefectParameter(defect, measuredParameters);
         return mapper.mapToResponseShortDefectLibraryDto(defect);
     }
@@ -93,19 +93,19 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
                 .orElseThrow(() -> new NotFoundException(ExceptionMassage.NOT_DEFECT.label));
     }
 
-    private DefectLibrary build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParametersLibrary) {
+    private void build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
         QualityAssessment qualityAssessmentType = getQualityAssessment(defect.getQualityAssessment());
-        validator.validate(defect);
         mapper.mapWithFields(defect
                 , equipmentService.getFullName(defect.getEquipmentLibraryId())
                 , documentationService.getDocument(defect.getDocumentationLibraryId())
-                , toString.measuredParameters(measuredParametersLibrary)
+                , toString.measuredParameters(measuredParameters)
                 , toString.thickness(defect.getMinThickness(), defect.getMaxThickness())
                 , toString.additionalEvaluationParameters(defect.getTotalLengthMM(), defect.getTotalLengthPercentage())
                 , toString.additionalEvaluationParameters(defect.getAssessmentAreaMM(), defect.getAssessmentAreaPercentage())
                 , qualityAssessmentType.label
                 , qualityAssessmentType);
-        return defect;
+        validator.validate(defect, measuredParameters);
+        exists(defect);
     }
 
     private QualityAssessment getQualityAssessment(String qualityAssessmentType) {

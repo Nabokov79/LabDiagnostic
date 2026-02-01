@@ -6,7 +6,17 @@ import java.util.List;
 
 public interface MeasurementParameterValidator {
 
-    List<MeasurementParameterLibrary> valid(String qualityAssessmentType
-            , boolean withoutNamingParameter
-            , List<MeasurementParameterLibrary> measuredParametersLibrary);
+    void validateByWithoutNamingParameter(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters);
+
+    void validateByQuantityMeasuredParameters(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters);
+
+    void validateNullAcceptableSizes(MeasurementParameterLibrary measuredParameter);
+
+    void validateNotNullAcceptableSizes(MeasurementParameterLibrary measuredParameter);
+
+    void validCalculateByResidualThickness(List<MeasurementParameterLibrary> measuredParametersLibrary);
+
+    void validateNullMeasurementParameters(List<MeasurementParameterLibrary> measuredParameters);
+
+    void validateAcceptableValue(MeasurementParameterLibrary measuredParameter);
 }

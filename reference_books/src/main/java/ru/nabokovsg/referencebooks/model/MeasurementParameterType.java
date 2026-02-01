@@ -10,6 +10,7 @@ public enum MeasurementParameterType {
     DEPTH("глубина"),
     DIAMETER("диаметр"),
     AREA("площадь"),
+    THICKNESS("толщина"),
     QUANTITY("количество");
 
     public final String label;
