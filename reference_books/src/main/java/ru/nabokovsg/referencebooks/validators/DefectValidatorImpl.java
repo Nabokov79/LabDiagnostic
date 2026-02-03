@@ -16,6 +16,7 @@ public class DefectValidatorImpl implements DefectValidator {
 
     @Override
     public void validate(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
+        parameterValidator.validateDuplicateMeasuredParameters(measuredParameters);
         switch (defect.getQualityAssessmentType()) {
             case RESIDUAL_THICKNESS -> {
                 parameterValidator.validateByQuantityMeasuredParameters(defect.getWithoutNamingParameter(), measuredParameters);

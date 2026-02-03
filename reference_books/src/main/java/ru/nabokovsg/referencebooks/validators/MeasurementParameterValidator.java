@@ -6,9 +6,13 @@ import java.util.List;
 
 public interface MeasurementParameterValidator {
 
-    void validateByWithoutNamingParameter(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters);
+    void validateByWithoutNamingParameter(boolean withoutNamingParameter
+                                        , List<MeasurementParameterLibrary> measuredParameters);
 
-    void validateByQuantityMeasuredParameters(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters);
+    void validateDuplicateMeasuredParameters(List<MeasurementParameterLibrary> measuredParameters);
+
+    void validateByQuantityMeasuredParameters(boolean withoutNamingParameter
+                                           , List<MeasurementParameterLibrary> measuredParameters);
 
     void validateNullAcceptableSizes(MeasurementParameterLibrary measuredParameter);
 

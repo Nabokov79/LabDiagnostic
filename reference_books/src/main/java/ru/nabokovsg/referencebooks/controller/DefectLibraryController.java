@@ -63,6 +63,6 @@ public class DefectLibraryController {
     @DeleteMapping("/defect/{id}")
     public ResponseEntity<String> delete(@PathVariable @NotNull @Positive @Parameter(name = "Идентификатор") Long id) {
         service.delete(id);
-        return ResponseEntity.ok("Данные дефекта удалены.");
+        return ResponseEntity.ok("Дефект удален.");
     }
 }

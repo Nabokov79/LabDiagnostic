@@ -43,7 +43,8 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     public ResponseShortRepairLibraryDto update(UpdateRepairLibraryDto repairDto) {
         RepairLibrary repair = getById(repairDto.getId());
         mapper.mapToUpdateRepairLibrary(repair, repairDto);
-        build(repair, measuredParameterService.update(repair.getMeasuredParametersLibrary(), repairDto.getMeasuredParametersLibrary()));
+        measuredParameterService.update(repair.getMeasuredParametersLibrary(), repairDto.getMeasuredParametersLibrary());
+        build(repair, repair.getMeasuredParametersLibrary());
         measuredParameterService.saveRepairParameter(repair, repair.getMeasuredParametersLibrary());
         return mapper.mapToResponseShortRepairLibraryDto(repository.save(repair));
     }
@@ -104,6 +105,7 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
 
     private void validate(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters) {
         parameterValidator.validateByQuantityMeasuredParameters(repair.getWithoutNamingParameter(), measuredParameters);
+        parameterValidator.validateDuplicateMeasuredParameters(measuredParameters);
         measuredParameters.forEach(parameterValidator::validateAcceptableValue);
     }
 }

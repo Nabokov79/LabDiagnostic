@@ -2,9 +2,12 @@ package ru.nabokovsg.referencebooks.validators;
 
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
+import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -12,14 +15,32 @@ import java.util.stream.Stream;
 public class MeasurementParameterValidatorImpl implements MeasurementParameterValidator {
 
     @Override
-    public void validateByWithoutNamingParameter(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters) {
+    public void validateByWithoutNamingParameter(boolean withoutNamingParameter
+                                               , List<MeasurementParameterLibrary> measuredParameters) {
         if (withoutNamingParameter) {
             throw new BadRequestException("Не подлежит измерению.");
         }
     }
 
     @Override
-    public void validateByQuantityMeasuredParameters(boolean withoutNamingParameter, List<MeasurementParameterLibrary> measuredParameters) {
+    public void validateDuplicateMeasuredParameters(List<MeasurementParameterLibrary> measuredParameters) {
+        if (measuredParameters == null) {
+            return;
+        }
+        Map<String, String> names = new HashMap<>(measuredParameters.size());
+        measuredParameters.forEach(parameter -> {
+            String name = names.get(parameter.getName());
+            if (name == null) {
+                names.put(parameter.getName(), parameter.getName());
+            } else {
+                throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+            }
+        });
+    }
+
+    @Override
+    public void validateByQuantityMeasuredParameters(boolean withoutNamingParameter
+                                                   , List<MeasurementParameterLibrary> measuredParameters) {
         if (withoutNamingParameter && measuredParameters == null) {
             throw new BadRequestException("Отсутствуют измеряемые параметры.");
         }
@@ -60,8 +81,10 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
         if (measuredParameter.getAcceptableMinValueMM() != null && measuredParameter.getAcceptableMaxValueMM() != null) {
             equals = measuredParameter.getAcceptableMinValueMM().equals(measuredParameter.getAcceptableMaxValueMM());
         }
-        if (!equals && measuredParameter.getAcceptableMinValuePercentage() != null && measuredParameter.getAcceptableMaxValuePercentage() != null) {
-            equals = measuredParameter.getAcceptableMinValuePercentage().equals(measuredParameter.getAcceptableMaxValuePercentage());
+        if (!equals && measuredParameter.getAcceptableMinValuePercentage() != null
+                    && measuredParameter.getAcceptableMaxValuePercentage() != null) {
+            equals = measuredParameter.getAcceptableMinValuePercentage()
+                                      .equals(measuredParameter.getAcceptableMaxValuePercentage());
         }
         return equals;
     }
@@ -71,8 +94,10 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
         if (measuredParameter.getAcceptableMinValueMM() != null && measuredParameter.getAcceptableMaxValueMM() != null) {
             more = measuredParameter.getAcceptableMinValueMM() > measuredParameter.getAcceptableMaxValueMM();
         }
-        if (!more && measuredParameter.getAcceptableMinValuePercentage() != null && measuredParameter.getAcceptableMaxValuePercentage() != null) {
-            more= measuredParameter.getAcceptableMinValuePercentage() > measuredParameter.getAcceptableMaxValuePercentage();
+        if (!more && measuredParameter.getAcceptableMinValuePercentage() != null
+                  && measuredParameter.getAcceptableMaxValuePercentage() != null) {
+            more= measuredParameter.getAcceptableMinValuePercentage() >
+                                                                     measuredParameter.getAcceptableMaxValuePercentage();
         }
         return more;
     }

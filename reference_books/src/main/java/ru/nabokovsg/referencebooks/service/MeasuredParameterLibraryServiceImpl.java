@@ -44,8 +44,8 @@ public class MeasuredParameterLibraryServiceImpl implements MeasuredParameterLib
     }
 
     @Override
-    public List<MeasurementParameterLibrary> update(List<MeasurementParameterLibrary> measuredParametersLibrary
-                                                  , List<MeasurementParameterLibraryDto> measuredParameters) {
+    public void update(List<MeasurementParameterLibrary> measuredParametersLibrary
+                     , List<MeasurementParameterLibraryDto> measuredParameters) {
         if (measuredParameters != null) {
             if (measuredParametersLibrary.size() == measuredParameters.size()) {
                 create.replaceEquals(measuredParametersLibrary, measuredParameters);
@@ -64,6 +64,5 @@ public class MeasuredParameterLibraryServiceImpl implements MeasuredParameterLib
             repository.deleteAllById(measuredParametersLibrary.stream().map(MeasurementParameterLibrary::getId).toList());
             measuredParametersLibrary.clear();
         }
-        return measuredParametersLibrary;
     }
 }

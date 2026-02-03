@@ -20,7 +20,8 @@ public class CreateMeasurementParameterLibraryServiceImpl implements CreateMeasu
     private final MeasurementParameterLibraryMapper mapper;
 
     @Override
-    public void replaceEquals(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters) {
+    public void replaceEquals(List<MeasurementParameterLibrary> measuredParametersLibrary
+                            , List<MeasurementParameterLibraryDto> measuredParameters) {
         Integer[] indexList = {measuredParametersLibrary.size()-1};
         measuredParameters.forEach(v -> {
             int index = indexList[0];
@@ -30,7 +31,8 @@ public class CreateMeasurementParameterLibraryServiceImpl implements CreateMeasu
     }
 
     @Override
-    public void replaceMore(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters, List<Long> delete) {
+    public void replaceMore(List<MeasurementParameterLibrary> measuredParametersLibrary
+                          , List<MeasurementParameterLibraryDto> measuredParameters, List<Long> delete) {
         Integer[] indexList = {measuredParameters.size()-1};
         List<MeasurementParameterLibrary> parameters = new ArrayList<>(measuredParameters.size());
         measuredParametersLibrary.forEach(parameter -> {
@@ -48,7 +50,8 @@ public class CreateMeasurementParameterLibraryServiceImpl implements CreateMeasu
     }
 
     @Override
-    public void replaceLess(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters) {
+    public void replaceLess(List<MeasurementParameterLibrary> measuredParametersLibrary
+                          , List<MeasurementParameterLibraryDto> measuredParameters) {
         Integer[] indexList = {measuredParametersLibrary.size()-1};
         measuredParameters.forEach(v -> {
             int index = indexList[0];

@@ -16,11 +16,8 @@ public interface MeasuredParameterLibraryService {
 
     void saveRepairParameter(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters);
 
-//    List<MeasurementParameterLibrary> createNew(List<@Valid NewMeasurementParameterLibraryDto> measuredParametersDto);
-//
-//    List<MeasurementParameterLibrary> createUpdate(List<@Valid UpdateMeasurementParameterLibraryDto> measuredParametersDto);
-
     List<MeasurementParameterLibrary> create(List<@Valid MeasurementParameterLibraryDto> measuredParametersDto);
 
-    List<MeasurementParameterLibrary> update(List<MeasurementParameterLibrary> measuredParametersLibrary, List<@Valid MeasurementParameterLibraryDto> measuredParametersDto);
+    void update(List<MeasurementParameterLibrary> measuredParametersLibrary
+              , List<@Valid MeasurementParameterLibraryDto> measuredParametersDto);
 }

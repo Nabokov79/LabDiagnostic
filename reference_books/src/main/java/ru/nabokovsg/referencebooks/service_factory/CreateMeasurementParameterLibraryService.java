@@ -7,10 +7,13 @@ import java.util.List;
 
 public interface CreateMeasurementParameterLibraryService {
 
-    void replaceEquals(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters);
+    void replaceEquals(List<MeasurementParameterLibrary> measuredParametersLibrary
+                     , List<MeasurementParameterLibraryDto> measuredParameters);
 
-    void replaceLess(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters);
-    void replaceMore(List<MeasurementParameterLibrary> measuredParametersLibrary, List<MeasurementParameterLibraryDto> measuredParameters, List<Long> delete);
+    void replaceLess(List<MeasurementParameterLibrary> measuredParametersLibrary
+                   , List<MeasurementParameterLibraryDto> measuredParameters);
+    void replaceMore(List<MeasurementParameterLibrary> measuredParametersLibrary
+                   , List<MeasurementParameterLibraryDto> measuredParameters, List<Long> delete);
 
     MeasurementParameterLibrary create(MeasurementParameterLibraryDto parameter);
 }

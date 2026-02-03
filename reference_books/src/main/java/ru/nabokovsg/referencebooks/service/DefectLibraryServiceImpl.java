@@ -47,13 +47,11 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     @Override
     public ResponseShortDefectLibraryDto update(UpdateDefectLibraryDto defectDto) {
         DefectLibrary defect = getById(defectDto.getId());
-        List<MeasurementParameterLibrary> measuredParameters =
-                measuredParameterService.update(defect.getMeasuredParametersLibrary(), defectDto.getMeasuredParametersLibrary());
         mapper.mapToUpdateDefectLibrary(defect, defectDto);
-        build(defect, measuredParameters);
-        defect = repository.save(defect);
-        measuredParameterService.saveDefectParameter(defect, measuredParameters);
-        return mapper.mapToResponseShortDefectLibraryDto(defect);
+        measuredParameterService.update(defect.getMeasuredParametersLibrary(), defectDto.getMeasuredParametersLibrary());
+        build(defect, defect.getMeasuredParametersLibrary());
+        measuredParameterService.saveDefectParameter(defect, defect.getMeasuredParametersLibrary());
+        return mapper.mapToResponseShortDefectLibraryDto(repository.save(defect));
     }
 
     @Override
