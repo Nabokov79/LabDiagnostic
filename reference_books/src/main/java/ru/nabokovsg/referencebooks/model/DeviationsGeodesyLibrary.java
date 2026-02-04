@@ -16,11 +16,17 @@ public class DeviationsGeodesyLibrary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+    @Column(name = "equipment")
+    private String equipmentLibrary;
     @Column(name = "equipment_library_id")
     private Long equipmentLibraryId;
+    @Column(name = "with_heat_carrier")
+    private Boolean withHeatCarrier;
     @Column(name = "heat_carrier")
     private String heatCarrier;
+    @Column(name = "condition")
+    private Boolean condition;
     @Column(name = "equipment_condition")
     private String equipmentCondition;
     @Column(name = "volume")

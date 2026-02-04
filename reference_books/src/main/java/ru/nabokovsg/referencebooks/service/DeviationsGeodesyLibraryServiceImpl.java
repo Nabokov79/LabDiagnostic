@@ -10,8 +10,11 @@ import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DeviationsGeodesyLibraryMapper;
 import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.repository.DeviationsGeodesyLibraryRepository;
+import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,23 +23,21 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
     private final DeviationsGeodesyLibraryRepository repository;
     private final DeviationsGeodesyLibraryMapper mapper;
     private final EquipmentLibraryService equipmentService;
+    private final ToStringService toString;
     private final static String MASSAGE = "Допустимые отклонения значений геодезических измерений не обнаружены.";
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto save(NewDeviationsGeodesyLibraryDto geodesyDto) {
-        DeviationsGeodesyLibrary geodesyLibrary = mapper.mapToAcceptableDeviationsGeodesy(geodesyDto
-                                                    , getHeatCarrier(geodesyDto.getWithHeatCarrier())
-                                                    , getEquipmentCondition(geodesyDto.getCondition())
-                                                    , equipmentService.getById(geodesyDto.getEquipmentLibraryId()));
-        getDuplicate(geodesyLibrary);
+        DeviationsGeodesyLibrary geodesyLibrary = mapper.mapToAcceptableDeviationsGeodesy(geodesyDto);
+        build(geodesyLibrary);
         return mapper.mapToResponseAcceptableDeviationsGeodesyDto(repository.save(geodesyLibrary));
     }
-
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto update(UpdateDeviationsGeodesyLibraryDto geodesyDto) {
         DeviationsGeodesyLibrary geodesyLibrary = getById(geodesyDto.getId());
         mapper.mapToUpdateAcceptableDeviationsGeodesy(geodesyLibrary, geodesyDto);
+        build(geodesyLibrary);
         return mapper.mapToResponseAcceptableDeviationsGeodesyDto(repository.save(geodesyLibrary));
     }
 
@@ -46,11 +47,17 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
     }
 
     @Override
-    public List<ResponseDeviationsGeodesyLibraryDto> getAll(Long equipmentLibraryId) {
-        return repository.findAllByEquipmentLibraryIdOrderByHeatCarrier(equipmentLibraryId)
-                         .stream()
-                         .map(mapper::mapToResponseAcceptableDeviationsGeodesyDto)
-                         .toList();
+    public List<ResponseDeviationsGeodesyLibraryDto> getAll(String name) {
+        Set<DeviationsGeodesyLibrary> deviations = repository.findAllOrderByEquipmentLibrary();
+        if (name != null) {
+            String equipmentLibraryName = name.toLowerCase();
+            deviations = deviations.stream()
+                    .filter(deviation -> deviation.getEquipmentLibrary().toLowerCase().contains(equipmentLibraryName))
+                    .collect(Collectors.toSet());
+        }
+        return deviations.stream()
+                .map(mapper::mapToResponseAcceptableDeviationsGeodesyDto)
+                .toList();
     }
 
     @Override
@@ -62,12 +69,36 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
         throw new NotFoundException(MASSAGE);
     }
 
-    private void getDuplicate(DeviationsGeodesyLibrary geodesyLibrary) {
-        if (repository.existsByEquipmentLibraryIdAndHeatCarrierAndEquipmentCondition(
-                                                                      geodesyLibrary.getEquipmentLibraryId()
-                                                                    , geodesyLibrary.getHeatCarrier()
-                                                                    , geodesyLibrary.getEquipmentCondition())) {
-            throw new BadRequestException("Обнаружен дубликат");
+
+    private void build(DeviationsGeodesyLibrary deviationsGeodesy) {
+        EquipmentLibrary equipment = equipmentService.getById(deviationsGeodesy.getEquipmentLibraryId());
+        mapper.mapWithFields(deviationsGeodesy
+                , toString.getEquipmentLibraryFullName(equipment)
+                , equipment.getVolume()
+                , getHeatCarrier(deviationsGeodesy.getWithHeatCarrier())
+                , getEquipmentCondition(deviationsGeodesy.getCondition()));
+        exists(deviationsGeodesy);
+    }
+
+    private void exists(DeviationsGeodesyLibrary deviation) {
+        boolean exists = false;
+        if (deviation.getId() == null) {
+            exists = repository.existsByEquipmentLibraryIdAndWithHeatCarrierAndCondition(
+                    deviation.getEquipmentLibraryId()
+                    , deviation.getWithHeatCarrier()
+                    , deviation.getCondition());
+        } else {
+            Long id = repository.findIdByEquipmentLibraryIdAndWithHeatCarrierAndCondition(
+                    deviation.getEquipmentLibraryId()
+                    , deviation.getWithHeatCarrier()
+                    , deviation.getCondition());
+            if (id != null) {
+                exists = !deviation.getId().equals(id);
+            }
+        }
+        if (exists) {
+            throw new BadRequestException(String.join("для ", ExceptionMassage.DUPLICATE.label
+                    , deviation.getEquipmentLibrary()));
         }
     }
 
@@ -87,6 +118,6 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
 
     public DeviationsGeodesyLibrary getById(Long id) {
         return repository.findById(id)
-                         .orElseThrow(() -> new NotFoundException(MASSAGE));
+                .orElseThrow(() -> new NotFoundException(MASSAGE));
     }
 }

@@ -55,11 +55,10 @@ public class DeviationsGeodesyLibraryController {
     }
 
     @Operation(summary = "Получить все допустимые значения отклонений")
-    @GetMapping("/geodesy/deviations/{id}")
+    @GetMapping("/geodesy/deviations")
     public ResponseEntity<List<ResponseDeviationsGeodesyLibraryDto>> getAll(
-            @PathVariable(name = "id") @NotNull @Positive
-            @Parameter(description = "Идентификатор типа оборудования") Long equipmentLibraryId) {
-        return ResponseEntity.ok().body(service.getAll(equipmentLibraryId));
+            @RequestParam(name = "name", required = false)  @Parameter(description = "Наименование, объем оборудования") String name) {
+        return ResponseEntity.ok().body(service.getAll(name));
     }
 
     @Operation(summary = "Удалить допустимое значение отклонения")

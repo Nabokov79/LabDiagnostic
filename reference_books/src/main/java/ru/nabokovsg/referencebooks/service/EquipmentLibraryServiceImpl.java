@@ -98,22 +98,6 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
     }
 
     @Override
-    public String getFullName(Long id) {
-        EquipmentLibrary equipment = getById(id);
-        String volume = null;
-        if (equipment.getVolume() != null) {
-            volume = String.join("", "V=", String.valueOf(equipment.getVolume()), " м3");
-        }
-        if (volume != null) {
-            return String.join("", equipment.getFullName(), ", ", volume);
-        }
-        if (equipment.getModel() != null) {
-            return String.join("", equipment.getFullName(), ", ", equipment.getModel());
-        }
-        return equipment.getFullName();
-    }
-
-    @Override
     public Set<EquipmentLibrary> getAllByIds(List<Long> ids) {
         return repository.findAllById(ids);
     }

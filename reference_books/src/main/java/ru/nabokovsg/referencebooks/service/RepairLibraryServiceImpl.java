@@ -33,7 +33,7 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     public ResponseShortRepairLibraryDto save(NewRepairLibraryDto repairDto) {
         List<MeasurementParameterLibrary> measuredParameters = measuredParameterService.create(repairDto.getMeasuredParametersLibrary());
         RepairLibrary repair = mapper.mapToRepairLibrary(repairDto);
-        build(mapper.mapToRepairLibrary(repairDto), measuredParameters);
+        build(repair, measuredParameters);
         repair = repository.save(repair);
         measuredParameterService.saveRepairParameter(repair, measuredParameters);
         return mapper.mapToResponseShortRepairLibraryDto(repair);
@@ -57,8 +57,9 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     @Override
     public List<ResponseShortRepairLibraryDto> getAll(String name) {
         if (name != null) {
+            String repairName = name.toLowerCase();
             return repository.findAll().stream()
-                    .filter(repair -> repair.getName().contains(name))
+                    .filter(repair -> repair.getName().toLowerCase().contains(repairName))
                     .map(mapper::mapToResponseShortRepairLibraryDto)
                     .toList();
         }

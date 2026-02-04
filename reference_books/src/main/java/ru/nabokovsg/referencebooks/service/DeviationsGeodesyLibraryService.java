@@ -14,7 +14,7 @@ public interface DeviationsGeodesyLibraryService {
 
     ResponseDeviationsGeodesyLibraryDto get(Long id);
 
-    List<ResponseDeviationsGeodesyLibraryDto> getAll(Long equipmentLibraryId);
+    List<ResponseDeviationsGeodesyLibraryDto> getAll(String name);
 
     void delete(Long id);
 }

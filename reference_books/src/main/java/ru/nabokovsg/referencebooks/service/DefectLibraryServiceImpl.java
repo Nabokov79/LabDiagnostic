@@ -94,7 +94,7 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     private void build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
         QualityAssessment qualityAssessmentType = getQualityAssessment(defect.getQualityAssessment());
         mapper.mapWithFields(defect
-                , equipmentService.getFullName(defect.getEquipmentLibraryId())
+                , toString.getEquipmentLibraryFullName(equipmentService.getById(defect.getEquipmentLibraryId()))
                 , documentationService.getDocument(defect.getDocumentationLibraryId())
                 , toString.measuredParameters(measuredParameters)
                 , toString.thickness(defect.getMinThickness(), defect.getMaxThickness())

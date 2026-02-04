@@ -26,7 +26,5 @@ public interface EquipmentLibraryService {
 
     EquipmentLibrary getById(Long id);
 
-    String getFullName(Long id);
-
     Set<EquipmentLibrary> getAllByIds(List<Long> ids);
 }

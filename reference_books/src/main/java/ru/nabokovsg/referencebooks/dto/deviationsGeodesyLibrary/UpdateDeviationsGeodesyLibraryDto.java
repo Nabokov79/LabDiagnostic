@@ -17,6 +17,12 @@ public class UpdateDeviationsGeodesyLibraryDto {
     @NotNull(message = "id should not be null")
     @Positive(message = "id can only be positive")
     private Long id;
+    @Schema(description = "Наличие теплоносителя")
+    @NotNull(message = "withHeatCarrier should not be null")
+    private Boolean withHeatCarrier;
+    @Schema(description = "Состояние оборудования: true=новое,  false=старое")
+    @NotNull(message = "condition should not be null")
+    private Boolean condition;
     @Schema(description = "Максимальная допустимая осадка")
     @Positive(message = "acceptablePrecipitation can only be positive")
     private Integer acceptablePrecipitation;

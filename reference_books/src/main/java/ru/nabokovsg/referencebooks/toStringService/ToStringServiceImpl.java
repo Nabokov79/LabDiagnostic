@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.toStringService;
 
 import org.springframework.stereotype.Component;
+import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 
 import java.util.Comparator;
@@ -58,5 +59,20 @@ public class ToStringServiceImpl implements ToStringService {
             return String.join(" ", String.valueOf(second), "%");
         }
         return null;
+    }
+
+    @Override
+    public String getEquipmentLibraryFullName(EquipmentLibrary equipment) {
+        String volume = null;
+        if (equipment.getVolume() != null) {
+            volume = String.join("", "V=", String.valueOf(equipment.getVolume()), " м3");
+        }
+        if (volume != null) {
+            return String.join("", equipment.getFullName(), ", ", volume);
+        }
+        if (equipment.getModel() != null) {
+            return String.join("", equipment.getFullName(), ", ", equipment.getModel());
+        }
+        return equipment.getFullName();
     }
 }

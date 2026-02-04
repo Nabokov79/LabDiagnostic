@@ -13,6 +13,8 @@ public class ResponseDeviationsGeodesyLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
+    @Schema(description = "Тип оборудования")
+    private String equipmentLibrary;
     @Schema(description = "Наличие теплоносителя")
     private String heatCarrier;
     @Schema(description = "Старое или новое оборудование")
