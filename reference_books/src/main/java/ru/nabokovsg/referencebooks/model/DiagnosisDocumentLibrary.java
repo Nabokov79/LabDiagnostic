@@ -11,16 +11,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "recommendation_library")
-public class RecommendationLibrary {
+@Table(name = "diagnosis_document_library")
+public class DiagnosisDocumentLibrary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "equipment")
-    private String equipmentLibrary;
-    @Column(name = "equipment_id")
-    private Long equipmentLibraryId;
-    @Column(name = "recommendation")
-    private String recommendation;
+    @Column(name = "document")
+    private String document;
+    @Column(name = "title")
+    private String title;
 }

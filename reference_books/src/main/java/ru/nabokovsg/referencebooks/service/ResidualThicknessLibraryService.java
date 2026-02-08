@@ -2,19 +2,20 @@ package ru.nabokovsg.referencebooks.service;
 
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.NewResidualThicknessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.ResponseResidualThicknessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.ResponseShortResidualThicknessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.UpdateResidualThicknessLibraryDto;
 
 import java.util.List;
 
 public interface ResidualThicknessLibraryService {
 
-    ResponseResidualThicknessLibraryDto save(NewResidualThicknessLibraryDto thicknessDto);
+    ResponseShortResidualThicknessLibraryDto save(NewResidualThicknessLibraryDto thicknessDto);
 
-    ResponseResidualThicknessLibraryDto update(UpdateResidualThicknessLibraryDto thicknessDto);
+    ResponseShortResidualThicknessLibraryDto update(UpdateResidualThicknessLibraryDto thicknessDto);
 
     ResponseResidualThicknessLibraryDto get(Long id);
 
-    List<ResponseResidualThicknessLibraryDto> getAll(Long equipmentLibraryId);
+    List<ResponseShortResidualThicknessLibraryDto> getAll(String name);
 
     void delete(Long id);
 }

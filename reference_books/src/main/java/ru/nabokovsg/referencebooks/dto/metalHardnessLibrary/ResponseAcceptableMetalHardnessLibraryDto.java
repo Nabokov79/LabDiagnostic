@@ -13,12 +13,18 @@ public class ResponseAcceptableMetalHardnessLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
-    @Schema(description = "Наименование элемента и подэлемента")
-    private String elementName;
-    @Schema(description = "Минимальный  диаметр элемента, допустимый измерения твердости металла")
-    private Integer minAcceptableDiameter;
-    @Schema(description = "Минимальная толщина стенки элемента, допустимая для измерения твердости металла")
-    private Double minAcceptableThickness;
+    @Schema(description = "Идентификатор нормативно-технического документа")
+    private Long documentationLibraryId;
+    @Schema(description = "Идентификатор типа оборудования")
+    private Long equipmentLibraryId;
+    @Schema(description = "Идентификатор элемента оборудования")
+    private Long elementLibraryId;
+    @Schema(description = "Идентификатор подэлемента элемента оборудования")
+    private Long partElementLibraryId;
+    @Schema(description = "Минимальный допустимый диаметр")
+    private Double diameter;
+    @Schema(description = "Минимальная допустимая толщина стенки")
+    private Double thickness;
     @Schema(description = "Минимальная допустимая твердость металла элемента")
     private Integer minAcceptableHardness;
     @Schema(description = "Максимальная допустимая твердость металла элемента")

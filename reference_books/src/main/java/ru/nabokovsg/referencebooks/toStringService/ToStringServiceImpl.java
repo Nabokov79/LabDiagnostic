@@ -75,4 +75,23 @@ public class ToStringServiceImpl implements ToStringService {
         }
         return equipment.getFullName();
     }
+
+    @Override
+    public String getStandardSize(Double diameter, Double thickness) {
+        String standardSize = null;
+        String diameterName = "d=";
+        String thicknessName = "s=";
+        String delimiter = ";";
+        if (diameter != null) {
+            standardSize = String.join("", diameterName, String.valueOf(diameter), delimiter);
+        }
+        if (standardSize == null) {
+            standardSize = String.join("", thicknessName, String.valueOf(thickness), delimiter);
+        } else {
+            if (thickness != null) {
+                standardSize = String.join("", standardSize, thicknessName, String.valueOf(thickness), delimiter);
+            }
+        }
+        return standardSize;
+    }
 }

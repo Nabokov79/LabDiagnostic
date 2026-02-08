@@ -4,6 +4,7 @@ import ru.nabokovsg.referencebooks.dto.partElementLibrary.NewPartElementLibraryD
 import ru.nabokovsg.referencebooks.dto.partElementLibrary.ResponsePartElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.partElementLibrary.ResponseShortPartElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.partElementLibrary.UpdatePartElementLibraryDto;
+import ru.nabokovsg.referencebooks.model.PartElementLibrary;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface PartElementLibraryService {
     List<ResponseShortPartElementLibraryDto> getAll(Long id, String name);
 
     void delete(Long id);
+
+    PartElementLibrary getById(Long id);
 }

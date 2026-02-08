@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.NewAcceptableMetalHardnessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseAcceptableMetalHardnessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseShortAcceptableMetalHardnessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.UpdateAcceptableMetalHardnessLibraryDto;
 import ru.nabokovsg.referencebooks.service.MetalHardnessLibraryService;
 
@@ -33,7 +34,7 @@ public class MetalHardnessLibraryController {
 
     @Operation(summary = "Добавить данные допустимой твердости металла ")
     @PostMapping("/hardness")
-    public ResponseEntity<ResponseAcceptableMetalHardnessLibraryDto> save(
+    public ResponseEntity<ResponseShortAcceptableMetalHardnessLibraryDto> save(
             @RequestBody @Valid
             @Parameter(name = "Значения допустимой твердости металла") NewAcceptableMetalHardnessLibraryDto hardnessDto) {
         return ResponseEntity.ok().body(service.save(hardnessDto));
@@ -41,7 +42,7 @@ public class MetalHardnessLibraryController {
 
     @Operation(summary = "Изменение значения допустимой твердости металла")
     @PatchMapping("/hardness")
-    public ResponseEntity<ResponseAcceptableMetalHardnessLibraryDto> update(
+    public ResponseEntity<ResponseShortAcceptableMetalHardnessLibraryDto> update(
             @RequestBody @Valid
             @Parameter(name = "Значения допустимой твердости металла") UpdateAcceptableMetalHardnessLibraryDto hardnessDto) {
         return ResponseEntity.ok().body(service.update(hardnessDto));
@@ -55,17 +56,17 @@ public class MetalHardnessLibraryController {
     }
 
     @Operation(summary = "Получить данные всех значений твердости металла")
-    @GetMapping("/hardnesses/{id}")
-    public ResponseEntity<List<ResponseAcceptableMetalHardnessLibraryDto>> getAll(
-            @PathVariable(name = "id") @NotNull @Positive
-            @Parameter(description = "Идентификатор типа оборудования") Long equipmentLibraryId) {
-        return ResponseEntity.ok().body(service.getAll(equipmentLibraryId));
+    @GetMapping("/hardnesses")
+    public ResponseEntity<List<ResponseShortAcceptableMetalHardnessLibraryDto>> getAll(
+                                                                        @RequestParam(name = "name", required = false)
+                                                                        @Parameter(description = "поиск") String name) {
+        return ResponseEntity.ok().body(service.getAll(name));
     }
 
     @Operation(summary = "Удалить данные допустимой твердости металла")
     @DeleteMapping("/hardness/{id}")
     public ResponseEntity<String> delete(@PathVariable @NotNull @Positive @Parameter(name = "Идентификатор") Long id) {
         service.delete(id);
-        return ResponseEntity.ok("Значения допустимой твердости металла удалены.");
+        return ResponseEntity.ok("Допустимая твердость металла удалена.");
     }
 }

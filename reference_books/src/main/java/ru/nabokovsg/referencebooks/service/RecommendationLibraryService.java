@@ -14,7 +14,7 @@ public interface RecommendationLibraryService {
 
     ResponseRecommendationLibraryDto get(Long id);
 
-    List<ResponseRecommendationLibraryDto> getAll(Long equipmentLibraryId);
+    List<ResponseRecommendationLibraryDto> getAll(String name);
 
     void delete(Long id);
 }

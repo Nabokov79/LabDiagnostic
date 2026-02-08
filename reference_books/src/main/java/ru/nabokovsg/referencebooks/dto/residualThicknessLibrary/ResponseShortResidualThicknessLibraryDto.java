@@ -8,23 +8,19 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-@Schema(description = "Данные допустимых толщин элементов оборудования")
-public class ResponseResidualThicknessLibraryDto {
+@Schema(description = "Краткие данные допустимых толщин элементов оборудования")
+public class ResponseShortResidualThicknessLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
-    @Schema(description = "Идентификатор нормативно-технический документа")
-    private Long documentationLibraryId;
-    @Schema(description = "Идентификатор типа оборудования")
-    private Long equipmentLibraryId;
-    @Schema(description = "Идентификатор типа элемента оборудования")
-    private Long elementLibraryId;
-    @Schema(description = "Идентификатор типа подэлемента элемента")
-    private Long partElementLibraryId;
-    @Schema(description = "Диаметр элемента(подэлемента)")
-    private Double diameter;
-    @Schema(description = "Толщина элемента(подэлемента)")
-    private Double thickness;
+    @Schema(description = "Нормативно-технический документ")
+    private String documentationLibrary;
+    @Schema(description = "Полное наименование типа оборудования")
+    private String equipmentFullName;
+    @Schema(description = "Полное наименование элемента (элемент + подэлемент)")
+    private String elementFullName;
+    @Schema(description = "Типоразмер элемента(подэлемента)")
+    private String standardSize;
     @Schema(description = "Минимальная допустимая толщина стенки элемента в мм")
     private Double  minAcceptableThicknessMM;
     @Schema(description = "Минимальная допустимая толщина стенки элемента в процентах")

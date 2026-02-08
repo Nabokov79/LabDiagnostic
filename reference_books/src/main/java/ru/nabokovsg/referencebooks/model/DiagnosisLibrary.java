@@ -16,11 +16,7 @@ public class DiagnosisLibrary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(name = "diagnosis")
     private String diagnosis;
-    @Column(name = "document")
-    private String document;
-    @Column(name = "title")
-    private String title;
 }

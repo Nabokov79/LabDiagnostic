@@ -17,18 +17,26 @@ public class MetalHardnessLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "documentation_id")
+    private Long documentationLibraryId;
+    @Column(name = "documentation")
+    private String documentationLibrary;
     @Column(name = "equipment_library_id")
     private Long equipmentLibraryId;
-    @Column(name = "element_name")
-    private String elementName;
+    @Column(name = "equipment_full_name")
+    private String equipmentFullName;
     @Column(name = "element_library_id")
     private Long elementLibraryId;
+    @Column(name = "element_full_name")
+    private String elementFullName;
     @Column(name = "part_element_library_id")
     private Long partElementLibraryId;
-    @Column(name = "acceptable_diameter")
-    private Integer minAcceptableDiameter;
-    @Column(name = "acceptable_thickness")
-    private Double minAcceptableThickness;
+    @Column(name = "diameter")
+    private Double diameter;
+    @Column(name = "thickness")
+    private Double thickness;
+    @Column(name = "standard_size")
+    private String standardSize;
     @Column(name = "min_hardness")
     private Integer minAcceptableHardness;
     @Column(name = "max_hardness")

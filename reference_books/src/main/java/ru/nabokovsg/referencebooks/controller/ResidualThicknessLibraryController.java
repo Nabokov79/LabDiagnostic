@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.NewResidualThicknessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.ResponseResidualThicknessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.ResponseShortResidualThicknessLibraryDto;
 import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.UpdateResidualThicknessLibraryDto;
 import ru.nabokovsg.referencebooks.service.ResidualThicknessLibraryService;
 
@@ -32,38 +33,38 @@ public class ResidualThicknessLibraryController {
     private final ResidualThicknessLibraryService service;
 
     @Operation(summary = "Добавить значение допустимой толщины")
-    @PostMapping("/thickness")
-    public ResponseEntity<ResponseResidualThicknessLibraryDto> save(
+    @PostMapping("/thickness/residual")
+    public ResponseEntity<ResponseShortResidualThicknessLibraryDto> save(
                                                  @RequestBody @Valid @Parameter(name = "Значение допустимой толщины")
                                                  NewResidualThicknessLibraryDto thicknessDto) {
         return ResponseEntity.ok().body(service.save(thicknessDto));
     }
 
     @Operation(summary = "Изменение значение допустимой толщины")
-    @PatchMapping("/thickness")
-    public ResponseEntity<ResponseResidualThicknessLibraryDto> update(
+    @PatchMapping("/thickness/residual")
+    public ResponseEntity<ResponseShortResidualThicknessLibraryDto> update(
                                                 @RequestBody @Valid @Parameter(name = "Значение допустимой толщины")
                                                 UpdateResidualThicknessLibraryDto thicknessDto) {
         return ResponseEntity.ok().body(service.update(thicknessDto));
     }
 
-    @Operation(summary = "Получить допустимое значение толщины")
-    @GetMapping("/thickness/{id}")
+    @Operation(summary = "Изменение значение допустимой толщины")
+    @GetMapping("/thickness/residual/{id}")
     public ResponseEntity<ResponseResidualThicknessLibraryDto> get(@PathVariable @NotNull @Positive
-                                                                  @Parameter(description = "Идентификатор") Long id) {
+                                                              @Parameter(description = "Идентификатор") Long id) {
         return ResponseEntity.ok().body(service.get(id));
     }
 
     @Operation(summary = "Получить все значения допустимых толщин")
-    @GetMapping("/thicknesses/{id}")
-    public ResponseEntity<List<ResponseResidualThicknessLibraryDto>> getAll(
-            @PathVariable(name = "id") @NotNull @Positive
-            @Parameter(description = "Идентификатор типа оборудования") Long equipmentLibraryId) {
-        return ResponseEntity.ok().body(service.getAll(equipmentLibraryId));
+    @GetMapping("/thicknesses/residual")
+    public ResponseEntity<List<ResponseShortResidualThicknessLibraryDto>> getAll(
+                                                                        @RequestParam(name = "name", required = false)
+                                                                        @Parameter(description = "поиск") String name) {
+        return ResponseEntity.ok().body(service.getAll(name));
     }
 
     @Operation(summary = "Удалить значение допустимой толщины")
-    @DeleteMapping("/thickness/{id}")
+    @DeleteMapping("/thickness/residual/{id}")
     public ResponseEntity<String> delete(@PathVariable @NotNull @Positive @Parameter(name = "Идентификатор") Long id) {
         service.delete(id);
         return ResponseEntity.ok("Значение допустимой толщины удалено.");

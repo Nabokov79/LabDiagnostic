@@ -15,6 +15,8 @@ public class ResponseRecommendationLibraryDto {
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
     private Long equipmentLibraryId;
+    @Schema(description = "Тип оборудования")
+    private String equipmentLibrary;
     @Schema(description = "Рекомендация")
     private String recommendation;
 }

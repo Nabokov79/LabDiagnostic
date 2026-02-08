@@ -14,4 +14,6 @@ public interface ToStringService {
     String additionalEvaluationParameters(Double first, Double second);
 
     String getEquipmentLibraryFullName(EquipmentLibrary equipment);
+
+    String getStandardSize(Double diameter, Double thickness);
 }

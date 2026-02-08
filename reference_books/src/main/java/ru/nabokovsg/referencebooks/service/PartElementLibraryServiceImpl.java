@@ -81,7 +81,8 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
         throw new NotFoundException(NO_FOUND);
     }
 
-    private PartElementLibrary getById(Long id) {
+    @Override
+    public PartElementLibrary getById(Long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
     }
 
