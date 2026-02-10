@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.NewDiagnosisLibraryDto;
 import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.ResponseDiagnosisLibraryDto;
+import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.ResponseShortDiagnosisLibraryDto;
 import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.UpdateDiagnosisLibraryDto;
 import ru.nabokovsg.referencebooks.service.DiagnosisLibraryService;
 
@@ -33,7 +34,7 @@ public class DiagnosisLibraryController {
 
     @Operation(summary = "Добавить наименование диагностики")
     @PostMapping("/diagnostic")
-    public ResponseEntity<ResponseDiagnosisLibraryDto> save(
+    public ResponseEntity<ResponseShortDiagnosisLibraryDto> save(
             @RequestBody @Valid
             @Parameter(name = "Наименование диагностики") NewDiagnosisLibraryDto diagnosisDto) {
         return ResponseEntity.ok().body(service.save(diagnosisDto));
@@ -41,7 +42,7 @@ public class DiagnosisLibraryController {
 
     @Operation(summary = "Изменение наименование диагностики")
     @PatchMapping("/diagnostic")
-    public ResponseEntity<ResponseDiagnosisLibraryDto> update(
+    public ResponseEntity<ResponseShortDiagnosisLibraryDto> update(
             @RequestBody @Valid
             @Parameter(name = "Наименование диагностики") UpdateDiagnosisLibraryDto diagnosisDto) {
         return ResponseEntity.ok().body(service.update(diagnosisDto));
@@ -56,7 +57,7 @@ public class DiagnosisLibraryController {
 
     @Operation(summary = "Получить все наименования диагностики")
     @GetMapping("/diagnostics")
-    public ResponseEntity<List<ResponseDiagnosisLibraryDto>> getAll(
+    public ResponseEntity<List<ResponseShortDiagnosisLibraryDto>> getAll(
             @RequestParam(name = "name", required = false)
             @Parameter(description = "Наименование диагностики") String name) {
         return ResponseEntity.ok().body(service.getAll(name));

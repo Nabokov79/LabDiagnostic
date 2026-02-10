@@ -1,8 +1,10 @@
 package ru.nabokovsg.referencebooks.toStringService;
 
 import org.springframework.stereotype.Component;
+import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
+import ru.nabokovsg.referencebooks.model.MeasurementType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -93,5 +95,15 @@ public class ToStringServiceImpl implements ToStringService {
             }
         }
         return standardSize;
+    }
+
+    @Override
+    public String getMeasurements(List<String> measurementsType) {
+        return String.join(" ", measurementsType.stream()
+                                                        .map(type -> MeasurementType.from(type)
+                                                                .orElseThrow(() -> new BadRequestException(
+                                                                        String.format("Недопустимое измерение: %s", type)))
+                                                                .label)
+                                                        .toList());
     }
 }

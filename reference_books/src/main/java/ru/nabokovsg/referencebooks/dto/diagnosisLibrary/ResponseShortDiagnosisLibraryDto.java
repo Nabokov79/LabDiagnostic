@@ -5,20 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Setter
 @Getter
 @AllArgsConstructor
-@Schema(description = "Данные вида диагностики")
-public class ResponseDiagnosisLibraryDto {
+@Schema(description = "Краткие данные вида диагностики")
+public class ResponseShortDiagnosisLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
-    @Schema(description = "Идентификатор типа оборудования")
-    private Long equipmentLibraryId;
+    @Schema(description = "Тип оборудования")
+    private String equipmentLibrary;
     @Schema(description = "Наименование диагностики")
     private String diagnosis;
     @Schema(description = "Типы выполняемых измерений при диагностики")
-    private List<String> measurementsType;
+    private String measurements;
 }

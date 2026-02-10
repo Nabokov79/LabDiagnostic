@@ -16,4 +16,6 @@ public interface ToStringService {
     String getEquipmentLibraryFullName(EquipmentLibrary equipment);
 
     String getStandardSize(Double diameter, Double thickness);
+
+    String getMeasurements(List<String> measurementsType);
 }
