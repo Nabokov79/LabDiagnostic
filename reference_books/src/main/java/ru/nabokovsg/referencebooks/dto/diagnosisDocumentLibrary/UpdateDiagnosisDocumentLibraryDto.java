@@ -3,18 +3,21 @@ package ru.nabokovsg.referencebooks.dto.diagnosisDocumentLibrary;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Данные для добавления вида документа диагностики")
-public class NewDiagnosisDocumentLibraryDto {
+@Schema(description = "Данные для изменения информации о виде документа диагностики")
+public class UpdateDiagnosisDocumentLibraryDto {
 
+    @Schema(description = "Идентификатор")
+    @NotNull(message = "id should not be null")
+    @Positive(message = "id can only be positive")
+    private Long id;
     @Schema(description = "Наименование документа")
     @NotNull(message = "document should not be null")
     @NotBlank(message = "name should not be blank")
