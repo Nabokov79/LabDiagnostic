@@ -8,38 +8,39 @@ import ru.nabokovsg.referencebooks.dto.deviationsGeodesyLibrary.ResponseDeviatio
 import ru.nabokovsg.referencebooks.dto.deviationsGeodesyLibrary.UpdateDeviationsGeodesyLibraryDto;
 import ru.nabokovsg.referencebooks.model.DeviationsGeodesyLibrary;
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
+import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibrary;
 
 @Mapper(componentModel = "spring")
 public interface DeviationsGeodesyLibraryMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibrary", ignore = true)
-    @Mapping(target = "volume", ignore = true)
     @Mapping(target = "heatCarrier", ignore = true)
     @Mapping(target = "equipmentCondition", ignore = true)
-    DeviationsGeodesyLibrary mapToAcceptableDeviationsGeodesy(NewDeviationsGeodesyLibraryDto geodesyDto);
+    @Mapping(target = "equipment", ignore = true)
+    @Mapping(target = "documentation", ignore = true)
+    DeviationsGeodesyLibrary mapToDeviationsGeodesyLibrary(NewDeviationsGeodesyLibraryDto geodesyDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibrary", ignore = true)
-    @Mapping(target = "equipmentLibraryId", ignore = true)
-    @Mapping(target = "volume", ignore = true)
     @Mapping(target = "heatCarrier", ignore = true)
     @Mapping(target = "equipmentCondition", ignore = true)
-    void mapToUpdateAcceptableDeviationsGeodesy(@MappingTarget DeviationsGeodesyLibrary deviationsGeodesy,
-                                                                UpdateDeviationsGeodesyLibraryDto deviationsGeodesyDto);
+    @Mapping(target = "equipment", ignore = true)
+    @Mapping(target = "documentation", ignore = true)
+    void mapToUpdateDeviationsGeodesyLibrary(@MappingTarget DeviationsGeodesyLibrary deviationsGeodesy,
+                                                            UpdateDeviationsGeodesyLibraryDto deviationsGeodesyDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibraryId", ignore = true)
     @Mapping(target = "withHeatCarrier", ignore = true)
     @Mapping(target = "condition", ignore = true)
     @Mapping(target = "acceptablePrecipitation", ignore = true)
     @Mapping(target = "maxDifferenceNeighboringPoints", ignore = true)
     @Mapping(target = "maxDifferenceDiametricPoints", ignore = true)
-    void mapWithFields(@MappingTarget DeviationsGeodesyLibrary deviationsGeodesy, String equipmentLibrary
-                                                                                , Integer volume
-                                                                                , String heatCarrier
-                                                                                , String equipmentCondition);
+    void mapWithFields(@MappingTarget DeviationsGeodesyLibrary deviationsGeodesy
+                                     , EquipmentLibrary equipment
+                                     , RegulatoryDocumentationLibrary documentation
+                                     , String heatCarrier
+                                     , String equipmentCondition);
 
-    ResponseDeviationsGeodesyLibraryDto mapToResponseAcceptableDeviationsGeodesyDto(
-                                                                                   DeviationsGeodesyLibrary deviations);
+    @Mapping(source = "deviations.equipment.equipmentFullName", target = "equipmentFullName")
+    @Mapping(source = "deviations.documentation.document", target = "documentation")
+    ResponseDeviationsGeodesyLibraryDto mapToResponseDeviationsGeodesyLibraryDto(DeviationsGeodesyLibrary deviations);
 }

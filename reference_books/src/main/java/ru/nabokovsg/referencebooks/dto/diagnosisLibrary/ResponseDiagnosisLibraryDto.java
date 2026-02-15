@@ -16,7 +16,7 @@ public class ResponseDiagnosisLibraryDto {
     @Schema(description = "Идентификатор")
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
-    private Long equipmentLibraryId;
+    private Long equipmentId;
     @Schema(description = "Наименование диагностики")
     private String diagnosis;
     @Schema(description = "Типы выполняемых измерений при диагностики")

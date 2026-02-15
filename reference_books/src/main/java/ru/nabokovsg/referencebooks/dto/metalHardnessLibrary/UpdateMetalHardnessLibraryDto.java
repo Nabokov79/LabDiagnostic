@@ -5,31 +5,29 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@Schema(description = "Данные для добавления допустимой твердости металла")
-public class NewAcceptableMetalHardnessLibraryDto {
+@Schema(description = "Данные для изменения допустимой твердости металла")
+public class UpdateMetalHardnessLibraryDto {
 
+    @Schema(description = "Идентификатор")
+    @NotNull(message = "id should not be null")
+    @Positive(message = "id can only be positive")
+    private Long id;
     @Schema(description = "Идентификатор нормативно-технического документа")
-    @NotNull(message = "documentationLibraryId should not be null")
-    @Positive(message = "documentationLibraryId can only be positive")
-    private Long documentationLibraryId;
-    @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentTypeId should not be null")
-    @Positive(message = "equipmentTypeId can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "documentation id should not be null")
+    @Positive(message = "documentation id can only be positive")
+    private Long documentationId;
     @Schema(description = "Идентификатор элемента оборудования")
-    @NotNull(message = "elementId should not be null")
-    @Positive(message = "elementId can only be positive")
-    private Long elementLibraryId;
+    @NotNull(message = "element id should not be null")
+    @Positive(message = "element id can only be positive")
+    private Long elementId;
     @Schema(description = "Идентификатор подэлемента элемента оборудования")
-    @Positive(message = "partElementLibraryId can only be positive")
-    private Long partElementLibraryId;
+    @Positive(message = "partElement id can only be positive")
+    private Long partElementId;
     @Schema(description = "Минимальный допустимый диаметр")
     @Positive(message = "diameter can only be positive")
     private Double diameter;

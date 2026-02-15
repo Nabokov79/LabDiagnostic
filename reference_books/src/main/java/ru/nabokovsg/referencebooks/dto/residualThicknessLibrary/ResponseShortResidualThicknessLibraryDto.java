@@ -14,7 +14,7 @@ public class ResponseShortResidualThicknessLibraryDto {
     @Schema(description = "Идентификатор")
     private Long id;
     @Schema(description = "Нормативно-технический документ")
-    private String documentationLibrary;
+    private String documentation;
     @Schema(description = "Полное наименование типа оборудования")
     private String equipmentFullName;
     @Schema(description = "Полное наименование элемента (элемент + подэлемент)")

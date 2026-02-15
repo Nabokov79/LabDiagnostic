@@ -2,7 +2,6 @@ package ru.nabokovsg.referencebooks.toStringService;
 
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
-import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementType;
 
@@ -64,34 +63,20 @@ public class ToStringServiceImpl implements ToStringService {
     }
 
     @Override
-    public String getEquipmentLibraryFullName(EquipmentLibrary equipment) {
-        String volume = null;
-        if (equipment.getVolume() != null) {
-            volume = String.join("", "V=", String.valueOf(equipment.getVolume()), " м3");
-        }
-        if (volume != null) {
-            return String.join("", equipment.getFullName(), ", ", volume);
-        }
-        if (equipment.getModel() != null) {
-            return String.join("", equipment.getFullName(), ", ", equipment.getModel());
-        }
-        return equipment.getFullName();
-    }
-
-    @Override
     public String getStandardSize(Double diameter, Double thickness) {
         String standardSize = null;
-        String diameterName = "d=";
-        String thicknessName = "s=";
+        String d = "D=";
+        String s = "S=";
         String delimiter = ";";
         if (diameter != null) {
-            standardSize = String.join("", diameterName, String.valueOf(diameter), delimiter);
+            standardSize = String.join("", d, String.valueOf(diameter), delimiter);
         }
+        String t = String.join("", s, String.valueOf(thickness), delimiter);
         if (standardSize == null) {
-            standardSize = String.join("", thicknessName, String.valueOf(thickness), delimiter);
+            return t;
         } else {
             if (thickness != null) {
-                standardSize = String.join("", standardSize, thicknessName, String.valueOf(thickness), delimiter);
+               return String.join(" ", standardSize, t);
             }
         }
         return standardSize;

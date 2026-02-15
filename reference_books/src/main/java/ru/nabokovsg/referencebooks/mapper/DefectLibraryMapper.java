@@ -8,39 +8,43 @@ import ru.nabokovsg.referencebooks.dto.defectLibrary.ResponseDefectLibraryDto;
 import ru.nabokovsg.referencebooks.dto.defectLibrary.ResponseShortDefectLibraryDto;
 import ru.nabokovsg.referencebooks.dto.defectLibrary.UpdateDefectLibraryDto;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
+import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.QualityAssessment;
+import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibrary;
 
 @Mapper(componentModel = "spring")
 public interface DefectLibraryMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibrary", ignore = true)
-    @Mapping(target = "documentationLibrary", ignore = true)
     @Mapping(target = "thickness", ignore = true)
     @Mapping(target = "totalLength", ignore = true)
     @Mapping(target = "assessmentArea", ignore = true)
     @Mapping(target = "qualityAssessmentType", ignore = true)
     @Mapping(target = "measuredParameters", ignore = true)
     @Mapping(target = "measuredParametersLibrary", ignore = true)
+    @Mapping(target = "equipment", ignore = true)
+    @Mapping(target = "documentation", ignore = true)
     DefectLibrary mapToDefectLibrary(NewDefectLibraryDto defectDto);
 
-    @Mapping(target = "equipmentLibrary", ignore = true)
-    @Mapping(target = "documentationLibrary", ignore = true)
     @Mapping(target = "thickness", ignore = true)
     @Mapping(target = "totalLength", ignore = true)
     @Mapping(target = "assessmentArea", ignore = true)
     @Mapping(target = "qualityAssessmentType", ignore = true)
     @Mapping(target = "measuredParameters", ignore = true)
     @Mapping(target = "measuredParametersLibrary", ignore = true)
+    @Mapping(target = "equipment", ignore = true)
+    @Mapping(target = "documentation", ignore = true)
     void mapToUpdateDefectLibrary(@MappingTarget DefectLibrary defect, UpdateDefectLibraryDto defectDto);
 
+    @Mapping(source = "defect.equipment.id", target = "equipmentId")
+    @Mapping(source = "defect.documentation.id", target = "documentationId")
     ResponseDefectLibraryDto mapToResponseDefectLibraryDto(DefectLibrary defect);
 
+    @Mapping(source = "defect.equipment.equipmentFullName", target = "equipmentFullName")
+    @Mapping(source = "defect.documentation.document", target = "documentation")
     ResponseShortDefectLibraryDto mapToResponseShortDefectLibraryDto(DefectLibrary defect);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibraryId", ignore = true)
-    @Mapping(target = "documentationLibraryId", ignore = true)
     @Mapping(target = "name", ignore = true)
     @Mapping(target = "defectsQuantity", ignore = true)
     @Mapping(target = "withoutNamingParameter", ignore = true)
@@ -54,8 +58,8 @@ public interface DefectLibraryMapper {
     @Mapping(target = "maxThickness", ignore = true)
     @Mapping(target = "measuredParametersLibrary", ignore = true)
     void mapWithFields(@MappingTarget DefectLibrary defect
-                                           , String equipmentLibrary
-                                           , String documentationLibrary
+                                           , EquipmentLibrary equipment
+                                           , RegulatoryDocumentationLibrary documentation
                                            , String measuredParameters
                                            , String thickness
                                            , String totalLength

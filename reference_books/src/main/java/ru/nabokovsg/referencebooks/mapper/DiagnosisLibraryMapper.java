@@ -8,6 +8,7 @@ import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.ResponseDiagnosisLibrary
 import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.ResponseShortDiagnosisLibraryDto;
 import ru.nabokovsg.referencebooks.dto.diagnosisLibrary.UpdateDiagnosisLibraryDto;
 import ru.nabokovsg.referencebooks.model.DiagnosisLibrary;
+import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 
 import java.util.List;
 
@@ -15,27 +16,31 @@ import java.util.List;
 public interface DiagnosisLibraryMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibrary", ignore = true)
+    @Mapping(target = "equipment", ignore = true)
     @Mapping(target = "measurements", ignore = true)
     @Mapping(target = "measurementsType", ignore = true)
     DiagnosisLibrary mapToDiagnosisLibrary(NewDiagnosisLibraryDto documentLibraryDto);
 
-    @Mapping(target = "equipmentLibrary", ignore = true)
+    @Mapping(target = "equipment", ignore = true)
     @Mapping(target = "measurements", ignore = true)
     @Mapping(target = "measurementsType", ignore = true)
     DiagnosisLibrary mapToUpdateDiagnosisLibrary(UpdateDiagnosisLibraryDto documentLibraryDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "equipmentLibraryId", ignore = true)
     @Mapping(target = "diagnosis", ignore = true)
     void mapFields(@MappingTarget DiagnosisLibrary diagnosisLibrary
-                                , String equipmentLibrary
+                                , EquipmentLibrary equipment
                                 , String measurements
                                 , String measurementsType);
 
-    ResponseShortDiagnosisLibraryDto mapToResponseShortDiagnosisLibraryDto(DiagnosisLibrary diagnosisLibrary);
+    @Mapping(source = "diagnosis.equipment.equipmentFullName", target = "equipmentFullName")
+    @Mapping(source = "diagnosis.diagnosis", target = "diagnosis")
+    @Mapping(source = "diagnosis.measurements", target = "measurements")
+    ResponseShortDiagnosisLibraryDto mapToResponseShortDiagnosisLibraryDto(DiagnosisLibrary diagnosis);
 
+    @Mapping(source = "diagnosis.equipment.id", target = "equipmentId")
+    @Mapping(source = "diagnosis.diagnosis", target = "diagnosis")
     @Mapping(source = "measurementsType", target = "measurementsType")
-    ResponseDiagnosisLibraryDto mapToResponseDiagnosisLibraryDto(DiagnosisLibrary diagnosisLibrary
+    ResponseDiagnosisLibraryDto mapToResponseDiagnosisLibraryDto(DiagnosisLibrary diagnosis
                                                                , List<String> measurementsType);
 }

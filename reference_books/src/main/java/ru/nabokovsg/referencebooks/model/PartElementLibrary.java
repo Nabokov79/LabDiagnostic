@@ -17,6 +17,8 @@ public class PartElementLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "part_full_name")
+    private String partElementFullName;
     @Column(name = "full_name")
     private String fullName;
     @Column(name = "name")

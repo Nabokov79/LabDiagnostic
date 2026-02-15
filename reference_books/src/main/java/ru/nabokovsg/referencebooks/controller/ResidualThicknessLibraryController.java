@@ -58,9 +58,9 @@ public class ResidualThicknessLibraryController {
     @Operation(summary = "Получить все значения допустимых толщин")
     @GetMapping("/thicknesses/residual")
     public ResponseEntity<List<ResponseShortResidualThicknessLibraryDto>> getAll(
-                                                                        @RequestParam(name = "name", required = false)
-                                                                        @Parameter(description = "поиск") String name) {
-        return ResponseEntity.ok().body(service.getAll(name));
+                                                                        @RequestParam(name = "search", required = false)
+                                                                        @Parameter(description = "поиск") String search) {
+        return ResponseEntity.ok().body(service.getAll(search));
     }
 
     @Operation(summary = "Удалить значение допустимой толщины")

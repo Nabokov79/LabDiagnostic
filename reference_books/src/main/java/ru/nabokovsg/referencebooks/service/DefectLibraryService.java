@@ -16,7 +16,7 @@ public interface DefectLibraryService {
 
     ResponseDefectLibraryDto get(Long id);
 
-    List<ResponseShortDefectLibraryDto> getAll(String defect);
+    List<ResponseShortDefectLibraryDto> getAll(String search);
 
     void delete(Long id);
 

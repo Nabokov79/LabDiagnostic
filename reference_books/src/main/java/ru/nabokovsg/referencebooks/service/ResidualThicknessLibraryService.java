@@ -15,7 +15,7 @@ public interface ResidualThicknessLibraryService {
 
     ResponseResidualThicknessLibraryDto get(Long id);
 
-    List<ResponseShortResidualThicknessLibraryDto> getAll(String name);
+    List<ResponseShortResidualThicknessLibraryDto> getAll(String search);
 
     void delete(Long id);
 }

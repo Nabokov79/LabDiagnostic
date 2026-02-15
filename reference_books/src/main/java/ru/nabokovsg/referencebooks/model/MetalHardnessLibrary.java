@@ -1,5 +1,6 @@
 package ru.nabokovsg.referencebooks.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,20 +18,6 @@ public class MetalHardnessLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "documentation_id")
-    private Long documentationLibraryId;
-    @Column(name = "documentation")
-    private String documentationLibrary;
-    @Column(name = "equipment_library_id")
-    private Long equipmentLibraryId;
-    @Column(name = "equipment_full_name")
-    private String equipmentFullName;
-    @Column(name = "element_library_id")
-    private Long elementLibraryId;
-    @Column(name = "element_full_name")
-    private String elementFullName;
-    @Column(name = "part_element_library_id")
-    private Long partElementLibraryId;
     @Column(name = "diameter")
     private Double diameter;
     @Column(name = "thickness")
@@ -43,4 +30,16 @@ public class MetalHardnessLibrary {
     private Integer maxAcceptableHardness;
     @Column(name = "measurement_error")
     private Float measurementError;
+    @ManyToOne
+    @JoinColumn(name = "documentation_id")
+    @JsonIgnore
+    private RegulatoryDocumentationLibrary documentation;
+    @ManyToOne
+    @JoinColumn(name = "element_id")
+    @JsonIgnore
+    private ElementLibrary element;
+    @ManyToOne
+    @JoinColumn(name = "part_element_id")
+    @JsonIgnore
+    private PartElementLibrary partElement;
 }

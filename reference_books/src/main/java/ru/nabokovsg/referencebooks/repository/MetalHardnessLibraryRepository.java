@@ -8,10 +8,12 @@ import java.util.Set;
 
 public interface MetalHardnessLibraryRepository extends JpaRepository<MetalHardnessLibrary, Long> {
 
-    @Query("select h from MetalHardnessLibrary h order by h.equipmentFullName desc")
+    @Query("select h" +
+          " from MetalHardnessLibrary h" +
+          " order by h.element.equipment.equipmentFullName desc")
     Set<MetalHardnessLibrary> findAllOrderByEquipmentFullName();
 
-    MetalHardnessLibrary findByPartElementLibraryId(Long partElementLibraryId);
+    MetalHardnessLibrary findByPartElementIdAndDocumentationId(Long partElementId, Long documentationId);
 
-    MetalHardnessLibrary findByElementLibraryId(Long elementLibraryId);
+    MetalHardnessLibrary findByElementIdAndDocumentationId(Long elementId, Long documentationId);
 }

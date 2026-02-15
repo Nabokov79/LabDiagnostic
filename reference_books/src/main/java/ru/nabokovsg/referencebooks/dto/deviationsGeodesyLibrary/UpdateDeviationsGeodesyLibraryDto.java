@@ -17,6 +17,14 @@ public class UpdateDeviationsGeodesyLibraryDto {
     @NotNull(message = "id should not be null")
     @Positive(message = "id can only be positive")
     private Long id;
+    @Schema(description = "Идентификатор типа оборудования")
+    @NotNull(message = "equipment id should not be null")
+    @Positive(message = "equipment id can only be positive")
+    private Long equipmentId;
+    @Schema(description = "Идентификатор нормативно-технического документа")
+    @NotNull(message = "documentation id should not be null")
+    @Positive(message = "documentation id can only be positive")
+    private Long documentationId;
     @Schema(description = "Наличие теплоносителя")
     @NotNull(message = "withHeatCarrier should not be null")
     private Boolean withHeatCarrier;

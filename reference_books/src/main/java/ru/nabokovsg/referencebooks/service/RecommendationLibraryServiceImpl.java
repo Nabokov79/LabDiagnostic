@@ -11,7 +11,7 @@ import ru.nabokovsg.referencebooks.mapper.RecommendationLibraryMapper;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.model.RecommendationLibrary;
 import ru.nabokovsg.referencebooks.repository.RecommendationLibraryRepository;
-import ru.nabokovsg.referencebooks.toStringService.ToStringService;
+import ru.nabokovsg.referencebooks.search.SearchService;
 
 import java.util.List;
 import java.util.Set;
@@ -24,13 +24,13 @@ public class RecommendationLibraryServiceImpl implements RecommendationLibrarySe
     private final RecommendationLibraryRepository repository;
     private final RecommendationLibraryMapper mapper;
     private final EquipmentLibraryService equipmentService;
-    private final ToStringService toString;
+    private final SearchService searchService;
     private final static String MASSAGE = "Рекомендация не найдена.";
 
     @Override
     public ResponseRecommendationLibraryDto save(NewRecommendationLibraryDto recommendationLibraryDto) {
         RecommendationLibrary recommendation = mapper.mapToRecommendationLibrary(recommendationLibraryDto);
-        build(recommendation);
+        build(recommendation, recommendationLibraryDto.getEquipmentId());
         return mapper.mapToResponseRecommendationLibraryDto(repository.save(recommendation));
     }
 
@@ -38,7 +38,7 @@ public class RecommendationLibraryServiceImpl implements RecommendationLibrarySe
     public ResponseRecommendationLibraryDto update(UpdateRecommendationLibraryDto recommendationLibraryDto) {
         RecommendationLibrary recommendation = getById(recommendationLibraryDto.getId());
         mapper.mapToUpdateRecommendationLibrary(recommendation, recommendationLibraryDto);
-        build(recommendation);
+        build(recommendation, recommendationLibraryDto.getEquipmentId());
         return mapper.mapToResponseRecommendationLibraryDto(repository.save(recommendation));
     }
 
@@ -48,13 +48,13 @@ public class RecommendationLibraryServiceImpl implements RecommendationLibrarySe
     }
 
     @Override
-    public List<ResponseRecommendationLibraryDto> getAll(String name) {
+    public List<ResponseRecommendationLibraryDto> getAll(String search) {
         Set<RecommendationLibrary> recommendations = repository.findAllByOrderByEquipmentLibrary();
-        if (name != null) {
-            final String search = name.toLowerCase();
+        if (search != null) {
             recommendations  = recommendations.stream()
-                    .filter(hardness -> hardness.getEquipmentLibrary().toLowerCase().contains(search)
-                                     || hardness.getRecommendation().toLowerCase().contains(search))
+                    .filter(recommendation ->
+                            searchService.search(search, List.of(recommendation.getEquipment().getEquipmentFullName()
+                                                               , recommendation.getRecommendation())))
                     .collect(Collectors.toSet());
         }
         return recommendations.stream()
@@ -75,15 +75,13 @@ public class RecommendationLibraryServiceImpl implements RecommendationLibrarySe
         return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
     }
 
-    private void build(RecommendationLibrary recommendation) {
-        exists(recommendation);
-        mapper.mapWithFields(recommendation
-               , toString.getEquipmentLibraryFullName(equipmentService.getById(recommendation.getEquipmentLibraryId())));
+    private void build(RecommendationLibrary recommendation, Long equipmentId) {
+        exists(recommendation, equipmentId);
+        mapper.mapWithFields(recommendation, equipmentService.getById(equipmentId));
     }
 
-    private void exists(RecommendationLibrary recommendation) {
-        if (repository.existsByEquipmentLibraryIdAndRecommendation(recommendation.getEquipmentLibraryId()
-                , recommendation.getRecommendation())) {
+    private void exists(RecommendationLibrary recommendation, Long equipmentId) {
+        if (repository.existsByEquipmentIdAndRecommendation(equipmentId, recommendation.getRecommendation())) {
             throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label
                                                                 , recommendation.getRecommendation()));
         }

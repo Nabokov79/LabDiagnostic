@@ -15,7 +15,7 @@ public interface DiagnosisLibraryService {
 
     ResponseDiagnosisLibraryDto get(Long id);
 
-    List<ResponseShortDiagnosisLibraryDto> getAll(String name);
+    List<ResponseShortDiagnosisLibraryDto> getAll(String search);
 
     void delete(Long id);
 }

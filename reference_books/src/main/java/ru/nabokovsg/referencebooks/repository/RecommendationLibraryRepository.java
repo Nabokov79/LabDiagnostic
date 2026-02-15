@@ -8,10 +8,10 @@ import java.util.Set;
 
 public interface RecommendationLibraryRepository extends JpaRepository<RecommendationLibrary, Long> {
 
-    boolean existsByEquipmentLibraryIdAndRecommendation(Long equipmentLibraryId, String recommendation);
+    boolean existsByEquipmentIdAndRecommendation(Long equipmentLibraryId, String recommendation);
 
-    Set<RecommendationLibrary> findAllByEquipmentLibraryId(Long equipmentLibraryId);
+    Set<RecommendationLibrary> findAllByEquipmentId(Long equipmentLibraryId);
 
-    @Query("select r from RecommendationLibrary r order by r.equipmentLibrary desc")
+    @Query("select r from RecommendationLibrary r order by r.equipment.equipmentFullName desc")
     Set<RecommendationLibrary> findAllByOrderByEquipmentLibrary();
 }

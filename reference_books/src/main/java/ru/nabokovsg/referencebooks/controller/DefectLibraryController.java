@@ -55,8 +55,8 @@ public class DefectLibraryController {
     @Operation(summary = "Получить дефекты")
     @GetMapping("/defects")
     public ResponseEntity<List<ResponseShortDefectLibraryDto>> getAll(
-                                          @RequestParam(name = "defect", required = false) String defect) {
-        return ResponseEntity.ok().body(service.getAll(defect));
+                                          @RequestParam(name = "search", required = false) String search) {
+        return ResponseEntity.ok().body(service.getAll(search));
     }
 
     @Operation(summary = "Удалить дефект")

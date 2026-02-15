@@ -1,5 +1,6 @@
 package ru.nabokovsg.referencebooks.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,10 +18,10 @@ public class RecommendationLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "equipment")
-    private String equipmentLibrary;
-    @Column(name = "equipment_id")
-    private Long equipmentLibraryId;
     @Column(name = "recommendation")
     private String recommendation;
+    @ManyToOne
+    @JoinColumn(name = "equipment_id")
+    @JsonIgnore
+    private EquipmentLibrary equipment;
 }

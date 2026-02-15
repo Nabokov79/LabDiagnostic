@@ -16,9 +16,13 @@ import lombok.Setter;
 public class NewDeviationsGeodesyLibraryDto {
 
     @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentTypeId should not be null")
-    @Positive(message = "equipmentTypeId can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "equipment id should not be null")
+    @Positive(message = "equipment id can only be positive")
+    private Long equipmentId;
+    @Schema(description = "Идентификатор нормативно-технического документа")
+    @NotNull(message = "documentation id should not be null")
+    @Positive(message = "documentation id can only be positive")
+    private Long documentationId;
     @Schema(description = "Наличие теплоносителя")
     @NotNull(message = "withHeatCarrier should not be null")
     private Boolean withHeatCarrier;

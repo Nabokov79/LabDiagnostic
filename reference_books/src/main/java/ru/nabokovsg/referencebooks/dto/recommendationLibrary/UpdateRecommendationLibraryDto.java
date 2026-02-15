@@ -19,9 +19,9 @@ public class UpdateRecommendationLibraryDto {
     @Positive(message = "id can only be positive")
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentLibrary id should not be null")
-    @Positive(message = "equipmentLibrary id can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "equipment id should not be null")
+    @Positive(message = "equipment id can only be positive")
+    private Long equipmentId;
     @Schema(description = "Рекомендация")
     @NotNull(message = "recommendation should not be null")
     @NotBlank(message = "recommendation should not be blank")

@@ -1,21 +1,21 @@
 package ru.nabokovsg.referencebooks.service;
 
-import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.NewAcceptableMetalHardnessLibraryDto;
-import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseAcceptableMetalHardnessLibraryDto;
-import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseShortAcceptableMetalHardnessLibraryDto;
-import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.UpdateAcceptableMetalHardnessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.NewMetalHardnessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseMetalHardnessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.ResponseShortMetalHardnessLibraryDto;
+import ru.nabokovsg.referencebooks.dto.metalHardnessLibrary.UpdateMetalHardnessLibraryDto;
 
 import java.util.List;
 
 public interface MetalHardnessLibraryService {
 
-    ResponseShortAcceptableMetalHardnessLibraryDto save(NewAcceptableMetalHardnessLibraryDto hardnessDto);
+    ResponseShortMetalHardnessLibraryDto save(NewMetalHardnessLibraryDto hardnessDto);
 
-    ResponseShortAcceptableMetalHardnessLibraryDto update(UpdateAcceptableMetalHardnessLibraryDto hardnessDto);
+    ResponseShortMetalHardnessLibraryDto update(UpdateMetalHardnessLibraryDto hardnessDto);
 
-    ResponseAcceptableMetalHardnessLibraryDto get(Long id);
+    ResponseMetalHardnessLibraryDto get(Long id);
 
-    List<ResponseShortAcceptableMetalHardnessLibraryDto> getAll(String name);
+    List<ResponseShortMetalHardnessLibraryDto> getAll(String search);
 
     void delete(Long id);
 }

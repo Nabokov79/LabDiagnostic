@@ -57,8 +57,9 @@ public class DeviationsGeodesyLibraryController {
     @Operation(summary = "Получить все допустимые значения отклонений")
     @GetMapping("/geodesy/deviations")
     public ResponseEntity<List<ResponseDeviationsGeodesyLibraryDto>> getAll(
-            @RequestParam(name = "name", required = false)  @Parameter(description = "Наименование, объем оборудования") String name) {
-        return ResponseEntity.ok().body(service.getAll(name));
+                                        @RequestParam(name = "search", required = false)
+                                        @Parameter(description = "Наименование, объем оборудования") String search) {
+        return ResponseEntity.ok().body(service.getAll(search));
     }
 
     @Operation(summary = "Удалить допустимое значение отклонения")

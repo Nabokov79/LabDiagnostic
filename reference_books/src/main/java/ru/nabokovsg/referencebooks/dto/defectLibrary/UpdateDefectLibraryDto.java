@@ -23,13 +23,13 @@ public class UpdateDefectLibraryDto {
     @Positive(message = "id can only be positive")
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentLibrary id should not be null")
-    @Positive(message = "equipmentLibrary id can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "equipment id should not be null")
+    @Positive(message = "equipment id can only be positive")
+    private Long equipmentId;
     @Schema(description = "Идентификатор нормативно-технического документа")
-    @NotNull(message = "documentationLibraryId should not be null")
-    @Positive(message = "documentationLibraryId can only be positive")
-    private Long documentationLibraryId;
+    @NotNull(message = "documentation id should not be null")
+    @Positive(message = "documentation id can only be positive")
+    private Long documentationId;
     @Schema(description = "Наименование дефекта")
     @NotNull(message = "defectName should not be null")
     @NotBlank(message = "defectName should not be blank")

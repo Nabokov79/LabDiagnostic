@@ -9,6 +9,7 @@ import ru.nabokovsg.referencebooks.dto.partElementLibrary.UpdatePartElementLibra
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.PartElementLibraryMapper;
+import ru.nabokovsg.referencebooks.model.ElementLibrary;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.model.PartElementLibrary;
 import ru.nabokovsg.referencebooks.repository.PartElementLibraryRepository;
@@ -31,24 +32,16 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
 
     @Override
     public ResponseShortPartElementLibraryDto save(NewPartElementLibraryDto partElementDto) {
-        String fullName = getFullName(partElementDto.getName(), partElementDto.getPlace());
-        exists(null, partElementDto.getElementLibraryId(), fullName);
-        PartElementLibrary partElement = mapper.mapToPartElementLibrary(partElementDto, fullName
-                , factory.createDimensions(partElementDto.getDiameter(), partElementDto.getLength(), partElementDto.getHeight(), partElementDto.getWidth())
-                , factory.createStandardSize(partElementDto.getDiameterSize(), partElementDto.getThicknessSize()));
-        mapper.mapToElementLibrary(partElement
-                , elementLibraryService.getById(partElementDto.getElementLibraryId()));
+        PartElementLibrary partElement = mapper.mapToPartElementLibrary(partElementDto);
+        build(partElement, partElementDto.getElementId());
         return mapper.mapToResponseShortPartElementLibraryDto(repository.save(partElement));
     }
 
     @Override
     public ResponseShortPartElementLibraryDto update(UpdatePartElementLibraryDto partElementDto) {
-        String fullName = getFullName(partElementDto.getName(), partElementDto.getPlace());
-        exists(partElementDto.getId(), partElementDto.getElementLibraryId(), fullName);
         PartElementLibrary partElement = getById(partElementDto.getId());
-        mapper.mapToUpdatePartElementLibrary(partElement, partElementDto, fullName
-                , factory.createDimensions(partElementDto.getDiameter(), partElementDto.getLength(), partElementDto.getHeight(), partElementDto.getWidth())
-                , factory.createStandardSize(partElementDto.getDiameterSize(), partElementDto.getThicknessSize()));
+        mapper.mapToUpdatePartElementLibrary(partElement, partElementDto);
+        build(partElement, partElementDto.getElementId());
         return mapper.mapToResponseShortPartElementLibraryDto(repository.save(partElement));
     }
 
@@ -59,7 +52,7 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
 
     @Override
     public List<ResponseShortPartElementLibraryDto> getAll(Long id, String name) {
-        Set<PartElementLibrary> partsElement = repository.findAllByElementIdOrderByFullName(id);
+        Set<PartElementLibrary> partsElement = repository.findAllByElementIdOrderByFullNameDesc(id);
         if (name != null) {
             final String fullName = name.toLowerCase();
             partsElement = partsElement.stream()
@@ -86,12 +79,24 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
         return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
     }
 
-    private void exists(Long id, Long elementLibraryId, String fullName) {
+    private void build(PartElementLibrary partElement, Long elementId) {
+        String fullName = getFullName(partElement.getName(), partElement.getPlace());
+        ElementLibrary element = elementLibraryService.getById(elementId);
+        mapper.mapWithFields(partElement
+                , element
+                , String.join(", ", element.getName(), fullName)
+                , fullName
+                , factory.createDimensions(partElement.getDiameter(), partElement.getLength(), partElement.getHeight(), partElement.getWidth())
+                , factory.createStandardSize(partElement.getDiameterSize(), partElement.getThicknessSize()));
+        exists(partElement.getId(), partElement.getElement(), partElement.getFullName());
+    }
+
+    private void exists(Long id, ElementLibrary element, String fullName) {
         boolean exists = false;
         if (id == null) {
-            exists = repository.existsByElementIdAndFullName(elementLibraryId, fullName);
+            exists = repository.existsByElementAndFullName(element, fullName);
         } else {
-            Long partId = repository.findIdByElementIdAndFullName(elementLibraryId, fullName);
+            Long partId = repository.findIdByElementAndFullName(element, fullName);
             if (partId != null) {
                 exists = !Objects.equals(id, partId);
             }

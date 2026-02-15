@@ -58,9 +58,9 @@ public class DiagnosisLibraryController {
     @Operation(summary = "Получить все наименования диагностики")
     @GetMapping("/diagnostics")
     public ResponseEntity<List<ResponseShortDiagnosisLibraryDto>> getAll(
-            @RequestParam(name = "name", required = false)
-            @Parameter(description = "Наименование диагностики") String name) {
-        return ResponseEntity.ok().body(service.getAll(name));
+                                                                    @RequestParam(name = "search", required = false)
+                                                                    @Parameter(description = "Поиск") String search) {
+        return ResponseEntity.ok().body(service.getAll(search));
     }
 
     @Operation(summary = "Удалить наименование диагностики")

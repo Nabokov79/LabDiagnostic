@@ -15,15 +15,22 @@ public interface PartElementLibraryMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "element", ignore = true)
-    PartElementLibrary mapToPartElementLibrary(NewPartElementLibraryDto partElement, String fullName, String dimensions, String standardSize);
+    @Mapping(target = "partElementFullName", ignore = true)
+    @Mapping(target = "fullName", ignore = true)
+    @Mapping(target = "standardSize", ignore = true)
+    @Mapping(target = "dimensions", ignore = true)
+    PartElementLibrary mapToPartElementLibrary(NewPartElementLibraryDto partElement);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "element", ignore = true)
+    @Mapping(target = "partElementFullName", ignore = true)
+    @Mapping(target = "fullName", ignore = true)
+    @Mapping(target = "standardSize", ignore = true)
+    @Mapping(target = "dimensions", ignore = true)
     void mapToUpdatePartElementLibrary(@MappingTarget PartElementLibrary partElement
-            , UpdatePartElementLibraryDto partElementDto, String fullName, String dimensions, String standardSize);
+                                                    , UpdatePartElementLibraryDto partElementDto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "fullName", ignore = true)
     @Mapping(target = "name", ignore = true)
     @Mapping(target = "place", ignore = true)
     @Mapping(target = "diameter", ignore = true)
@@ -32,10 +39,15 @@ public interface PartElementLibraryMapper {
     @Mapping(target = "width",ignore = true)
     @Mapping(target = "diameterSize", ignore = true)
     @Mapping(target = "thicknessSize", ignore = true)
-    @Mapping(target = "standardSize", ignore = true)
-    @Mapping(target = "dimensions", ignore = true)
     @Mapping(source = "element", target = "element")
-    void mapToElementLibrary(@MappingTarget PartElementLibrary partElement, ElementLibrary element);
+    @Mapping(source = "dimensions", target = "dimensions")
+    @Mapping(source = "standardSize", target = "standardSize")
+    void mapWithFields(@MappingTarget PartElementLibrary partElement
+                                    , ElementLibrary element
+                                    , String partElementFullName
+                                    , String fullName
+                                    , String dimensions
+                                    , String standardSize);
 
     ResponseShortPartElementLibraryDto mapToResponseShortPartElementLibraryDto(PartElementLibrary partElement);
 

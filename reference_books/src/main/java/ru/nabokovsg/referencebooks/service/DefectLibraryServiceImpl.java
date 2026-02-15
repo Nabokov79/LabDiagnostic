@@ -1,8 +1,5 @@
 package ru.nabokovsg.referencebooks.service;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.defectLibrary.NewDefectLibraryDto;
@@ -14,6 +11,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DefectLibraryMapper;
 import ru.nabokovsg.referencebooks.repository.DefectLibraryRepository;
+import ru.nabokovsg.referencebooks.search.DefectDuplicateSearchService;
+import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 import ru.nabokovsg.referencebooks.validators.DefectValidator;
 
@@ -26,19 +25,20 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
 
     private final DefectLibraryRepository repository;
     private final DefectLibraryMapper mapper;
-    private final EntityManager em;
     private final EquipmentLibraryService equipmentService;
     private final RegulatoryDocumentationLibraryService documentationService;
     private final MeasuredParameterLibraryService measuredParameterService;
     private final DefectValidator validator;
     private final ToStringService toString;
+    private final SearchService searchService;
+    private final DefectDuplicateSearchService duplicateSearchService;
 
     @Override
     public ResponseShortDefectLibraryDto save(NewDefectLibraryDto defectDto) {
         List<MeasurementParameterLibrary> measuredParameters =
                 measuredParameterService.create(defectDto.getMeasuredParametersLibrary());
         DefectLibrary defect = mapper.mapToDefectLibrary(defectDto);
-        build(defect, measuredParameters);
+        build(defect, measuredParameters, defectDto.getEquipmentId(), defectDto.getDocumentationId());
         defect = repository.save(defect);
         measuredParameterService.saveDefectParameter(defect, measuredParameters);
         return mapper.mapToResponseShortDefectLibraryDto(defect);
@@ -49,7 +49,7 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
         DefectLibrary defect = getById(defectDto.getId());
         mapper.mapToUpdateDefectLibrary(defect, defectDto);
         measuredParameterService.update(defect.getMeasuredParametersLibrary(), defectDto.getMeasuredParametersLibrary());
-        build(defect, defect.getMeasuredParametersLibrary());
+        build(defect, defect.getMeasuredParametersLibrary(), defectDto.getEquipmentId(), defectDto.getDocumentationId());
         measuredParameterService.saveDefectParameter(defect, defect.getMeasuredParametersLibrary());
         return mapper.mapToResponseShortDefectLibraryDto(repository.save(defect));
     }
@@ -60,14 +60,14 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
     }
 
     @Override
-    public List<ResponseShortDefectLibraryDto> getAll(String defect) {
+    public List<ResponseShortDefectLibraryDto> getAll(String search) {
         Set<DefectLibrary> defects = repository.findAllOrderByName();
-        if (defect != null) {
-            final String defectName = defect.toLowerCase();
+        if (search != null) {
             return defects.stream()
-                          .filter(d -> d.getEquipmentLibrary().toLowerCase().contains(defectName)
-                                    || d.getDocumentationLibrary().toLowerCase().contains(defectName)
-                                    || d.getName().toLowerCase().contains(defectName))
+                    .filter(d ->
+                            searchService.search(search, List.of(d.getEquipment().getEquipmentFullName()
+                                                               , d.getDocumentation().getDocument()
+                                                               , d.getName())))
                           .map(mapper::mapToResponseShortDefectLibraryDto)
                           .toList();
         }
@@ -91,11 +91,11 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
                 .orElseThrow(() -> new NotFoundException(ExceptionMassage.NOT_DEFECT.label));
     }
 
-    private void build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters) {
+    private void build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters, Long equipmentId, Long documentationId) {
         QualityAssessment qualityAssessmentType = getQualityAssessment(defect.getQualityAssessment());
         mapper.mapWithFields(defect
-                , toString.getEquipmentLibraryFullName(equipmentService.getById(defect.getEquipmentLibraryId()))
-                , documentationService.getDocument(defect.getDocumentationLibraryId())
+                , equipmentService.getById(equipmentId)
+                , documentationService.getById(documentationId)
                 , toString.measuredParameters(measuredParameters)
                 , toString.thickness(defect.getMinThickness(), defect.getMaxThickness())
                 , toString.additionalEvaluationParameters(defect.getTotalLengthMM(), defect.getTotalLengthPercentage())
@@ -103,77 +103,11 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
                 , qualityAssessmentType.label
                 , qualityAssessmentType);
         validator.validate(defect, measuredParameters);
-        exists(defect);
+        duplicateSearchService.exists(defect, equipmentId, documentationId);
     }
 
     private QualityAssessment getQualityAssessment(String qualityAssessmentType) {
         return QualityAssessment.from(qualityAssessmentType).orElseThrow(
                 () -> new BadRequestException(String.format("Оценка качества не поддерживается: %s", qualityAssessmentType)));
-    }
-
-    private void exists(DefectLibrary defect) {
-        boolean exists = false;
-        if (defect.getId() == null) {
-            exists = getDuplicate(defect) != null;
-        } else {
-            Long id = getDuplicate(defect);
-            if (id != null) {
-                exists = !defect.getId().equals(id);
-            }
-        }
-        if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label,
-                    String.join(" ", defect.getName(), "по", defect.getDocumentationLibrary())));
-        }
-    }
-
-    private Long getDuplicate(DefectLibrary defect) {
-        QDefectLibrary defectLibrary = QDefectLibrary.defectLibrary;
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(defectLibrary.equipmentLibraryId.eq(defect.getEquipmentLibraryId()));
-        builder.and(defectLibrary.name.eq(defect.getName()));
-        builder.and(defectLibrary.documentationLibraryId.eq(defect.getDocumentationLibraryId()));
-        if (defect.getMinThickness() != null || defect.getMaxThickness() != null) {
-            if (defect.getMinThickness() != null) {
-                builder.and(defectLibrary.minThickness.eq(defect.getMinThickness()));
-            }
-            if (defect.getMaxThickness() != null) {
-                builder.and(defectLibrary.maxThickness.eq(defect.getMaxThickness()));
-            }
-            return new JPAQueryFactory(em).select(defectLibrary.id)
-                                          .from(defectLibrary)
-                                          .where(builder)
-                                          .fetchOne();
-        }
-        return filterDuplicates(defect, new JPAQueryFactory(em).select(defectLibrary)
-                                                               .from(defectLibrary)
-                                                               .where(builder)
-                                                               .fetch());
-    }
-
-    private Long filterDuplicates(DefectLibrary defect, List<DefectLibrary> defects) {
-        Long[] id = {null};
-        if (defect.getMinThickness() != null && defect.getMaxThickness() != null) {
-            defects.forEach(v -> {
-                if (v.getMinThickness() != null && v.getMaxThickness() != null) {
-                    id[0] = v.getId();
-                }
-            });
-        }
-        if (defect.getMinThickness() == null) {
-            defects.forEach(v -> {
-                if (v.getMinThickness() == null) {
-                    id[0] = v.getId();
-                }
-            });
-        }
-        if (defect.getMaxThickness() == null) {
-            defects.forEach(v -> {
-                if (v.getMaxThickness() == null) {
-                    id[0] = v.getId();
-                }
-            });
-        }
-        return id[0];
     }
 }

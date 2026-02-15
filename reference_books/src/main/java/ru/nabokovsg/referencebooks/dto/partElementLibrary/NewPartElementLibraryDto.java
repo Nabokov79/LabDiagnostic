@@ -19,7 +19,7 @@ public class NewPartElementLibraryDto {
     @Schema(description = "Идентификатор элемента")
     @NotNull(message = "element id should not be null")
     @Positive(message = "element id can only be positive")
-    private Long elementLibraryId;
+    private Long elementId;
     @Schema(description = "Наименование подэлемента")
     @NotNull(message = "name should not be null")
     @NotBlank(message = "name should not be blank")

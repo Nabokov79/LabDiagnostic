@@ -19,20 +19,16 @@ public class UpdateResidualThicknessLibraryDto {
     @Positive(message = "id can only be positive")
     private Long id;
     @Schema(description = "Идентификатор нормативно-технического документа")
-    @NotNull(message = "documentationLibraryId should not be null")
-    @Positive(message = "documentationLibraryId can only be positive")
-    private Long documentationLibraryId;
-    @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentLibraryId should not be null")
-    @Positive(message = "equipmentLibraryId can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "documentation id should not be null")
+    @Positive(message = "documentation id can only be positive")
+    private Long documentationId;
     @Schema(description = "Идентификатор элемента оборудования")
-    @NotNull(message = "elementLibraryId should not be null")
-    @Positive(message = "elementLibraryId can only be positive")
-    private Long elementLibraryId;
+    @NotNull(message = "element id should not be null")
+    @Positive(message = "element id can only be positive")
+    private Long elementId;
     @Schema(description = "Идентификатор подэлемента элемента оборудования")
-    @Positive(message = "partElementLibraryId can only be positive")
-    private Long partElementLibraryId;
+    @Positive(message = "partElement id can only be positive")
+    private Long partElementId;
     @Schema(description = "Диаметр элемента(подэлемента)")
     @Positive(message = "diameter can only be positive")
     private Double diameter;

@@ -14,7 +14,7 @@ public interface RegulatoryDocumentationLibraryRepository extends JpaRepository<
     @Query("select d.id from RegulatoryDocumentationLibrary d where d.document = ?1")
     Long findIdByDocument(String document);
 
-    @Query("select d from RegulatoryDocumentationLibrary d order by d.fullName")
+    @Query("select d from RegulatoryDocumentationLibrary d order by d.fullName desc")
     Set<RegulatoryDocumentationLibrary> findAllOrderByFullName();
 
     @Query("select d.document from RegulatoryDocumentationLibrary d where d.id =?1")

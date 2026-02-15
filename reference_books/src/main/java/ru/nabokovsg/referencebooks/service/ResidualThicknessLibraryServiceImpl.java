@@ -12,16 +12,16 @@ import ru.nabokovsg.referencebooks.dto.residualThicknessLibrary.UpdateResidualTh
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.ResidualThicknessLibraryMapper;
+import ru.nabokovsg.referencebooks.model.PartElementLibrary;
 import ru.nabokovsg.referencebooks.model.QResidualThicknessLibrary;
 import ru.nabokovsg.referencebooks.model.ResidualThicknessLibrary;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.ResidualThicknessLibraryRepository;
-import ru.nabokovsg.referencebooks.service_factory.EquipmentInformationBuilderService;
+import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 import ru.nabokovsg.referencebooks.validators.SizeAcceptableCheckingValidator;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,47 +33,45 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
     private final ResidualThicknessLibraryMapper mapper;
     private final RegulatoryDocumentationLibraryService documentationService;
     private final SizeAcceptableCheckingValidator validator;
-    private final EquipmentInformationBuilderService builderService;
     private final EntityManager em;
     private final ToStringService toString;
+    private final SearchService searchService;
+    private final ElementLibraryService elementService;
+    private final PartElementLibraryService partElementService;
     private final static String MASSAGE = "Допустимые значения остаточной толщины не обнаружены.";
 
     @Override
-    public ResponseShortResidualThicknessLibraryDto save(NewResidualThicknessLibraryDto thicknessDto) {
-        ResidualThicknessLibrary residualThickness = mapper.mapToAcceptableThickness(thicknessDto);
-        validate(residualThickness);
-        build(residualThickness);
-        return mapper.mapToResponseShortResidualThicknessLibraryDto(repository.save(residualThickness));
+    public ResponseShortResidualThicknessLibraryDto save(NewResidualThicknessLibraryDto residualThicknessDto) {
+        ResidualThicknessLibrary residualThickness = mapper.mapToResidualThickness(residualThicknessDto);
+        build(residualThickness, residualThicknessDto.getElementId()
+                , residualThicknessDto.getPartElementId(), residualThicknessDto.getDocumentationId());
+        return getResponseShortMetalHardnessLibraryDto(repository.save(residualThickness));
     }
 
     @Override
-    public ResponseShortResidualThicknessLibraryDto update(UpdateResidualThicknessLibraryDto thicknessDto) {
-        ResidualThicknessLibrary residualThickness = getById(thicknessDto.getId());
-        mapper.mapToUpdateAcceptableThickness(residualThickness, thicknessDto);
-        validate(residualThickness);
-        build(residualThickness);
-        return mapper.mapToResponseShortResidualThicknessLibraryDto(repository.save(residualThickness));
+    public ResponseShortResidualThicknessLibraryDto update(UpdateResidualThicknessLibraryDto residualThicknessDto) {
+        ResidualThicknessLibrary residualThickness = getById(residualThicknessDto.getId());
+        mapper.mapToUpdateResidualThickness(residualThickness, residualThicknessDto);
+        build(residualThickness, residualThicknessDto.getElementId()
+                , residualThicknessDto.getPartElementId(), residualThicknessDto.getDocumentationId());
+        return getResponseShortMetalHardnessLibraryDto(repository.save(residualThickness));
     }
 
     @Override
     public ResponseResidualThicknessLibraryDto get(Long id) {
-        return mapper.mapToResponseAcceptableResidualThicknessDto(getById(id));
+        return getResponseMetalHardnessLibraryDto(getById(id));
     }
 
     @Override
-    public List<ResponseShortResidualThicknessLibraryDto> getAll(String name) {
-        Set<ResidualThicknessLibrary> thicknesses = repository.findAllOrderByElementNameDesc();
-        if (name != null) {
-            final String search = name.toLowerCase();
+    public List<ResponseShortResidualThicknessLibraryDto> getAll(String search) {
+        Set<ResidualThicknessLibrary> thicknesses = repository.findAllOrderByEquipmentFullName();
+        if (search != null) {
             thicknesses = thicknesses.stream()
-                    .filter(hardness ->
-                            hardness.getEquipmentFullName().toLowerCase().contains(search)
-                                    || hardness.getElementFullName().toLowerCase().contains(search)
-                                    || hardness.getDocumentationLibrary().toLowerCase().contains(search))
-                    .collect(Collectors.toSet());
+                                     .filter(thickness -> searchService.search(search, getSearchList(thickness)))
+                                     .collect(Collectors.toSet());
         }
         return thicknesses.stream()
-                .map(mapper::mapToResponseShortResidualThicknessLibraryDto)
+                .map(this::getResponseShortMetalHardnessLibraryDto)
                 .toList();
     }
 
@@ -90,55 +88,39 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
         return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
     }
 
-    private void build(ResidualThicknessLibrary residualThickness) {
-        Map<String, String> information;
-        if (residualThickness.getPartElementLibraryId() != null) {
-            information = builderService.getByPartElement(residualThickness.getPartElementLibraryId());
+    private void build(ResidualThicknessLibrary residualThickness, Long elementId, Long partElementId, Long documentationId) {
+        validate(residualThickness);
+        if (partElementId != null) {
+            PartElementLibrary partElement = partElementService.getById(partElementId);
+            mapper.mapWithPartElement(residualThickness
+                    , partElement.getElement()
+                    , partElement
+                    , documentationService.getById(documentationId)
+                    , toString.getStandardSize(residualThickness.getDiameter(), residualThickness.getThickness()));
         } else {
-            information = builderService.getByElement(residualThickness.getElementLibraryId());
+            mapper.mapWithElement(residualThickness
+                    , elementService.getById(elementId)
+                    , documentationService.getById(documentationId)
+                    , toString.getStandardSize(residualThickness.getDiameter(), residualThickness.getThickness()));
         }
-        String documentationLibrary = documentationService.getDocument(residualThickness.getDocumentationLibraryId());
-        information.forEach((k,v) ->
-                mapper.mapToResidualThicknessLibrary(residualThickness, k, v, documentationLibrary
-                                                        , toString.getStandardSize(residualThickness.getDiameter()
-                                                                                , residualThickness.getThickness())));
         exists(residualThickness);
-    }
-
-    private void validate(ResidualThicknessLibrary residualThickness) {
-        validator.validateStandardSize(residualThickness.getDiameter(), residualThickness.getThickness());
-        validator.validateResidualThickness(residualThickness.getMinAcceptableThicknessMM()
-                , residualThickness.getMinAcceptableThicknessPercent()
-                , residualThickness.getMaxAcceptableThinningMM()
-                , residualThickness.getMaxAcceptableThinningPercent());
     }
 
     private void exists(ResidualThicknessLibrary thickness) {
         QResidualThicknessLibrary residualThickness = QResidualThicknessLibrary.residualThicknessLibrary;
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(residualThickness.documentationLibraryId.eq(thickness.getDocumentationLibraryId()));
-        builder.and(residualThickness.equipmentLibraryId.eq(thickness.getEquipmentLibraryId()));
-        builder.and(residualThickness.elementLibraryId.eq(thickness.getElementLibraryId()));
-        if (thickness.getPartElementLibraryId() != null) {
-            builder.and(residualThickness.partElementLibraryId.eq(thickness.getPartElementLibraryId()));
+        builder.and(residualThickness.documentation.id.eq(thickness.getDocumentation().getId()));
+        if (thickness.getElement() != null) {
+            builder.and(residualThickness.element.id.eq(thickness.getElement().getId()));
+        }
+        if (thickness.getPartElement() != null) {
+            builder.and(residualThickness.partElement.id.eq(thickness.getPartElement().getId()));
         }
         if (thickness.getDiameter() != null) {
             builder.and(residualThickness.diameter.eq(thickness.getDiameter()));
         }
         if (thickness.getThickness() != null) {
             builder.and(residualThickness.thickness.eq(thickness.getThickness()));
-        }
-        if (thickness.getMinAcceptableThicknessMM() != null) {
-            builder.and(residualThickness.minAcceptableThicknessMM.eq(thickness.getMinAcceptableThicknessMM()));
-        }
-        if (thickness.getMinAcceptableThicknessPercent() != null) {
-            builder.and(residualThickness.minAcceptableThicknessPercent.eq(thickness.getMinAcceptableThicknessPercent()));
-        }
-        if (thickness.getMaxAcceptableThinningMM() != null) {
-            builder.and(residualThickness.maxAcceptableThinningMM.eq(thickness.getMaxAcceptableThinningMM()));
-        }
-        if (thickness.getMaxAcceptableThinningPercent() != null) {
-            builder.and(residualThickness.maxAcceptableThinningPercent.eq(thickness.getMaxAcceptableThinningPercent()));
         }
         boolean exists = false;
         if (thickness.getId() == null) {
@@ -157,7 +139,47 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, thickness.getElementFullName()));
+                    String.join("", ExceptionMassage.DUPLICATE.label, getElementFullName(thickness)));
         }
+    }
+
+    private List<String> getSearchList(ResidualThicknessLibrary thickness) {
+        if (thickness.getPartElement() != null) {
+            return List.of(thickness.getPartElement().getElement().getEquipment().getEquipmentFullName()
+                    , thickness.getPartElement().getPartElementFullName()
+                    , thickness.getDocumentation().getDocument());
+        }
+        return List.of(thickness.getElement().getEquipment().getEquipmentFullName()
+                , thickness.getElement().getName()
+                , thickness.getDocumentation().getDocument());
+    }
+
+    private String getElementFullName(ResidualThicknessLibrary thickness) {
+        if (thickness.getPartElement() != null) {
+            return thickness.getPartElement().getPartElementFullName();
+        }
+        return thickness.getElement().getName();
+    }
+
+    private ResponseResidualThicknessLibraryDto getResponseMetalHardnessLibraryDto(ResidualThicknessLibrary thickness) {
+        if (thickness.getPartElement() != null) {
+            return mapper.mapToResponseResidualThicknessDtoByPartElement(thickness);
+        }
+        return mapper.mapToResponseResidualThicknessDtoByElement(thickness);
+    }
+
+    private ResponseShortResidualThicknessLibraryDto getResponseShortMetalHardnessLibraryDto(ResidualThicknessLibrary thickness) {
+        if (thickness.getPartElement() != null) {
+            return mapper.mapToResponseShortResidualThicknessLibraryDtoByByPartElement(thickness);
+        }
+        return mapper.mapToResponseShortResidualThicknessLibraryDtoByByElement(thickness);
+    }
+
+    private void validate(ResidualThicknessLibrary residualThickness) {
+        validator.validateStandardSize(residualThickness.getDiameter(), residualThickness.getThickness());
+        validator.validateResidualThickness(residualThickness.getMinAcceptableThicknessMM()
+                                          , residualThickness.getMinAcceptableThicknessPercent()
+                                          , residualThickness.getMaxAcceptableThinningMM()
+                                          , residualThickness.getMaxAcceptableThinningPercent());
     }
 }

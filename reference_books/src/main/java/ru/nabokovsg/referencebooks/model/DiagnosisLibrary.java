@@ -1,5 +1,6 @@
 package ru.nabokovsg.referencebooks.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,14 +18,14 @@ public class DiagnosisLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "equipment")
-    private String equipmentLibrary;
-    @Column(name = "equipment_id")
-    private Long equipmentLibraryId;
     @Column(name = "diagnosis")
     private String diagnosis;
     @Column(name = "measurements")
     private String measurements;
     @Column(name = "measurements_type")
     private String measurementsType;
+    @ManyToOne
+    @JoinColumn(name = "equipment_id")
+    @JsonIgnore
+    private EquipmentLibrary equipment;
 }

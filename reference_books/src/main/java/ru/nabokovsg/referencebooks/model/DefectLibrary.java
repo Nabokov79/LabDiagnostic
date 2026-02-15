@@ -1,5 +1,6 @@
 package ru.nabokovsg.referencebooks.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,14 +20,6 @@ public class DefectLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "equipment")
-    private String equipmentLibrary;
-    @Column(name = "equipment_id")
-    private Long equipmentLibraryId;
-    @Column(name = "documentation")
-    private String documentationLibrary;
-    @Column(name = "documentation_id")
-    private Long documentationLibraryId;
     @Column(name = "name")
     private String name;
     @Column(name = "measured_parameters")
@@ -67,4 +60,12 @@ public class DefectLibrary {
             cascade = CascadeType.REMOVE,
             fetch = FetchType.EAGER)
     private List<MeasurementParameterLibrary> measuredParametersLibrary;
+    @ManyToOne
+    @JoinColumn(name = "documentation_id")
+    @JsonIgnore
+    private RegulatoryDocumentationLibrary documentation;
+    @ManyToOne
+    @JoinColumn(name = "equipment_id")
+    @JsonIgnore
+    private EquipmentLibrary equipment;
 }

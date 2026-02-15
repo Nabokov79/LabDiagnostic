@@ -57,9 +57,9 @@ public class RecommendationLibraryController {
     @Operation(summary = "Получить все рекомендации")
     @GetMapping("/recommendations")
     public ResponseEntity<List<ResponseRecommendationLibraryDto>> getAll(
-                                                                    @RequestParam(name = "name", required = false)
-                                                                    @Parameter(description = "поиск") String name) {
-        return ResponseEntity.ok().body(service.getAll(name));
+                                                                    @RequestParam(name = "search", required = false)
+                                                                    @Parameter(description = "поиск") String search) {
+        return ResponseEntity.ok().body(service.getAll(search));
     }
 
     @Operation(summary = "Удаление рекомендации")

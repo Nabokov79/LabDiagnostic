@@ -13,14 +13,14 @@ public class ResponseResidualThicknessLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
-    @Schema(description = "Идентификатор нормативно-технический документа")
-    private Long documentationLibraryId;
+    @Schema(description = "Идентификатор нормативно-технического документа")
+    private Long documentationId;
     @Schema(description = "Идентификатор типа оборудования")
-    private Long equipmentLibraryId;
-    @Schema(description = "Идентификатор типа элемента оборудования")
-    private Long elementLibraryId;
-    @Schema(description = "Идентификатор типа подэлемента элемента")
-    private Long partElementLibraryId;
+    private Long equipmentId;
+    @Schema(description = "Идентификатор элемента оборудования")
+    private Long elementId;
+    @Schema(description = "Идентификатор подэлемента элемента оборудования")
+    private Long partElementId;
     @Schema(description = "Диаметр элемента(подэлемента)")
     private Double diameter;
     @Schema(description = "Толщина элемента(подэлемента)")

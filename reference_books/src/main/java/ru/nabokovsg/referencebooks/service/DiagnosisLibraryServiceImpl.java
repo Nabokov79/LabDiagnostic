@@ -12,8 +12,10 @@ import ru.nabokovsg.referencebooks.mapper.DiagnosisLibraryMapper;
 import ru.nabokovsg.referencebooks.model.DiagnosisLibrary;
 import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.DiagnosisLibraryRepository;
+import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,20 +27,21 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
     private final DiagnosisLibraryRepository repository;
     private final DiagnosisLibraryMapper mapper;
     private final EquipmentLibraryService equipmentService;
+    private final SearchService searchService;
     private final ToStringService toString;
     private final static String MASSAGE = "Диагностика не обнаружена.";
 
     @Override
     public ResponseShortDiagnosisLibraryDto save(NewDiagnosisLibraryDto diagnosisDto) {
         DiagnosisLibrary diagnosisLibrary = mapper.mapToDiagnosisLibrary(diagnosisDto);
-        build(diagnosisLibrary, diagnosisDto.getMeasurementsType());
+        build(diagnosisLibrary, diagnosisDto.getMeasurementsType(), diagnosisDto.getEquipmentId());
         return mapper.mapToResponseShortDiagnosisLibraryDto(repository.save(diagnosisLibrary));
     }
 
     @Override
     public ResponseShortDiagnosisLibraryDto update(UpdateDiagnosisLibraryDto diagnosisDto) {
         DiagnosisLibrary diagnosisLibrary = mapper.mapToUpdateDiagnosisLibrary(diagnosisDto);
-        build(diagnosisLibrary, diagnosisDto.getMeasurementsType());
+        build(diagnosisLibrary, diagnosisDto.getMeasurementsType(), diagnosisDto.getEquipmentId());
         return mapper.mapToResponseShortDiagnosisLibraryDto(repository.save(diagnosisLibrary));
     }
 
@@ -49,18 +52,19 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
     }
 
     @Override
-    public List<ResponseShortDiagnosisLibraryDto> getAll(String name) {
+    public List<ResponseShortDiagnosisLibraryDto> getAll(String search) {
         Set<DiagnosisLibrary> diagnostics = repository.findAllOrderByEquipmentLibrary();
-        if (name != null) {
-            final String diagnostic = name.toLowerCase();
+        if (search != null) {
             diagnostics = diagnostics
                     .stream()
-                    .filter(diagnosis -> diagnosis.getDiagnosis().toLowerCase().contains(diagnostic)
-                                      || diagnosis.getEquipmentLibrary().toLowerCase().contains(diagnostic))
+                    .filter(diagnosis ->
+                            searchService.search(search, List.of(diagnosis.getEquipment().getEquipmentFullName()
+                                                               , diagnosis.getDiagnosis())))
                     .collect(Collectors.toSet());
         }
         return diagnostics.stream()
                           .map(mapper::mapToResponseShortDiagnosisLibraryDto)
+                          .sorted(Comparator.comparing(ResponseShortDiagnosisLibraryDto::getEquipmentFullName))
                           .toList();
     }
 
@@ -78,9 +82,9 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
                 .orElseThrow(() -> new NotFoundException(MASSAGE));
     }
 
-    private void build(DiagnosisLibrary diagnosisLibrary, List<String> measurementsType) {
+    private void build(DiagnosisLibrary diagnosisLibrary, List<String> measurementsType, Long equipmentId) {
         mapper.mapFields(diagnosisLibrary
-                , toString.getEquipmentLibraryFullName(equipmentService.getById(diagnosisLibrary.getEquipmentLibraryId()))
+                , equipmentService.getById(equipmentId)
                 , toString.getMeasurements(measurementsType)
                 , String.join(",", measurementsType));
         exists(diagnosisLibrary);
@@ -89,10 +93,10 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
     private void exists(DiagnosisLibrary diagnosisLibrary) {
         boolean exists = false;
         if (diagnosisLibrary.getId() == null) {
-            exists = repository.existsByEquipmentLibraryAndDiagnosis(diagnosisLibrary.getEquipmentLibrary()
+            exists = repository.existsByEquipmentAndDiagnosis(diagnosisLibrary.getEquipment()
                     , diagnosisLibrary.getDiagnosis());
         } else {
-            Long id = repository.findIdByEquipmentLibraryAndDiagnosis(diagnosisLibrary.getEquipmentLibrary()
+            Long id = repository.findIdByEquipmentAndDiagnosis(diagnosisLibrary.getEquipment()
                     , diagnosisLibrary.getDiagnosis());
             if (id != null) {
                 exists = !diagnosisLibrary.getId().equals(id);
@@ -101,7 +105,7 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
         if (exists) {
             throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label,
                     String.join(" ", diagnosisLibrary.getDiagnosis()
-                            , "для", diagnosisLibrary.getEquipmentLibrary())));
+                            , "для", diagnosisLibrary.getEquipment().getEquipmentFullName())));
         }
     }
 }

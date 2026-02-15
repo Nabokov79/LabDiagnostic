@@ -16,6 +16,8 @@ public class EquipmentLibrary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "equipment_full_name")
+    private String equipmentFullName;
     @Column(name = "full_name")
     private String fullName;
     @Column(name = "short_name")

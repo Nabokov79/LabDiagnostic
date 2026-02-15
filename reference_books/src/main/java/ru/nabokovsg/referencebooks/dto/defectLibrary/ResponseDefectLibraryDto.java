@@ -18,9 +18,9 @@ public class ResponseDefectLibraryDto {
     @Schema(description = "Идентификатор")
     private Long id;
     @Schema(description = "Идентификатор типа оборудования")
-    private Long equipmentLibraryId;
+    private Long equipmentId;
     @Schema(description = "Идентификатор нормативно-технического документа")
-    private Long documentationLibraryId;
+    private Long documentationId;
     @Schema(description = "Наименование дефекта")
     private String name;
     @Schema(description = "Объединить наименование с измерением параметра")

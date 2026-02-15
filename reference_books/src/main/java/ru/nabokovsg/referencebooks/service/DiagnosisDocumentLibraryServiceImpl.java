@@ -48,7 +48,7 @@ public class DiagnosisDocumentLibraryServiceImpl implements DiagnosisDocumentLib
     public List<ResponseDiagnosisDocumentLibraryDto> getAll(String name) {
         Set<DiagnosisDocumentLibrary> documents = repository.findAllOrderByDocument();
         if (name != null) {
-            final String documentName = name.toUpperCase();
+            final String documentName = name.toLowerCase();
             documents = documents.stream()
                                  .filter(document -> document.getDocument().toLowerCase().contains(documentName))
                                  .collect(Collectors.toSet());

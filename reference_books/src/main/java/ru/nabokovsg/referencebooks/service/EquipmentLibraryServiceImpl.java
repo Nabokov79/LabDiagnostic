@@ -35,9 +35,7 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
     @Override
     public ResponseShortEquipmentLibraryDto save(NewEquipmentLibraryDto equipmentDto) {
         EquipmentLibrary equipment = mapper.mapToEquipmentLibrary(equipmentDto);
-        validByDuplicate(equipment);
-        mapper.mapToDimensions(equipment, factory.createDimensions(equipment.getDiameter(), equipment.getLength()
-                                                                 , equipment.getHeight(), equipment.getWidth()));
+        build(equipment);
         return mapper.mapToResponseShortEquipmentLibraryDto(repository.save(equipment));
     }
 
@@ -45,9 +43,7 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
     public ResponseShortEquipmentLibraryDto update(UpdateEquipmentLibraryDto equipmentDto) {
         EquipmentLibrary equipment = getById(equipmentDto.getId());
         mapper.mapToUpdateEquipmentLibrary(equipment, equipmentDto);
-        mapper.mapToDimensions(equipment, factory.createDimensions(equipment.getDiameter(), equipment.getLength()
-                , equipment.getHeight(), equipment.getWidth()));
-        validByDuplicate(equipment);
+        build(equipment);
         return mapper.mapToResponseShortEquipmentLibraryDto(repository.save(equipment));
     }
 
@@ -102,6 +98,13 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
         return repository.findAllById(ids);
     }
 
+    private void build(EquipmentLibrary equipment) {
+        validByDuplicate(equipment);
+        mapper.mapToDimensions(equipment
+                , getEquipmentFullName(equipment)
+                , factory.createDimensions(equipment.getDiameter(), equipment.getLength(), equipment.getHeight(), equipment.getWidth()));
+    }
+
     private void validByDuplicate(EquipmentLibrary equipment) {
         QEquipmentLibrary equipmentLibrary = QEquipmentLibrary.equipmentLibrary;
         BooleanBuilder builder = new BooleanBuilder();
@@ -119,5 +122,19 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
             throw new BadRequestException(
                                 String.join(" ", ExceptionMassage.DUPLICATE.label, equipment.getFullName()));
         }
+    }
+
+    private String getEquipmentFullName(EquipmentLibrary equipment) {
+        String volume = null;
+        if (equipment.getVolume() != null) {
+            volume = String.join("", "V=", String.valueOf(equipment.getVolume()), " м3");
+        }
+        if (volume != null) {
+            return String.join("", equipment.getFullName(), ", ", volume);
+        }
+        if (equipment.getModel() != null) {
+            return String.join("", equipment.getFullName(), ", ", equipment.getModel());
+        }
+        return equipment.getFullName();
     }
 }

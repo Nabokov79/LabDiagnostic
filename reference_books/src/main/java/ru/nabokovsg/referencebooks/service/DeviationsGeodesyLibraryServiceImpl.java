@@ -10,7 +10,7 @@ import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DeviationsGeodesyLibraryMapper;
 import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.repository.DeviationsGeodesyLibraryRepository;
-import ru.nabokovsg.referencebooks.toStringService.ToStringService;
+import ru.nabokovsg.referencebooks.search.SearchService;
 
 import java.util.List;
 import java.util.Set;
@@ -23,41 +23,42 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
     private final DeviationsGeodesyLibraryRepository repository;
     private final DeviationsGeodesyLibraryMapper mapper;
     private final EquipmentLibraryService equipmentService;
-    private final ToStringService toString;
+    private final SearchService searchService;
+    private final RegulatoryDocumentationLibraryService documentationService;
     private final static String MASSAGE = "Допустимые отклонения значений геодезических измерений не обнаружены.";
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto save(NewDeviationsGeodesyLibraryDto geodesyDto) {
-        DeviationsGeodesyLibrary geodesyLibrary = mapper.mapToAcceptableDeviationsGeodesy(geodesyDto);
-        build(geodesyLibrary);
-        return mapper.mapToResponseAcceptableDeviationsGeodesyDto(repository.save(geodesyLibrary));
+        DeviationsGeodesyLibrary geodesyLibrary = mapper.mapToDeviationsGeodesyLibrary(geodesyDto);
+        build(geodesyLibrary, geodesyDto.getEquipmentId(), geodesyDto.getDocumentationId());
+        return mapper.mapToResponseDeviationsGeodesyLibraryDto(repository.save(geodesyLibrary));
     }
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto update(UpdateDeviationsGeodesyLibraryDto geodesyDto) {
         DeviationsGeodesyLibrary geodesyLibrary = getById(geodesyDto.getId());
-        mapper.mapToUpdateAcceptableDeviationsGeodesy(geodesyLibrary, geodesyDto);
-        build(geodesyLibrary);
-        return mapper.mapToResponseAcceptableDeviationsGeodesyDto(repository.save(geodesyLibrary));
+        mapper.mapToUpdateDeviationsGeodesyLibrary(geodesyLibrary, geodesyDto);
+        build(geodesyLibrary, geodesyDto.getEquipmentId(), geodesyDto.getDocumentationId());
+        return mapper.mapToResponseDeviationsGeodesyLibraryDto(repository.save(geodesyLibrary));
     }
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto get(Long id) {
-        return mapper.mapToResponseAcceptableDeviationsGeodesyDto(getById(id));
+        return mapper.mapToResponseDeviationsGeodesyLibraryDto(getById(id));
     }
 
     @Override
-    public List<ResponseDeviationsGeodesyLibraryDto> getAll(String name) {
+    public List<ResponseDeviationsGeodesyLibraryDto> getAll(String search) {
         Set<DeviationsGeodesyLibrary> deviations = repository.findAllOrderByEquipmentLibrary();
-        if (name != null) {
-            String equipmentLibraryName = name.toLowerCase();
+        if (search != null) {
             deviations = deviations.stream()
-                    .filter(deviation -> deviation.getEquipmentLibrary().toLowerCase().contains(equipmentLibraryName))
-                    .collect(Collectors.toSet());
+                                .filter(d ->
+                                        searchService.search(search, List.of(d.getEquipment().getEquipmentFullName())))
+                                .collect(Collectors.toSet());
         }
         return deviations.stream()
-                .map(mapper::mapToResponseAcceptableDeviationsGeodesyDto)
-                .toList();
+                         .map(mapper::mapToResponseDeviationsGeodesyLibraryDto)
+                         .toList();
     }
 
     @Override
@@ -70,35 +71,37 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
     }
 
 
-    private void build(DeviationsGeodesyLibrary deviationsGeodesy) {
-        EquipmentLibrary equipment = equipmentService.getById(deviationsGeodesy.getEquipmentLibraryId());
+    private void build(DeviationsGeodesyLibrary deviationsGeodesy, Long equipmentId, Long documentationId) {
+        EquipmentLibrary equipment = equipmentService.getById(equipmentId);
         mapper.mapWithFields(deviationsGeodesy
-                , toString.getEquipmentLibraryFullName(equipment)
-                , equipment.getVolume()
-                , getHeatCarrier(deviationsGeodesy.getWithHeatCarrier())
-                , getEquipmentCondition(deviationsGeodesy.getCondition()));
+                           , equipment
+                           , documentationService.getById(documentationId)
+                           , getHeatCarrier(deviationsGeodesy.getWithHeatCarrier())
+                           , getEquipmentCondition(deviationsGeodesy.getCondition()));
         exists(deviationsGeodesy);
     }
 
     private void exists(DeviationsGeodesyLibrary deviation) {
         boolean exists = false;
         if (deviation.getId() == null) {
-            exists = repository.existsByEquipmentLibraryIdAndWithHeatCarrierAndCondition(
-                    deviation.getEquipmentLibraryId()
-                    , deviation.getWithHeatCarrier()
-                    , deviation.getCondition());
+            exists = repository.existsByEquipmentAndDocumentationAndWithHeatCarrierAndCondition(
+                                                                                          deviation.getEquipment()
+                                                                                        , deviation.getDocumentation()
+                                                                                        , deviation.getWithHeatCarrier()
+                                                                                        , deviation.getCondition());
         } else {
-            Long id = repository.findIdByEquipmentLibraryIdAndWithHeatCarrierAndCondition(
-                    deviation.getEquipmentLibraryId()
-                    , deviation.getWithHeatCarrier()
-                    , deviation.getCondition());
+            Long id = repository.findIdByEquipmentAndDocumentationAndWithHeatCarrierAndCondition(
+                                                                                          deviation.getEquipment()
+                                                                                        , deviation.getDocumentation()
+                                                                                        , deviation.getWithHeatCarrier()
+                                                                                        , deviation.getCondition());
             if (id != null) {
                 exists = !deviation.getId().equals(id);
             }
         }
         if (exists) {
             throw new BadRequestException(String.join("для ", ExceptionMassage.DUPLICATE.label
-                    , deviation.getEquipmentLibrary()));
+                    , deviation.getEquipment().getEquipmentFullName()));
         }
     }
 

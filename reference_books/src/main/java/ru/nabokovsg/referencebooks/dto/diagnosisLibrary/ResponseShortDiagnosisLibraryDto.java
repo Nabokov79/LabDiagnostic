@@ -13,8 +13,8 @@ public class ResponseShortDiagnosisLibraryDto {
 
     @Schema(description = "Идентификатор")
     private Long id;
-    @Schema(description = "Тип оборудования")
-    private String equipmentLibrary;
+    @Schema(description = "Полное наименование типа оборудования")
+    private String equipmentFullName;
     @Schema(description = "Наименование диагностики")
     private String diagnosis;
     @Schema(description = "Типы выполняемых измерений при диагностики")

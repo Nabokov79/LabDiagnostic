@@ -18,9 +18,9 @@ import java.util.List;
 public class NewDiagnosisLibraryDto {
 
     @Schema(description = "Идентификатор типа оборудования")
-    @NotNull(message = "equipmentLibrary id should not be null")
-    @Positive(message = "equipmentLibrary id can only be positive")
-    private Long equipmentLibraryId;
+    @NotNull(message = "equipment id should not be null")
+    @Positive(message = "equipment id can only be positive")
+    private Long equipmentId;
     @Schema(description = "Наименование диагностики")
     @NotNull(message = "diagnosis should not be null")
     @NotBlank(message = "diagnosis should not be blank")
