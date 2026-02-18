@@ -9,7 +9,7 @@ import ru.nabokovsg.referencebooks.dto.defectLibrary.ResponseShortDefectLibraryD
 import ru.nabokovsg.referencebooks.dto.defectLibrary.UpdateDefectLibraryDto;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
-import ru.nabokovsg.referencebooks.model.QualityAssessment;
+import ru.nabokovsg.referencebooks.model_enum.QualityAssessment;
 import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibrary;
 
 @Mapper(componentModel = "spring")

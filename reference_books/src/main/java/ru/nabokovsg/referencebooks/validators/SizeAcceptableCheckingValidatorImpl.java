@@ -2,6 +2,7 @@ package ru.nabokovsg.referencebooks.validators;
 
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 
 @Component
 public class SizeAcceptableCheckingValidatorImpl implements SizeAcceptableCheckingValidator {
@@ -9,14 +10,14 @@ public class SizeAcceptableCheckingValidatorImpl implements SizeAcceptableChecki
     @Override
     public void validateStandardSize(Double diameter, Double thickness) {
         if (diameter == null && thickness == null) {
-            throw new BadRequestException("Не заданы типоразмеры.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_STANDARD_SIZE.label);
         }
     }
 
     @Override
     public void validateAcceptableHardness(Integer minAcceptableHardness, Integer maxAcceptableHardness) {
         if (minAcceptableHardness == null && maxAcceptableHardness == null) {
-            throw new BadRequestException("Не заданы допустимые значения твердости");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_ACCEPTABLE_HARDNESS.label);
         }
     }
 
@@ -25,7 +26,7 @@ public class SizeAcceptableCheckingValidatorImpl implements SizeAcceptableChecki
                                         , Double maxAcceptableThinningMM, Integer maxAcceptableThinningPercent) {
         if (minAcceptableThicknessMM == null && minAcceptableThicknessPercent == null
                                         && maxAcceptableThinningMM == null && maxAcceptableThinningPercent == null) {
-            throw new BadRequestException("Отсутствуют допустимые значения.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_ACCEPTABLE_THICKNESS.label);
         }
     }
 }

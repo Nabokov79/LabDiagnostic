@@ -10,12 +10,13 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.MetalHardnessLibraryMapper;
 import ru.nabokovsg.referencebooks.model.*;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.MetalHardnessLibraryRepository;
 import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 import ru.nabokovsg.referencebooks.validators.SizeAcceptableCheckingValidator;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +34,6 @@ public class MetalHardnessLibraryServiceImpl implements MetalHardnessLibraryServ
     private final SearchService searchService;
     private final ElementLibraryService elementService;
     private final PartElementLibraryService partElementService;
-    private final static String MASSAGE = "Допустимое значение твердости металла не обнаружено.";
 
     @Override
     public ResponseShortMetalHardnessLibraryDto save(NewMetalHardnessLibraryDto hardnessDto) {
@@ -74,11 +74,11 @@ public class MetalHardnessLibraryServiceImpl implements MetalHardnessLibraryServ
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(MASSAGE);
+        throw new NotFoundException(NotFoundExceptionMassage.METAL_HARDNESS.label);
     }
 
     private MetalHardnessLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.METAL_HARDNESS.label));
     }
 
     private void build(MetalHardnessLibrary metalHardness, Long elementId, Long partElementId, Long documentationId) {
@@ -110,7 +110,7 @@ public class MetalHardnessLibraryServiceImpl implements MetalHardnessLibraryServ
         }
         if (duplicate != null && (metalHardness.getId() == null || !Objects.equals(duplicate.getId(), metalHardness.getId()))) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, getElementFullName(metalHardness)));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, getElementFullName(metalHardness)));
         }
     }
 

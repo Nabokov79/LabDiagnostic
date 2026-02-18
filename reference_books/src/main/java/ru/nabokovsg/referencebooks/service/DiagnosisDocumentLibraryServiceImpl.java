@@ -9,7 +9,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DiagnosisDocumentLibraryMapper;
 import ru.nabokovsg.referencebooks.model.DiagnosisDocumentLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.DiagnosisDocumentLibraryRepository;
 
 import java.util.List;
@@ -22,7 +23,6 @@ public class DiagnosisDocumentLibraryServiceImpl implements DiagnosisDocumentLib
 
     private final DiagnosisDocumentLibraryRepository repository;
     private final DiagnosisDocumentLibraryMapper mapper;
-    private final static String NOT_FOUND = "Документ не найден.";
 
     @Override
     public ResponseDiagnosisDocumentLibraryDto save(NewDiagnosisDocumentLibraryDto documentDto) {
@@ -64,11 +64,11 @@ public class DiagnosisDocumentLibraryServiceImpl implements DiagnosisDocumentLib
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.DOCUMENT.label);
     }
 
     private DiagnosisDocumentLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DOCUMENT.label));
     }
 
     private void exists(DiagnosisDocumentLibrary document) {
@@ -83,7 +83,7 @@ public class DiagnosisDocumentLibraryServiceImpl implements DiagnosisDocumentLib
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, document.getDocument()));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, document.getDocument()));
         }
     }
 }

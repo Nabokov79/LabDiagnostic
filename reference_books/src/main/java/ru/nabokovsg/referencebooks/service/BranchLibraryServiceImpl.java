@@ -10,7 +10,8 @@ import ru.nabokovsg.referencebooks.model.BranchLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.BranchLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.BranchLibraryRepository;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class BranchLibraryServiceImpl implements BranchLibraryService {
     private final BranchLibraryRepository repository;
     private final BranchLibraryMapper mapper;
     private final OrganizationLibraryService service;
-    private final static String NOT_FOUND = "Филиал не обнаружен";
 
     @Override
     public ResponseShortBranchLibraryDto save(NewBranchLibraryDto branchDto) {
@@ -67,20 +67,20 @@ public class BranchLibraryServiceImpl implements BranchLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.BRANCH.label);
     }
 
     @Override
     public BranchLibrary getById(Long id) {
         return repository.findById(id)
-                         .orElseThrow(() -> new NotFoundException(NOT_FOUND));
+                         .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.BRANCH.label));
 
     }
 
     @Override
     public String getFullNameById(long id) {
         return repository.findFullNameById(id)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.BRANCH.label));
     }
 
     private void exists(Long id, String fullName) {
@@ -92,7 +92,7 @@ public class BranchLibraryServiceImpl implements BranchLibraryService {
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label,fullName));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, fullName));
         }
     }
 }

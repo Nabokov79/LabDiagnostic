@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import ru.nabokovsg.referencebooks.dto.equipmentLibrary.ResponseShortEquipmentLibraryDto;
-import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryStatus;
-import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryType;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryStatus;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryType;
 
 import java.util.List;
 

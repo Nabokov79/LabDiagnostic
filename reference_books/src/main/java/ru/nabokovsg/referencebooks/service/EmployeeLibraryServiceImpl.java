@@ -10,7 +10,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.EmployeeLibraryMapper;
 import ru.nabokovsg.referencebooks.model.EmployeeLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.EmployeeLibraryRepository;
 
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
     private final BranchLibraryService branchService;
     private final DepartmentLibraryService departmentService;
     private final HeatSupplySourceLibraryService sourceService;
-    private final static String NOT_FOUND = "Сотрудник не найден.";
 
     @Override
     public ResponseShortEmployeeLibraryDto save(NewEmployeeLibraryDto employeeDto) {
@@ -45,7 +45,7 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
             create(employee);
             return mapper.mapToResponseShortEmployeeLibraryDto(repository.save(employee));
         }
-        throw new NotFoundException(String.format(NOT_FOUND));
+        throw new NotFoundException(String.format(NotFoundExceptionMassage.EMPLOYEE.label));
     }
 
     @Override
@@ -82,18 +82,18 @@ public class EmployeeLibraryServiceImpl implements EmployeeLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.EMPLOYEE.label);
     }
 
     private void exists(String email) {
         if (repository.existsByEmail(email)) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, email));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, email));
         }
     }
 
-    public EmployeeLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+    private EmployeeLibrary getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.EMPLOYEE.label));
     }
 
     private void create(EmployeeLibrary employee) {

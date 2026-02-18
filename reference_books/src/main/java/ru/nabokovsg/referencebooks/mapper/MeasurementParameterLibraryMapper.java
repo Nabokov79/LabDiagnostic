@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementParameterLibraryDto;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
-import ru.nabokovsg.referencebooks.model.ParameterCalculationType;
+import ru.nabokovsg.referencebooks.model_enum.ParameterCalculationType;
 import ru.nabokovsg.referencebooks.model.RepairLibrary;
 
 @Mapper(componentModel = "spring")

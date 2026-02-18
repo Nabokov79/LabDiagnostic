@@ -15,7 +15,8 @@ import ru.nabokovsg.referencebooks.mapper.ResidualThicknessLibraryMapper;
 import ru.nabokovsg.referencebooks.model.PartElementLibrary;
 import ru.nabokovsg.referencebooks.model.QResidualThicknessLibrary;
 import ru.nabokovsg.referencebooks.model.ResidualThicknessLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.ResidualThicknessLibraryRepository;
 import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
@@ -38,7 +39,6 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
     private final SearchService searchService;
     private final ElementLibraryService elementService;
     private final PartElementLibraryService partElementService;
-    private final static String MASSAGE = "Допустимые значения остаточной толщины не обнаружены.";
 
     @Override
     public ResponseShortResidualThicknessLibraryDto save(NewResidualThicknessLibraryDto residualThicknessDto) {
@@ -81,11 +81,11 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(MASSAGE);
+        throw new NotFoundException(NotFoundExceptionMassage.RESIDUAL_THICKNESS.label);
     }
 
     private ResidualThicknessLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.RESIDUAL_THICKNESS.label));
     }
 
     private void build(ResidualThicknessLibrary residualThickness, Long elementId, Long partElementId, Long documentationId) {
@@ -139,7 +139,7 @@ public class ResidualThicknessLibraryServiceImpl implements ResidualThicknessLib
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, getElementFullName(thickness)));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, getElementFullName(thickness)));
         }
     }
 

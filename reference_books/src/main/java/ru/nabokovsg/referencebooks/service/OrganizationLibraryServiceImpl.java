@@ -10,7 +10,8 @@ import ru.nabokovsg.referencebooks.model.OrganizationLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.OrganizationLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.OrganizationLibraryRepository;
 
 import java.util.List;
@@ -23,7 +24,6 @@ public class OrganizationLibraryServiceImpl implements OrganizationLibraryServic
 
     private final OrganizationLibraryRepository repository;
     private final OrganizationLibraryMapper mapper;
-    private final static String NOT_FOUND = "Организация не обнаружена";
 
     @Override
     public ResponseShortOrganizationLibraryDto save(NewOrganizationLibraryDto organizationDto) {
@@ -65,18 +65,18 @@ public class OrganizationLibraryServiceImpl implements OrganizationLibraryServic
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.ORGANIZATION.label);
     }
 
     @Override
     public OrganizationLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.ORGANIZATION.label));
     }
 
     private void validateByFullName(String fullName) {
         if (repository.existsByFullName(fullName)) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, fullName));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, fullName));
         }
     }
 }

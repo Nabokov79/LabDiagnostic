@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 
 import java.util.List;
 
@@ -41,7 +42,6 @@ public class DefectValidatorImpl implements DefectValidator {
                 validateAssessmentArea(defect);
                 validStandardSize(defect);
             }
-            //"NOT_ACCEPTABLE"
             default -> {
                 parameterValidator.validateByWithoutNamingParameter(defect.getWithoutNamingParameter(), measuredParameters);
                 validateNotNullEvaluationAreaUnacceptable(defect);
@@ -54,25 +54,25 @@ public class DefectValidatorImpl implements DefectValidator {
 
     private void validateAssessmentArea(DefectLibrary defect) {
         if (defect.getAssessmentAreaMM() != null && defect.getAssessmentAreaPercentage() != null) {
-            throw new BadRequestException("Недопустимое количество оценочных участков.");
+            throw new BadRequestException(BadRequestExceptionMassage.UNACCEPTABLE_QUANTITY.label);
         }
     }
 
     private void validateNotNullEvaluationAreaUnacceptable(DefectLibrary defect) {
         if (defect.getAssessmentAreaMM() != null || defect.getAssessmentAreaPercentage() != null) {
-            throw new BadRequestException("Оценка по участку недопустима.");
+            throw new BadRequestException(BadRequestExceptionMassage.ESTIMATION_PLOT_UNACCEPTABLE.label);
         }
     }
 
     private void validateNotNullTotalLengthUnacceptable(DefectLibrary defect) {
         if (defect.getTotalLengthMM() != null || defect.getTotalLengthPercentage() != null) {
-            throw new BadRequestException("Оценка по суммарной длине недопустима.");
+            throw new BadRequestException(BadRequestExceptionMassage.ESTIMATION_LENGTH_UNACCEPTABLE.label);
         }
     }
 
     private void validateNotNullDefectsQuantity(DefectLibrary defect) {
         if (defect.getDefectsQuantity() != null) {
-            throw new BadRequestException("Оценка по количеству дефектов недопустима.");
+            throw new BadRequestException(BadRequestExceptionMassage.ESTIMATION_QUANTITY_UNACCEPTABLE.label);
         }
     }
 
@@ -84,10 +84,10 @@ public class DefectValidatorImpl implements DefectValidator {
     private void validNominalDiameters(DefectLibrary defect) {
         if (defect.getMinDiameter() != null && defect.getMaxDiameter() != null) {
             if (defect.getMinDiameter().equals(defect.getMaxDiameter())) {
-                throw new BadRequestException("Номинальные диаметры соединяемых элементов не могут быть равны.");
+                throw new BadRequestException(BadRequestExceptionMassage.DIAMETERS_CANNOT_EQUAL.label);
             }
             if (defect.getMaxDiameter() < defect.getMinDiameter()) {
-                throw new BadRequestException("Не верно заданы номинальные диаметры соединяемых элементов.");
+                throw new BadRequestException(BadRequestExceptionMassage.DIAMETERS_INCORRECT.label);
             }
         }
     }
@@ -95,10 +95,10 @@ public class DefectValidatorImpl implements DefectValidator {
     private void validNominalThicknesses(DefectLibrary defect) {
         if (defect.getMinThickness() != null && defect.getMaxThickness() != null) {
             if (defect.getMinThickness().equals(defect.getMaxThickness())) {
-                throw new BadRequestException("Номинальные толщины соединяемых элементов не могут быть равны.");
+                throw new BadRequestException(BadRequestExceptionMassage.THICKNESS_CANNOT_EQUAL.label);
             }
             if (defect.getMaxThickness() < defect.getMinThickness()) {
-                throw new BadRequestException("Не верно заданы номинальные толщины соединяемых элементов.");
+                throw new BadRequestException(BadRequestExceptionMassage.THICKNESS_INCORRECT.label);
             }
         }
     }

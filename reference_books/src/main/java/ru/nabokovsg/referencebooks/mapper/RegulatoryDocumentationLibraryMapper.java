@@ -9,8 +9,8 @@ import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.ResponseSh
 import ru.nabokovsg.referencebooks.dto.regulatoryDocumentationLibrary.UpdateRegulatoryDocumentationLibraryDto;
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibrary;
-import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryStatus;
-import ru.nabokovsg.referencebooks.model.RegulatoryDocumentationLibraryType;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryStatus;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryType;
 
 import java.util.Set;
 

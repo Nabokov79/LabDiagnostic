@@ -9,8 +9,9 @@ import ru.nabokovsg.referencebooks.dto.heatSupplySiteLibrary.UpdateHeatSupplySit
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.HeatSupplySiteLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.HeatSupplySiteLibrary;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.HeatSupplySiteLibraryRepository;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class HeatSupplySiteLibraryServiceImpl implements HeatSupplySiteLibrarySe
     private final HeatSupplySiteLibraryRepository repository;
     private final HeatSupplySiteLibraryMapper mapper;
     private final HeatSupplySourceLibraryService sourceLibraryService;
-    private final static String NOT_FOUND = "Участок тепловой сети не обнаружен.";
 
     @Override
     public ResponseShortHeatSupplySiteLibraryDto save(NewHeatSupplySiteLibraryDto siteDto) {
@@ -68,13 +68,13 @@ public class HeatSupplySiteLibraryServiceImpl implements HeatSupplySiteLibrarySe
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.HEAT_SUPPLY_SITE.label);
     }
 
     @Override
     public HeatSupplySiteLibrary getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.HEAT_SUPPLY_SITE.label));
     }
 
     private void exists(Long id, String fullDescription) {
@@ -86,7 +86,7 @@ public class HeatSupplySiteLibraryServiceImpl implements HeatSupplySiteLibrarySe
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label, fullDescription));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label, fullDescription));
         }
     }
 }

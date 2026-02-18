@@ -14,6 +14,8 @@ import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.EquipmentLibraryMapper;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.EquipmentLibraryRepository;
 import ru.nabokovsg.referencebooks.service_factory.CopyEquipmentElementsService;
 import ru.nabokovsg.referencebooks.service_factory.ElementNameFactory;
@@ -30,7 +32,6 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
     private final ElementNameFactory factory;
     private final EntityManager em;
     private final CopyEquipmentElementsService copyService;
-    private final static String NO_FOUND = "Оборудование не обнаружено";
 
     @Override
     public ResponseShortEquipmentLibraryDto save(NewEquipmentLibraryDto equipmentDto) {
@@ -85,12 +86,12 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NO_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.EQUIPMENT.label);
     }
 
     @Override
     public EquipmentLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.EQUIPMENT.label));
     }
 
     @Override
@@ -120,7 +121,7 @@ public class EquipmentLibraryServiceImpl implements EquipmentLibraryService {
                                    .where(builder)
                                    .fetchOne() != null) {
             throw new BadRequestException(
-                                String.join(" ", ExceptionMassage.DUPLICATE.label, equipment.getFullName()));
+                                String.join(" ", BadRequestExceptionMassage.DUPLICATE.label, equipment.getFullName()));
         }
     }
 

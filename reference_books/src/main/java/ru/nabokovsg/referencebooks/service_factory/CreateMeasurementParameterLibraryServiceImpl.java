@@ -6,9 +6,10 @@ import ru.nabokovsg.referencebooks.dto.measurementParameterLibrary.MeasurementPa
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.mapper.MeasurementParameterLibraryMapper;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
-import ru.nabokovsg.referencebooks.model.MeasurementParameterType;
-import ru.nabokovsg.referencebooks.model.ParameterCalculationType;
-import ru.nabokovsg.referencebooks.model.UnitMeasurementType;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.MeasurementParameterType;
+import ru.nabokovsg.referencebooks.model_enum.ParameterCalculationType;
+import ru.nabokovsg.referencebooks.model_enum.UnitMeasurementType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,18 +80,18 @@ public class CreateMeasurementParameterLibraryServiceImpl implements CreateMeasu
     private ParameterCalculationType getParameterCalculationType(String calculation) {
         return ParameterCalculationType.from(calculation)
                 .orElseThrow(() -> new BadRequestException(
-                        String.format("Недопустимый тип расчета: %s", calculation)));
+                        String.format(BadRequestExceptionMassage.PARAMETER_CALCULATION.label, "%s", calculation)));
     }
 
     private String getMeasurementParameterType(String name) {
         return MeasurementParameterType.from(name)
                 .orElseThrow(() -> new BadRequestException(
-                        String.format("Недопустимое наименование: %s", name))).label;
+                        String.format(BadRequestExceptionMassage.MEASUREMENT_PARAMETER.label, "%s", name))).label;
     }
 
     private String getUnitMeasurementType(String unitMeasurement) {
         return UnitMeasurementType.from(unitMeasurement)
                 .orElseThrow(() -> new BadRequestException(
-                        String.format("Недопустимая единица измерения: %s", unitMeasurement))).label;
+                        String.format(BadRequestExceptionMassage.UNIT_MEASUREMENT.label, "%s", unitMeasurement))).label;
     }
 }

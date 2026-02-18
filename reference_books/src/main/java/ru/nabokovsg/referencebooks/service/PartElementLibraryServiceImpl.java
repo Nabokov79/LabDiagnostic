@@ -10,8 +10,9 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.PartElementLibraryMapper;
 import ru.nabokovsg.referencebooks.model.ElementLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.PartElementLibrary;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.PartElementLibraryRepository;
 import ru.nabokovsg.referencebooks.service_factory.ElementNameFactory;
 
@@ -28,7 +29,6 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
     private final PartElementLibraryMapper mapper;
     private final ElementLibraryService elementLibraryService;
     private final ElementNameFactory factory;
-    private final static String NO_FOUND = "Подэлемент не обнаружен";
 
     @Override
     public ResponseShortPartElementLibraryDto save(NewPartElementLibraryDto partElementDto) {
@@ -71,12 +71,12 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NO_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.PART_ELEMENT.label);
     }
 
     @Override
     public PartElementLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.PART_ELEMENT.label));
     }
 
     private void build(PartElementLibrary partElement, Long elementId) {
@@ -102,7 +102,7 @@ public class PartElementLibraryServiceImpl implements PartElementLibraryService 
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, fullName));
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, fullName));
         }
     }
     private String getFullName(String name, String place) {

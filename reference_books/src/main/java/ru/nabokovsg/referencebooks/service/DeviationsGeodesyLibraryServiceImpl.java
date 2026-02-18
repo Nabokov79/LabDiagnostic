@@ -9,6 +9,9 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DeviationsGeodesyLibraryMapper;
 import ru.nabokovsg.referencebooks.model.*;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.EquipmentCondition;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.DeviationsGeodesyLibraryRepository;
 import ru.nabokovsg.referencebooks.search.SearchService;
 
@@ -25,7 +28,6 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
     private final EquipmentLibraryService equipmentService;
     private final SearchService searchService;
     private final RegulatoryDocumentationLibraryService documentationService;
-    private final static String MASSAGE = "Допустимые отклонения значений геодезических измерений не обнаружены.";
 
     @Override
     public ResponseDeviationsGeodesyLibraryDto save(NewDeviationsGeodesyLibraryDto geodesyDto) {
@@ -67,7 +69,7 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(MASSAGE);
+        throw new NotFoundException(NotFoundExceptionMassage.GEODESIC.label);
     }
 
 
@@ -100,7 +102,7 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("для ", ExceptionMassage.DUPLICATE.label
+            throw new BadRequestException(String.join("для ", BadRequestExceptionMassage.DUPLICATE.label
                     , deviation.getEquipment().getEquipmentFullName()));
         }
     }
@@ -119,8 +121,8 @@ public class DeviationsGeodesyLibraryServiceImpl implements DeviationsGeodesyLib
         return EquipmentCondition.OLD.label;
     }
 
-    public DeviationsGeodesyLibrary getById(Long id) {
+    private DeviationsGeodesyLibrary getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(MASSAGE));
+                .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.GEODESIC.label));
     }
 }

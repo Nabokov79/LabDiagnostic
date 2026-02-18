@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.model.DefectLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.QDefectLibrary;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class DefectDuplicateSearchServiceImpl implements DefectDuplicateSearchSe
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label,
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label,
                     String.join(" ", defect.getName(), "по", defect.getDocumentation().getDocument())));
         }
     }

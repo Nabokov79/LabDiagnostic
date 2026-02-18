@@ -1,7 +1,6 @@
 package ru.nabokovsg.referencebooks.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.NewElementLibraryDto;
 import ru.nabokovsg.referencebooks.dto.elementLibrary.ResponseShortElementLibraryDto;
@@ -11,7 +10,8 @@ import ru.nabokovsg.referencebooks.model.ElementLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.ElementLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.ElementLibraryRepository;
 import ru.nabokovsg.referencebooks.service_factory.ElementNameFactory;
 
@@ -20,14 +20,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ElementLibraryServiceImpl implements ElementLibraryService {
 
     private final ElementLibraryRepository repository;
     private final ElementLibraryMapper mapper;
     private final EquipmentLibraryService equipmentLibraryService;
     private final ElementNameFactory factory;
-    private final static String NO_FOUND = "Элемент не обнаружен";
 
     @Override
     public ResponseShortElementLibraryDto save(NewElementLibraryDto elementDto) {
@@ -75,12 +73,12 @@ public class ElementLibraryServiceImpl implements ElementLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NO_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.ELEMENT.label);
     }
 
     @Override
     public ElementLibrary getById(long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NO_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.ELEMENT.label));
     }
 
     private void exists(Long id, Long equipmentLibraryId, String name) {
@@ -94,7 +92,7 @@ public class ElementLibraryServiceImpl implements ElementLibraryService {
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, name));
         }
     }
 }

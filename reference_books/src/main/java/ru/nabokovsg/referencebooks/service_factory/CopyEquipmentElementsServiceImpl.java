@@ -9,6 +9,7 @@ import ru.nabokovsg.referencebooks.mapper.ElementLibraryMapper;
 import ru.nabokovsg.referencebooks.model.ElementLibrary;
 import ru.nabokovsg.referencebooks.model.EquipmentLibrary;
 import ru.nabokovsg.referencebooks.model.PartElementLibrary;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.ElementLibraryRepository;
 import ru.nabokovsg.referencebooks.repository.PartElementLibraryRepository;
 
@@ -27,10 +28,10 @@ public class CopyEquipmentElementsServiceImpl implements CopyEquipmentElementsSe
     @Override
     public List<ResponseShortElementLibraryDto> copyElements(EquipmentLibrary equipment, EquipmentLibrary copyEquipment) {
         if (copyEquipment.getElements().isEmpty()) {
-            throw new BadRequestException("Отсутствуют элементы для копирования.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_ELEMENTS.label);
         }
         if (!equipment.getElements().isEmpty()) {
-            throw new BadRequestException("Все элементы скопированы.");
+            throw new BadRequestException(BadRequestExceptionMassage.COPY_ELEMENTS.label);
         }
         Map<String, Set<PartElementLibrary>> partsElement = new HashMap<>();
         List<ElementLibrary> elements = copyEquipment.getElements().stream()

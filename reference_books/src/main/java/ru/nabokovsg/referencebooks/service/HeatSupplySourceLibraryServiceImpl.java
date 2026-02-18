@@ -1,7 +1,6 @@
 package ru.nabokovsg.referencebooks.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.nabokovsg.referencebooks.dto.heatSupplySourceLibrary.NewHeatSupplySourceLibraryDto;
 import ru.nabokovsg.referencebooks.dto.heatSupplySourceLibrary.ResponseHeatSupplySourceLibraryDto;
@@ -10,8 +9,9 @@ import ru.nabokovsg.referencebooks.dto.heatSupplySourceLibrary.UpdateHeatSupplyS
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.HeatSupplySourceLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
 import ru.nabokovsg.referencebooks.model.HeatSupplySourceLibrary;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.HeatSupplySourceLibraryRepository;
 
 import java.util.List;
@@ -25,7 +25,6 @@ public class HeatSupplySourceLibraryServiceImpl implements HeatSupplySourceLibra
     private final HeatSupplySourceLibraryRepository repository;
     private final HeatSupplySourceLibraryMapper mapper;
     private final DepartmentLibraryService departmentService;
-    private final static String NOT_FOUND = "Источник теплоснабжения не обнаружен.";
 
     @Override
     public ResponseShortHeatSupplySourceLibraryDto save(NewHeatSupplySourceLibraryDto sourceDto) {
@@ -69,12 +68,12 @@ public class HeatSupplySourceLibraryServiceImpl implements HeatSupplySourceLibra
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.HEAT_SUPPLY_SOURCE.label);
     }
 
     @Override
     public HeatSupplySourceLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.HEAT_SUPPLY_SOURCE.label));
     }
 
     private void exists(Long id, String address) {
@@ -86,7 +85,7 @@ public class HeatSupplySourceLibraryServiceImpl implements HeatSupplySourceLibra
             exists = repository.existsByAddress(address);
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, address));
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, address));
         }
     }
 }

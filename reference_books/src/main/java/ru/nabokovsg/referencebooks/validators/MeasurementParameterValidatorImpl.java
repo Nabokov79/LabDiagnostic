@@ -2,7 +2,7 @@ package ru.nabokovsg.referencebooks.validators;
 
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
     public void validateByWithoutNamingParameter(boolean withoutNamingParameter
                                                , List<MeasurementParameterLibrary> measuredParameters) {
         if (withoutNamingParameter) {
-            throw new BadRequestException("Не подлежит измерению.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_MEASURED.label);
         }
     }
 
@@ -33,7 +33,7 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
             if (name == null) {
                 names.put(parameter.getName(), parameter.getName());
             } else {
-                throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, name));
+                throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, name));
             }
         });
     }
@@ -42,17 +42,17 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
     public void validateByQuantityMeasuredParameters(boolean withoutNamingParameter
                                                    , List<MeasurementParameterLibrary> measuredParameters) {
         if (withoutNamingParameter && measuredParameters == null) {
-            throw new BadRequestException("Отсутствуют измеряемые параметры.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_MEASURED_PARAMETERS.label);
         }
         if (withoutNamingParameter && measuredParameters.size() != 1) {
-            throw new BadRequestException("Недопустимое количество измеряемых параметров.");
+            throw new BadRequestException(BadRequestExceptionMassage.UNACCEPTABLE_PARAMETERS.label);
         }
     }
 
     @Override
     public void validateNullAcceptableSizes(MeasurementParameterLibrary measuredParameter) {
         if (!getAcceptableSizesNull(measuredParameter)) {
-            throw new BadRequestException("Оценка допустимости измеряемого параметра недоступна.");
+            throw new BadRequestException(BadRequestExceptionMassage.EVALUATION_UNACCEPTABLE.label);
         }
     }
 
@@ -60,8 +60,7 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
     public void validateNotNullAcceptableSizes(MeasurementParameterLibrary measuredParameter) {
         if (getAcceptableSizesNull(measuredParameter)) {
             throw new BadRequestException(
-                    String.format("Отсутствуют значения допустимых размеров измерения параметра для параметра: %s"
-                                                                                        , measuredParameter.getName()));
+                String.join("", BadRequestExceptionMassage.NOT_ACCEPTABLE_SIZE.label, measuredParameter.getName()));
         }
         validateAcceptableValue(measuredParameter);
     }
@@ -69,10 +68,10 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
     @Override
     public void validateAcceptableValue(MeasurementParameterLibrary measuredParameter) {
         if (equals(measuredParameter)) {
-            throw new BadRequestException("Допустимые значения параметра не могут быть равны.");
+            throw new BadRequestException(BadRequestExceptionMassage.CANNOT_EQUAL.label);
         }
         if (more(measuredParameter)) {
-            throw new BadRequestException("Не верно заданы допустимые значения.");
+            throw new BadRequestException(BadRequestExceptionMassage.INCORRECT_VALUE.label);
         }
     }
 
@@ -121,14 +120,14 @@ public class MeasurementParameterValidatorImpl implements MeasurementParameterVa
             }
         });
         if (!calculateByResidualThickness[0]) {
-            throw new BadRequestException("Отсутствуют параметры для расчета остаточной толщины.");
+            throw new BadRequestException(BadRequestExceptionMassage.MISSING_PARAMETERS.label);
         }
     }
 
     @Override
     public void validateNullMeasurementParameters(List<MeasurementParameterLibrary> measuredParameters) {
         if (measuredParameters != null) {
-            throw new BadRequestException("Не подлежит измерению.");
+            throw new BadRequestException(BadRequestExceptionMassage.NOT_MEASURED.label);
         }
     }
 }

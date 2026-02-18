@@ -6,12 +6,13 @@ import ru.nabokovsg.referencebooks.dto.repairLibrary.NewRepairLibraryDto;
 import ru.nabokovsg.referencebooks.dto.repairLibrary.ResponseRepairLibraryDto;
 import ru.nabokovsg.referencebooks.dto.repairLibrary.ResponseShortRepairLibraryDto;
 import ru.nabokovsg.referencebooks.dto.repairLibrary.UpdateRepairLibraryDto;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
 import ru.nabokovsg.referencebooks.model.RepairLibrary;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.RepairLibraryMapper;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.RepairLibraryRepository;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
 import ru.nabokovsg.referencebooks.validators.MeasurementParameterValidator;
@@ -27,7 +28,6 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
     private final MeasuredParameterLibraryService measuredParameterService;
     private final MeasurementParameterValidator parameterValidator;
     private final ToStringService toString;
-    private final static String MASSAGE = "Ремонт не обнаружен.";
 
     @Override
     public ResponseShortRepairLibraryDto save(NewRepairLibraryDto repairDto) {
@@ -75,12 +75,12 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(MASSAGE);
+        throw new NotFoundException(NotFoundExceptionMassage.REPAIR.label);
     }
 
     @Override
     public RepairLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(MASSAGE));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.REPAIR.label));
     }
 
     private void build(RepairLibrary repair, List<MeasurementParameterLibrary> measuredParameters) {
@@ -100,7 +100,7 @@ public class RepairLibraryServiceImpl implements RepairLibraryService {
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, repair.getName()));
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, repair.getName()));
         }
     }
 

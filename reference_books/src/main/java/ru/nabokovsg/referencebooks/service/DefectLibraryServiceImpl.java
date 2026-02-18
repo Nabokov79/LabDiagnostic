@@ -10,6 +10,9 @@ import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DefectLibraryMapper;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.QualityAssessment;
 import ru.nabokovsg.referencebooks.repository.DefectLibraryRepository;
 import ru.nabokovsg.referencebooks.search.DefectDuplicateSearchService;
 import ru.nabokovsg.referencebooks.search.SearchService;
@@ -82,13 +85,13 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(ExceptionMassage.NOT_DEFECT.label);
+        throw new NotFoundException(NotFoundExceptionMassage.DEFECT.label);
     }
 
     @Override
     public DefectLibrary getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ExceptionMassage.NOT_DEFECT.label));
+                .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DEFECT.label));
     }
 
     private void build(DefectLibrary defect, List<MeasurementParameterLibrary> measuredParameters, Long equipmentId, Long documentationId) {
@@ -108,6 +111,7 @@ public class DefectLibraryServiceImpl implements DefectLibraryService {
 
     private QualityAssessment getQualityAssessment(String qualityAssessmentType) {
         return QualityAssessment.from(qualityAssessmentType).orElseThrow(
-                () -> new BadRequestException(String.format("Оценка качества не поддерживается: %s", qualityAssessmentType)));
+                () -> new BadRequestException(
+                      String.format(BadRequestExceptionMassage.QUALITY_ASSESSMENT.label, "%s", qualityAssessmentType)));
     }
 }

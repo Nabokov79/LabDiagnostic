@@ -8,8 +8,9 @@ import ru.nabokovsg.referencebooks.dto.technicalDeviceLibrary.UpdateTechnicalDev
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.TechnicalDeviceLibraryMapper;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
 import ru.nabokovsg.referencebooks.model.TechnicalDevice;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.TechnicalDeviceLibraryRepository;
 
 import java.util.List;
@@ -23,7 +24,6 @@ public class TechnicalDeviceLibraryServiceImpl implements TechnicalDeviceLibrary
     private final TechnicalDeviceLibraryRepository repository;
     private final TechnicalDeviceLibraryMapper mapper;
     private final HeatSupplySiteLibraryService siteLibraryService;
-    private final static String NOT_FOUND = "Техническое устройство не обнаружено.";
 
     @Override
     public ResponseTechnicalDeviceLibraryDto save(NewTechnicalDeviceLibraryDto deviceDto) {
@@ -67,11 +67,11 @@ public class TechnicalDeviceLibraryServiceImpl implements TechnicalDeviceLibrary
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.TECHNICAL_DEVICE.label);
     }
 
     private TechnicalDevice getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.TECHNICAL_DEVICE.label));
     }
 
     private void exists(Long id, String fullName) {
@@ -83,7 +83,7 @@ public class TechnicalDeviceLibraryServiceImpl implements TechnicalDeviceLibrary
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label,fullName));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label,fullName));
         }
     }
 }

@@ -1,4 +1,4 @@
-package ru.nabokovsg.referencebooks.model;
+package ru.nabokovsg.referencebooks.model_enum;
 
 import java.util.Optional;
 

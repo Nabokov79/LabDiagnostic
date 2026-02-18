@@ -3,7 +3,7 @@ package ru.nabokovsg.referencebooks.toStringService;
 import org.springframework.stereotype.Component;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.model.MeasurementParameterLibrary;
-import ru.nabokovsg.referencebooks.model.MeasurementType;
+import ru.nabokovsg.referencebooks.model_enum.MeasurementType;
 
 import java.util.Comparator;
 import java.util.List;

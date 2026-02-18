@@ -10,6 +10,7 @@ import ru.nabokovsg.referencebooks.model.*;
 import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.RegulatoryDocumentationLibraryMapper;
+import ru.nabokovsg.referencebooks.model_enum.*;
 import ru.nabokovsg.referencebooks.repository.RegulatoryDocumentationLibraryRepository;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class RegulatoryDocumentationLibraryServiceImpl implements RegulatoryDocu
     private final RegulatoryDocumentationLibraryRepository repository;
     private final RegulatoryDocumentationLibraryMapper mapper;
     private final EquipmentLibraryService equipmentService;
-    private final static String NOT_FOUND = "Документ не найден.";
 
     @Override
     public ResponseRegulatoryDocumentationLibraryDto save(NewRegulatoryDocumentationLibraryDto documentationDto) {
@@ -74,28 +74,28 @@ public class RegulatoryDocumentationLibraryServiceImpl implements RegulatoryDocu
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.DOCUMENT.label);
     }
 
     @Override
     public RegulatoryDocumentationLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DOCUMENT.label));
     }
 
     @Override
     public String getDocument(Long id) {
-        return repository.findDocumentById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findDocumentById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DOCUMENT.label));
     }
 
     private void setDocumentType(RegulatoryDocumentationLibrary document) {
         RegulatoryDocumentationLibraryType type = RegulatoryDocumentationLibraryType.from(document.getDocumentType()).orElseThrow(
-                () -> new BadRequestException(String.format("Тип документа не поддерживается: %s", document.getDocumentType())));
+                () -> new BadRequestException(String.format(BadRequestExceptionMassage.DOCUMENT_TYPE.label, "%s", document.getDocumentType())));
         mapper.mapWithType(document, type, type.label);
     }
 
     private void setDocumentStatus(RegulatoryDocumentationLibrary document) {
         RegulatoryDocumentationLibraryStatus status = RegulatoryDocumentationLibraryStatus.from(document.getDocumentStatus()).orElseThrow(
-                () -> new BadRequestException(String.format("Статус документа не поддерживается: %s", document.getDocumentStatus())));
+                () -> new BadRequestException(String.format(BadRequestExceptionMassage.DOCUMENT_STATUS.label, "%s", document.getDocumentStatus())));
         mapper.mapWithStatus(document, status, status.label);
     }
 
@@ -122,7 +122,7 @@ public class RegulatoryDocumentationLibraryServiceImpl implements RegulatoryDocu
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label, document));
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label, document));
         }
     }
 }

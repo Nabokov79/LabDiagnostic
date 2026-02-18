@@ -2,6 +2,8 @@ package ru.nabokovsg.referencebooks.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryStatus;
+import ru.nabokovsg.referencebooks.model_enum.RegulatoryDocumentationLibraryType;
 
 import java.util.Set;
 

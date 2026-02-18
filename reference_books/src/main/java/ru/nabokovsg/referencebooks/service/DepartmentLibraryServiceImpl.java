@@ -10,7 +10,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DepartmentLibraryMapper;
 import ru.nabokovsg.referencebooks.model.DepartmentLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.DepartmentLibraryRepository;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class DepartmentLibraryServiceImpl implements DepartmentLibraryService {
     private final DepartmentLibraryRepository repository;
     private final DepartmentLibraryMapper mapper;
     private final BranchLibraryService service;
-    private final static String NOT_FOUND = "Подразделение не обнаружено.";
 
     @Override
     public ResponseShortDepartmentLibraryDto save(NewDepartmentLibraryDto departmentDto) {
@@ -68,12 +68,12 @@ public class DepartmentLibraryServiceImpl implements DepartmentLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(NOT_FOUND);
+        throw new NotFoundException(NotFoundExceptionMassage.DEPARTMENT.label);
     }
 
     @Override
     public DepartmentLibrary getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DEPARTMENT.label));
     }
 
     private void exists(Long id, String fullName) {
@@ -85,7 +85,7 @@ public class DepartmentLibraryServiceImpl implements DepartmentLibraryService {
         }
         if (exists) {
             throw new BadRequestException(
-                    String.join("", ExceptionMassage.DUPLICATE.label,fullName));
+                    String.join("", BadRequestExceptionMassage.DUPLICATE.label,fullName));
         }
     }
 }

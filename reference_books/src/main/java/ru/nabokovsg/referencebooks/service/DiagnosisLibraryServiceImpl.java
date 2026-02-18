@@ -10,7 +10,8 @@ import ru.nabokovsg.referencebooks.exceptions.BadRequestException;
 import ru.nabokovsg.referencebooks.exceptions.NotFoundException;
 import ru.nabokovsg.referencebooks.mapper.DiagnosisLibraryMapper;
 import ru.nabokovsg.referencebooks.model.DiagnosisLibrary;
-import ru.nabokovsg.referencebooks.model.ExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.BadRequestExceptionMassage;
+import ru.nabokovsg.referencebooks.model_enum.NotFoundExceptionMassage;
 import ru.nabokovsg.referencebooks.repository.DiagnosisLibraryRepository;
 import ru.nabokovsg.referencebooks.search.SearchService;
 import ru.nabokovsg.referencebooks.toStringService.ToStringService;
@@ -29,7 +30,6 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
     private final EquipmentLibraryService equipmentService;
     private final SearchService searchService;
     private final ToStringService toString;
-    private final static String MASSAGE = "Диагностика не обнаружена.";
 
     @Override
     public ResponseShortDiagnosisLibraryDto save(NewDiagnosisLibraryDto diagnosisDto) {
@@ -74,12 +74,12 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
             repository.deleteById(id);
             return;
         }
-        throw new NotFoundException(MASSAGE);
+        throw new NotFoundException(NotFoundExceptionMassage.DIAGNOSIS.label);
     }
 
     private DiagnosisLibrary getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(MASSAGE));
+                .orElseThrow(() -> new NotFoundException(NotFoundExceptionMassage.DIAGNOSIS.label));
     }
 
     private void build(DiagnosisLibrary diagnosisLibrary, List<String> measurementsType, Long equipmentId) {
@@ -103,7 +103,7 @@ public class DiagnosisLibraryServiceImpl implements DiagnosisLibraryService {
             }
         }
         if (exists) {
-            throw new BadRequestException(String.join("", ExceptionMassage.DUPLICATE.label,
+            throw new BadRequestException(String.join("", BadRequestExceptionMassage.DUPLICATE.label,
                     String.join(" ", diagnosisLibrary.getDiagnosis()
                             , "для", diagnosisLibrary.getEquipment().getEquipmentFullName())));
         }
