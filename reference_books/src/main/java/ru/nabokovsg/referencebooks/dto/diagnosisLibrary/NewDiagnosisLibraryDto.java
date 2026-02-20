@@ -1,10 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.diagnosisLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +21,7 @@ public class NewDiagnosisLibraryDto {
     @Schema(description = "Наименование диагностики")
     @NotNull(message = "diagnosis should not be null")
     @NotBlank(message = "diagnosis should not be blank")
+    @Max(value = 120, message = "diagnosis can't be more than 120")
     private String diagnosis;
     @Schema(description = "Типы выполняемых измерений при диагностики")
     @NotNull(message = "measurementsType should not be null")

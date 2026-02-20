@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.equipmentLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,16 +20,19 @@ public class NewEquipmentLibraryDto {
     @Schema(description = "Полное наименование")
     @NotNull(message = "fullName should not be null")
     @NotBlank(message = "fullName should not be blank")
+    @Max(value = 120, message = "fullName can't be more than 120")
     private String fullName;
     @Schema(description = "Краткое наименование")
     @NotNull(message = "shortName should not be null")
     @NotBlank(message = "shortName should not be blank")
+    @Max(value = 120, message = "shortName can't be more than 120")
     private String shortName;
     @Schema(description = "Объем оборудования типа ёмкость")
     @Positive(message = "volume can only be positive")
     private Integer volume;
     @Schema(description = "Модель")
     @NotBlank(message = "model should not be blank")
+    @Max(value = 120, message = "model can't be more than 120")
     private String model;
     @Schema(description = "Период стабилизации основания")
     @Positive(message = "periodStabilization can only be positive")

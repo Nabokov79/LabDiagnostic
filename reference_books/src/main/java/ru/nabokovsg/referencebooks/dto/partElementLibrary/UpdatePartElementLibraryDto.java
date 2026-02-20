@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.partElementLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -25,9 +26,11 @@ public class UpdatePartElementLibraryDto {
     @Schema(description = "Наименование подэлемента")
     @NotNull(message = "name should not be null")
     @NotBlank(message = "name should not be blank")
+    @Max(value = 120, message = "name can't be more than 120")
     private String name;
     @Schema(description = "Место на подэлементе")
     @NotBlank(message = "place should not be blank")
+    @Max(value = 60, message = "place can't be more than 60")
     private String place;
     @Schema(description = "Диаметр (габаритный размер)")
     @Positive(message = "diameter can only be positive")

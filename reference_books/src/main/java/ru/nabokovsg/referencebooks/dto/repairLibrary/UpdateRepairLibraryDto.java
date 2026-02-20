@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.repairLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,7 +24,8 @@ public class UpdateRepairLibraryDto {
     private Long id;
     @Schema(description = "Наименование типа ремонта")
     @NotNull(message = "name should not be null")
-    @NotBlank(message = "repairName should not be blank")
+    @NotBlank(message = "name should not be blank")
+    @Max(value = 60, message = "name can't be more than 60")
     private String name;
     @Schema(description = "Объединить наименование с измерением параметра")
     @NotNull(message = "withoutNamingParameter should not be null")

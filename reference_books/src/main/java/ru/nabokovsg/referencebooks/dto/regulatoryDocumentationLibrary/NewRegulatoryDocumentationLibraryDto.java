@@ -24,15 +24,17 @@ public class NewRegulatoryDocumentationLibraryDto {
     @Schema(description = "Полное наименование документа")
     @NotNull(message = "fullName should not be null")
     @NotBlank(message = "fullName should not be blank")
-    @Max(value = 120, message = "fullName can't be more than 10")
+    @Max(value = 120, message = "fullName can't be more than 120")
     private String fullName;
     @Schema(description = "Тип и номер документа")
     @NotNull(message = "document should not be null")
     @NotBlank(message = "document should not be blank")
+    @Max(value = 120, message = "document can't be more than 120")
     private String document;
     @Schema(description = "Наименование документа")
     @NotNull(message = "documentName should not be null")
     @NotBlank(message = "documentName should not be blank")
+    @Max(value = 240, message = "documentName can't be more than 240")
     private String documentName;
     @Schema(description = "Тип документа")
     @NotNull(message = "documentType should not be null")

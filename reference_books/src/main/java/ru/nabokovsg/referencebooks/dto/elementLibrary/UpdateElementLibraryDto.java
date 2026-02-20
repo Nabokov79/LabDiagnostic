@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.elementLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,8 +20,9 @@ public class UpdateElementLibraryDto {
     @Positive(message = "id can only be positive")
     private Long id;
     @Schema(description = "Наименование элемента")
-    @NotBlank(message = "element name should not be blank")
     @NotNull(message = "element name should not be null")
+    @NotBlank(message = "element name should not be blank")
+    @Max(value = 120, message = "name can't be more than 120")
     private String name;
     @Schema(description = "Диаметр (габаритный размер)")
     @Positive(message = "diameter can only be positive")

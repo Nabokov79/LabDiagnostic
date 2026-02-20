@@ -1,6 +1,7 @@
 package ru.nabokovsg.referencebooks.dto.heatSupplySourceLibrary;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,6 +24,7 @@ public class NewHeatSupplySourceLibraryDto {
     @Schema(description = "Aдрес")
     @NotNull(message = "address should not be null")
     @NotBlank(message = "address should not be blank")
+    @Max(value = 120, message = "address can't be more than 120")
     private String address;
     @Schema(description = "Идентификатор подразделения")
     @NotNull(message = "department id should not be null")
